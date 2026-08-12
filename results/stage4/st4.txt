@@ -1,0 +1,60 @@
+HuggingFaceTB/SmolLM2-135M-Instruct
+  d = 576, N = 49152, layers = 30
+  tied embeddings : True
+  final norm      : LlamaRMSNorm (eps=1e-05, gain=yes)
+  lm_head bias    : no
+
+corpus: 20 general + 20 polysemy (10 minimal pairs) = 40 sentences   using 40
+
+========================================================================
+EXTRACT
+========================================================================
+40 sentences, 532 token positions, 9 layers analysed  (3.7s)
+
+========================================================================
+LAYER-WISE PER-DIMENSION LOG-VOLUME  (k-stable; the primary quantity)
+========================================================================
+NOTE: k is held FIXED at 5 for cross-layer comparability; k_sel is
+what the cond_eff<=1e2 rule would choose, reported for diagnosis.
+
+ layer  logvol/k mean       std  k_sel med  cond_eff med   entropy     n
+     1        -1.0691    0.6104          9          84.2     1.070   532
+     5        -1.8485    0.6895          7          76.0     1.258   532
+    10        -2.1166    0.4653          6          70.9     1.312   532
+    15        -2.7868    1.3046          6          58.5     1.422   532
+    20        -3.3545    1.2737          5          61.9     1.261   532
+    25        -3.9180    1.2259          9          82.8     1.429   532
+    28        -3.9843    1.1691         12          87.1     2.016   532
+    29        -3.7349    0.8375         19          88.4     2.911   532
+    30        -3.5750    0.5880         26          91.6     3.642   532
+
+  highest volume: layer 1 (-1.069)   lowest: layer 28 (-3.984)
+
+========================================================================
+E2  ADJUDICATION -- four instruments, identical activations
+========================================================================
+computing intrinsic curvature on 40 of 4788 points (~9 s each)...
+   10/40  (34s)
+   20/40  (65s)
+   30/40  (97s)
+   40/40  (131s)
+
+instrument                               median                      range
+1. intrinsic Fisher-Rao K (this work)   2.6015e-01 [ 1.490e-01,  9.695e-01]
+2. local-PCA residual (Mabrok)       2.3974e-02 [ 1.603e-04,  9.816e-02]
+3. Frenet under U^T U (Manson)       1.8625e-04 [ 3.710e-08,  1.113e-02]
+4. Euclidean angle (King et al.)     1.9716e+00 [ 1.557e+00,  2.252e+00]
+
+Pairwise Spearman rank correlations (n = 40):
+   1.  vs 2. :  rho = -0.239  <-- proxies vs intrinsic
+   1.  vs 3. :  rho = +0.192  <-- proxies vs intrinsic
+   1.  vs 4. :  rho = +0.099  <-- proxies vs intrinsic
+   2.  vs 3. :  rho = -0.069
+   2.  vs 4. :  rho = +0.305
+   3.  vs 4. :  rho = +0.685
+
+  RQ2b: intrinsic K = 2.602e-01 vs Mabrok-style proxy = 2.397e-02
+        ratio = 10.9x  -- the two instruments do not
+        measure the same thing, as 01-literature-review.md S6 predicted.
+
+wrote results\stage4\stage4.json

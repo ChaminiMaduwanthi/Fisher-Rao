@@ -1,0 +1,67 @@
+
+======================================================================
+GATE B  validation ladder -- torch/autodiff implementation
+======================================================================
+  rung 3  categorical simplex (n=4)      K = +0.25   worst |err| = 3.16e-15   PASS
+  rung 6  univariate Gaussian            K = -0.50   worst |err| = 3.89e-16   PASS
+  rung 2  Poincare half-plane            K = -1.00   worst |err| = 7.77e-16   PASS
+
+  scalar R, simplex n=4 (k=3)                R = +1.50   rel.err = 1.66e-13   PASS
+  scalar R, simplex n=6 (k=5)                R = +5.00   rel.err = 1.42e-15   PASS
+  scalar R, simplex n=7 (k=6)                R = +7.50   rel.err = 2.25e-15   PASS
+
+  GATE B: PASS -- proceeding to real activations
+
+HuggingFaceTB/SmolLM2-135M-Instruct: d=576, layers=30
+
+======================================================================
+3.8  FRAME INVARIANCE  (curvature must not depend on basis rotation)
+======================================================================
+  layer 10:  R = +7.319908e+00   rotated = +7.319908e+00   rel.diff = 2.59e-11
+  layer 20:  R = +1.108268e+01   rotated = +1.108268e+01   rel.diff = 1.12e-11
+  layer 30:  R = +8.575225e+00   rotated = +8.575225e+00   rel.diff = 2.32e-13
+
+  worst rel.diff = 2.59e-11   PASS
+
+======================================================================
+INTRINSIC FISHER-RAO CURVATURE  (k = 6, radial direction quotiented)
+======================================================================
+Absolute K is pinned near the ambient simplex value +0.25, so the
+model-specific signal is the DEVIATION.  Exact references at k=6:
+    K_simplex = +0.25          R_simplex = k(k-1)/4 = 7.50
+Both validated to machine precision above.
+
+ layer    K median   dK median     dK IQR   scalar R        dR   dR rel   log vol  k_eff
+     1     0.24975   -9.15e-04   1.21e-02     16.928    +9.428  +125.7%    -17.39      7
+     5     0.25008   +6.81e-05   5.19e-04      8.082    +0.582    +7.8%    -14.42      5
+    10     0.25003   +2.32e-05   1.34e-04      7.320    -0.180    -2.4%    -14.26      5
+    15     0.25081   +7.40e-04   1.64e-03      7.809    +0.309    +4.1%    -17.08      5
+    20     0.25050   +4.88e-04   1.39e-03     11.083    +3.583   +47.8%    -19.30      4
+    25     0.25110   +9.65e-04   4.91e-03     18.570   +11.070  +147.6%    -23.36      5
+    28     0.25735   +7.00e-03   1.07e-02     10.065    +2.565   +34.2%    -21.07     12
+    29     0.25266   +2.60e-03   3.41e-03      7.040    -0.460    -6.1%    -20.76     27
+    30     0.24683   -3.95e-03   4.48e-02      8.575    +1.075   +14.3%    -21.71     86
+
+  ABSOLUTE K:  median 0.2468..0.2574, K>0 in 100%..100% of planes
+     -> strongly POSITIVELY curved.  Mabrok's proxy reports ~1e-5,
+        four orders of magnitude smaller (RQ2b).
+
+  DEVIATION dR/R_ref: -6.1% .. +147.6%  <- the model-specific signal
+     most simplex-like : layer 29 (dR/R = -6.1%)
+     most anomalous    : layer 25 (dR/R = +147.6%)
+  dK IQR spread: 1.3e-04 .. 4.5e-02  (333x)  <- anisotropy varies with depth
+
+======================================================================
+3.12  SENSITIVITY TO THE RETAINED RANK k  (layer 20)
+======================================================================
+   k      K median    K>0       scalar R
+   3    2.6361e-01   100%     1.6908e+00
+   4    2.5248e-01   100%     3.2184e+00
+   5    2.5443e-01   100%     6.4608e+00
+   6    2.5062e-01   100%     1.1083e+01
+   7    2.5013e-01   100%     1.2111e+01
+
+  If the conclusions move with k, curvature is not identifiable
+  from this metric and that is itself the finding (02-research-gap.md S6).
+
+wrote results\stage3\stage3.json

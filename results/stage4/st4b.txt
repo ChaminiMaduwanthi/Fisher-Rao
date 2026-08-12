@@ -1,0 +1,104 @@
+Loading weights:   0%|          | 0/272 [00:00<?, ?it/s]Loading weights:  86%|████████▌ | 234/272 [00:00<00:00, 2333.73it/s]Loading weights: 100%|██████████| 272/272 [00:00<00:00, 2389.62it/s]
+HuggingFaceTB/SmolLM2-135M-Instruct
+  d = 576, N = 49152, layers = 30
+  tied embeddings : True
+  final norm      : LlamaRMSNorm (eps=1e-05, gain=yes)
+  lm_head bias    : no
+
+corpus: 20 general + 20 polysemy (10 minimal pairs) = 40 sentences   using 40
+
+========================================================================
+EXTRACT
+========================================================================
+40 sentences, 541 token positions, 9 layers analysed  (8.3s)
+
+========================================================================
+LAYER-WISE PER-DIMENSION LOG-VOLUME  (k-stable; the primary quantity)
+========================================================================
+NOTE: k is held FIXED at 5 for cross-layer comparability; k_sel is
+what the cond_eff<=1e2 rule would choose, reported for diagnosis.
+
+ layer  logvol/k mean       std  k_sel med  cond_eff med   entropy     n
+     1        -1.0582    0.6072          9          85.2     1.129   541
+     5        -1.8529    0.6946          7          78.5     1.253   541
+    10        -2.1219    0.4465          6          69.6     1.318   541
+    15        -2.7807    1.2932          6          60.6     1.404   541
+    20        -3.3347    1.2795          6          62.6     1.246   541
+    25        -3.8570    1.2516          9          82.8     1.482   541
+    28        -3.9135    1.1953         14          89.2     2.157   541
+    29        -3.6941    0.8304         21          89.3     3.106   541
+    30        -3.5781    0.5761         28          89.8     3.863   541
+
+  highest volume: layer 1 (-1.058)   lowest: layer 28 (-3.914)
+
+========================================================================
+E2  ADJUDICATION -- four instruments, identical activations
+========================================================================
+computing intrinsic curvature on 360 of 4869 points (40/layer, stratified; ~3 s each)...
+   20/360  (110s)
+   40/360  (221s)
+   60/360  (337s)
+   80/360  (449s)
+   100/360  (562s)
+   120/360  (673s)
+   140/360  (781s)
+   160/360  (893s)
+   180/360  (1002s)
+   200/360  (1115s)
+   220/360  (1230s)
+   240/360  (1339s)
+   260/360  (1454s)
+   280/360  (1574s)
+   300/360  (1693s)
+   320/360  (1807s)
+   340/360  (1927s)
+   360/360  (2013s)
+
+instrument                               median                      range
+1. intrinsic Fisher-Rao K (this work)   2.5648e-01 [-5.123e-01,  1.666e+01]
+2. local-PCA residual (Mabrok)       1.9416e-02 [ 1.673e-04,  9.941e-02]
+3. Frenet under U^T U (Manson)       4.7521e-04 [ 3.784e-08,  2.293e-02]
+4. Euclidean angle (King et al.)     1.9892e+00 [ 1.076e+00,  2.826e+00]
+
+Pairwise Spearman rank correlations (n = 360):
+   1.  vs 2. :  rho = -0.144  <-- proxies vs intrinsic
+   1.  vs 3. :  rho = +0.133  <-- proxies vs intrinsic
+   1.  vs 4. :  rho = +0.137  <-- proxies vs intrinsic
+   2.  vs 3. :  rho = +0.071
+   2.  vs 4. :  rho = +0.178
+   3.  vs 4. :  rho = +0.248
+
+========================================================================
+POSITIVE CONTROL  does intrinsic K carry real signal?
+========================================================================
+  K median 0.2565  IQR 0.0183  CV 2.954  range [-0.512,16.660]
+  K vs scalar R (same geometry, independent contraction): rho = +0.720
+  PASS -- K has real variance, so the nulls above are informative
+
+========================================================================
+LAYER CONFOUND  pooled vs within-layer correlations
+========================================================================
+  intrinsic K  vs layer: rho = -0.191
+  PCA proxy    vs layer: rho = -0.120
+  Manson       vs layer: rho = -0.724
+  King         vs layer: rho = -0.381
+
+  pair                            pooled   within-layer mean  layers
+  intrinsic_K vs pca              -0.144              +0.000       9
+  intrinsic_K vs manson           +0.133              -0.003       8
+  intrinsic_K vs king             +0.137              +0.112       9
+  manson vs king                  +0.248              +0.063       8
+
+  A conclusion only counts if it survives the within-layer column.
+
+  Magnitudes: intrinsic K = 2.565e-01, local-PCA proxy = 1.942e-02 (ratio 13.2x).
+  NOTE this does NOT replicate Mabrok's published ~1e-5; see
+  07-stage4-log.md S1.1(b).  The correlations, not the magnitudes,
+  are the defensible result.
+
+wrote results\stage4\stage4.json
+itudes,
+  are the defensible result.
+
+wrote results\stage4\stage4.json
+exit=0

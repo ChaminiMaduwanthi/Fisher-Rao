@@ -1,0 +1,11 @@
+  k          L5        L10        L20        L25        L29   ranking (most anomalous first)
+  4      +7.4%      -7.9%      +7.3%      +0.6%      +2.4%   L5 > L20 > L29 > L25 > L10
+  5      +3.4%      +1.0%     +29.2%     +70.5%      +1.2%   L25 > L20 > L5 > L29 > L10
+  6      +7.8%      -2.4%     +47.8%    +147.6%      -6.1%   L25 > L20 > L5 > L10 > L29
+  7    +583.5%     +48.5%     +15.3%    +208.0%      -1.6%   L5 > L25 > L10 > L20 > L29
+
+Spearman rank correlation of the layer ordering between k values:
+   k=4 vs k=5:  rho = +0.300
+   k=5 vs k=6:  rho = +0.900
+   k=6 vs k=7:  rho = +0.500
+   k=4 vs k=7:  rho = +0.200

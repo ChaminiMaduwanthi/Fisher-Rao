@@ -1,0 +1,12 @@
+Per layer: k_eff, and dR/R_ref at k below / at / above k_eff.
+Also cond_eff of the RETAINED subspace at each k -- the diagnostic that
+should explain any blow-up.
+
+layer  k_eff |                    k=3                   k=4                   k=5                   k=6                   k=7
+             |        dR/R       cond       dR/R       cond       dR/R       cond       dR/R       cond       dR/R       cond
+    5      5 |     +34.8%     5.8e+00     +7.4%     9.3e+00     +3.4%     2.8e+01     +7.8%*    4.6e+02   +583.5%*    6.4e+02
+   10      5 |     +11.2%     6.4e+00     -7.9%     1.1e+01     +1.0%     1.5e+01     -2.4%*    4.6e+02    +48.5%*    6.1e+02
+   20      4 |     +12.7%     1.4e+01     +7.3%     5.2e+01    +29.2%*    1.2e+02    +47.8%*    4.6e+02    +15.3%*    8.6e+02
+   25      5 |     +20.4%     3.4e+01     +0.6%     1.3e+02    +70.5%     1.9e+02   +147.6%*    3.0e+02   +208.0%*    4.9e+02
+
+  * marks k > k_eff (retaining directions outside the effective subspace)
