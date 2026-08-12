@@ -159,7 +159,7 @@ def fig2():
     ax = axes[1]
     ax.plot(vlay, lv_real, "o-", color=REAL, ms=3.4, lw=1.3)
     ax.plot(vlay, lv_scr, "s--", color=SCR, ms=3.2, lw=1.3)
-    ax.set_title("(b) log volume element\n" + r"$\bf{reproduced}$ ($\rho=+0.97$)",
+    ax.set_title("(b) log volume element\n" + r"$\bf{reproduced}$ ($\rho=+0.96$)",
                  fontsize=8, pad=4)
     ax.set_ylabel(r"$\log\sqrt{\det G}$")
 

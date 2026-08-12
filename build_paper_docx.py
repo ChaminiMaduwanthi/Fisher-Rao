@@ -156,12 +156,31 @@ def build_body(md: str, figs: dict) -> str:
     i = 0
     cols_state = 1            # the title block is single-column
     pending_table: list[list[str]] = []
+    cap_idx: int | None = None
 
     def flush_table(full: bool):
-        nonlocal pending_table
-        if pending_table:
-            out.append(table(pending_table, FULL_IN if full else COL_IN))
-            pending_table = []
+        """Emit the pending table.
+
+        A table with many narrow columns is unreadable squeezed into one IEEE
+        column, so tables past a column threshold are promoted to full width by
+        wrapping them -- and their caption -- in their own single-column
+        continuous section.  In OOXML the paragraph *carrying* a sectPr is the
+        LAST paragraph of that section, hence the break goes in before the
+        caption and the closing break after the table.
+        """
+        nonlocal pending_table, cap_idx
+        if not pending_table:
+            return
+        wide = full or len(pending_table[0]) >= 7
+        if wide:
+            at = cap_idx if cap_idx is not None else len(out)
+            out.insert(at, para("", "BodyText", sect=sectpr(2)))
+            out.append(table(pending_table, FULL_IN))
+            out.append(para("", "BodyText", sect=sectpr(1)))
+        else:
+            out.append(table(pending_table, COL_IN))
+        pending_table = []
+        cap_idx = None
 
     while i < len(lines):
         ln = lines[i].rstrip()
@@ -230,6 +249,7 @@ def build_body(md: str, figs: dict) -> str:
 
         # ---- table captions ----------------------------------------------
         if ln.startswith("**TABLE "):
+            cap_idx = len(out)
             out.append(para(re.sub(r"^TABLE\s+[IVX]+\.\s*", "",
                                    ln.strip("*")), "tablehead", jc="center"))
             continue
@@ -241,15 +261,15 @@ def build_body(md: str, figs: dict) -> str:
 
         # ---- lists --------------------------------------------------------
         if re.match(r"^[-*] ", ln):
-            out.append(para("• " + ln[2:], "bulletlist"))
+            out.append(para(ln[2:], "bulletlist"))
             continue
         if re.match(r"^\d+\. ", ln):
-            out.append(para(ln, "bulletlist"))
+            out.append(para(ln, "BodyText", jc="both"))
             continue
 
         # ---- references ---------------------------------------------------
         if re.match(r"^\[\d+\] ", ln):
-            out.append(para(ln, "references"))
+            out.append(para(re.sub(r"^\[\d+\]\s*", "", ln), "references"))
             continue
 
         out.append(para(ln, "BodyText", jc="both"))
