@@ -171,7 +171,7 @@ With the clean paired scramble — `p` untouched, direction set identical, only 
 | 5 | 60 | 0.2555 | 0.0003 | 55/60 | **+6.45** |
 | **5** | **221** | **0.2546** | **0.0109** | **201/221** | **+12.18** |
 
-The last row is the full point file; the n = 60 and n = 126 rows quoted elsewhere are earlier checkpoints of the same run, and every shared row agrees to 1e−12 ([12-audit-log.md](12-audit-log.md) §3).
+The last row is the full point file; the n = 60 and n = 126 rows quoted elsewhere are earlier checkpoints of the same run, and every shared row agrees to 1e−12 ([12-audit-log.md](../12-audit-log.md) §3).
 | 6 | 60 | 0.2537 | 0.0297 | 51/60 | **+5.42** |
 
 And it is not conditioning: matching `cond_eff` between the arms (21.4 vs 25.8) leaves the effect intact.

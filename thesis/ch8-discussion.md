@@ -55,7 +55,7 @@ Stated plainly, because several of these were claimed at some point in the work 
 
 **2. Scale up.** GPT-2 XL and Pythia-2.8B, which also enables the like-for-like comparison to King et al. that §8.2 says is currently impossible.
 
-**3. Chase the negative-curvature minority.** 10.7% of points carry a negatively curved plane. They are not conditioning failures (`cond_eff` z = −1.39, n.s.) and not an entropy effect (z = −0.45, n.s.), and they carry **2.03× the median effective dimension at indistinguishable entropy** (248 vs 122; AUC 0.618, z = +2.69). This is the only place absolute curvature carries a model-specific signal that has survived a control — but it is a modest effect, and the ρ = +0.42 originally reported for it was a rank-tie artefact ([12-audit-log.md](12-audit-log.md) §2).
+**3. Chase the negative-curvature minority.** 10.7% of points carry a negatively curved plane. They are not conditioning failures (`cond_eff` z = −1.39, n.s.) and not an entropy effect (z = −0.45, n.s.), and they carry **2.03× the median effective dimension at indistinguishable entropy** (248 vs 122; AUC 0.618, z = +2.69). This is the only place absolute curvature carries a model-specific signal that has survived a control — but it is a modest effect, and the ρ = +0.42 originally reported for it was a rank-tie artefact ([12-audit-log.md](../12-audit-log.md) §2).
 
 **4. Connect the causal and behavioural experiments.** Perturb along high-curvature directions *at the disambiguation layer* and test whether the resolved sense flips. This links Chapter 7 §7.2 to §7.3 and would be the strongest single result the framework could produce.
 
