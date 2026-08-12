@@ -8,7 +8,6 @@
 
 | File | Contents | Audience |
 |---|---|---|
-| [00-SINHALA-GUIDE.md](00-SINHALA-GUIDE.md) | සිංහල මාර්ගෝපදේශය — everything below, explained simply | You |
 | [01-literature-review.md](01-literature-review.md) | 20+ papers across 5 research streams; what each does and fails to do | Supervisor, Ch. 2–3 |
 | [02-research-gap.md](02-research-gap.md) | The gap, 5 research questions, 6 claimed contributions, honest risk assessment | Supervisor, Ch. 1 |
 | [03-methodology.md](03-methodology.md) | The mathematics, the singularity problem, the validation ladder, 5 experiments | Ch. 4–5 |
@@ -35,7 +34,7 @@
 | [run_stage4.py](run_stage4.py) / [run_polysemy.py](run_polysemy.py) | E2 adjudication; RQ3b ambiguity localisation | Stage 4 |
 | [run_control.py](run_control.py) / [check_polysemy.py](check_polysemy.py) | Controls: **+1/4 is not a construction artifact**; **narrowed** the RQ3b claim to scale-invariance | Stage 3–4 |
 
-**Start here:** [00-SINHALA-GUIDE.md](00-SINHALA-GUIDE.md) → [02-research-gap.md](02-research-gap.md) → [04-stage-plan.md](04-stage-plan.md) Stage 0.
+**Start here:** [02-research-gap.md](02-research-gap.md) → [04-stage-plan.md](04-stage-plan.md) Stage 0.
 
 ---
 

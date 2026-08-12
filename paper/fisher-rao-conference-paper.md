@@ -179,7 +179,7 @@ By contrast, the scrambled log-volume profile has its minimum at the same layer 
 | layer | 1 | 5 | 10 | 15 | 20 | 25 | 28 | 29 | 30 |
 |---|---|---|---|---|---|---|---|---|---|
 | real | 14 | 8 | **6** | 7 | 6 | 22 | 77 | 167 | 217 |
-| scrambled | 13 | 8 | **5** | 6 | 6 | 24 | 54 | 150 | 215 |
+| scram. | 13 | 8 | **5** | 6 | 6 | 24 | 54 | 150 | 215 |
 
 The interpretation is direct. Quantities computed from the *spectrum* of `G(h)` — its determinant, its eigenvalue decay — are reproduced by a structure-free control at matched entropy, so they are largely restatements of the predictive concentration profile. Curvature requires the *second derivatives* of the metric, and it is the quantity that collapses.
 
@@ -193,8 +193,8 @@ The collapse is not uniform. Table V gives the fraction of the real curvature re
 
 | layer | 1 | 5 | 10 | 15 | 20 | 25 | 28 | 29 | 30 |
 |---|---|---|---|---|---|---|---|---|---|
-| retained | 2.3 % | 2.3 % | 1.5 % | 1.7 % | −5.3 % | −95.5 % | 7.0 % | 25.8 % | 61.4 % |
-| sign test | 19/21 | 17/17 | 22/25 | 23/24 | 28/29 | 20/20 | 20/23 | 30/35 | 22/27 |
+| retained | 2.3% | 2.3% | 1.5% | 1.7% | −5.3% | −95.5% | 7.0% | 25.8% | 61.4% |
+| sign | 19/21 | 17/17 | 22/25 | 23/24 | 28/29 | 20/20 | 20/23 | 30/35 | 22/27 |
 
 The learned assignment does nearly all the work through the middle of the network and least at the two ends — where context has not yet been integrated, and where the prediction is already committed and concentration alone largely fixes the geometry.
 

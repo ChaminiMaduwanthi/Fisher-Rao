@@ -115,8 +115,12 @@ def image_para(rid: str, w_in: float, path: str, name: str) -> str:
 def table(rows: list[list[str]], width_in: float) -> str:
     ncol = max(len(r) for r in rows)
     tw = int(width_in * 1440)                      # twips
-    cw = tw // ncol
-    grid = "".join(f'<w:gridCol w:w="{cw}"/>' for _ in range(ncol))
+    # Wide tables (the 10-column layer sweeps) wrap their row labels into
+    # unreadable stacks under equal widths, so the label column gets more room.
+    lead = 2.2 if ncol >= 8 else 1.0
+    cw = int(tw / (ncol - 1 + lead))
+    widths = [int(cw * lead)] + [cw] * (ncol - 1)
+    grid = "".join(f'<w:gridCol w:w="{w}"/>' for w in widths)
     body = []
     for i, row in enumerate(rows):
         cells = []
@@ -125,7 +129,7 @@ def table(rows: list[list[str]], width_in: float) -> str:
             style = "tablecolhead" if i == 0 else "tablecopy"
             jc = "center" if (i == 0 or j > 0) else "left"
             cells.append(
-                f'<w:tc><w:tcPr><w:tcW w:w="{cw}" w:type="dxa"/>'
+                f'<w:tc><w:tcPr><w:tcW w:w="{widths[j]}" w:type="dxa"/>'
                 '<w:vAlign w:val="center"/></w:tcPr>'
                 + f"<w:p><w:pPr><w:pStyle w:val=\"{style}\"/>"
                   f'<w:jc w:val="{jc}"/><w:spacing w:before="20" w:after="20"/>'

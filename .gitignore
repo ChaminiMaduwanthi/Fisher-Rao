@@ -11,8 +11,10 @@ results/xl_check.log
 # rendered previews, regenerable from the markdown
 paper/_preview/
 
-# internal drafts, not part of the record
+# internal drafts and personal notes, not part of the record
 drafts/
+00-SINHALA-GUIDE.md
+dbg_scramble.py
 
 .DS_Store
 Thumbs.db
