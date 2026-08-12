@@ -1,0 +1,402 @@
+% References for: Information-Geometric Curvature Analysis of Transformer
+% Representations Using Fisher-Rao Metrics
+% Compiled 2026-08-10
+%
+% VERIFICATION STATUS
+%   [FULL]  read at full-text or methods-section level
+%   [ABS]   read at abstract/summary level only -- VERIFY author lists, page
+%           numbers and venues against the original before submitting.
+%
+% Preprint metadata (especially author lists and venue) must be re-checked at
+% write-up time; several of these are recent and may now be published.
+
+% ============================================================
+% STREAM A -- Fisher-Rao pullback metrics on transformers
+% ============================================================
+
+@article{mabrok2026latent,
+  title   = {Latent Semantic Manifolds in Large Language Models},
+  author  = {Mabrok, Mohamed A.},
+  journal = {arXiv preprint arXiv:2603.22301},
+  year    = {2026},
+  month   = mar,
+  note    = {[FULL] THE key paper. Derives G(h) = W'(diag(p)-pp')W
+             (Prop. 5.2). Defines Riemann tensor (Def. 9.1) and sectional
+             curvature (Def. 9.2) but computes NEITHER -- uses local-PCA
+             curvature and second fundamental form proxies instead.
+             Reports curvature ~1e-5, "broadly stable across layers".
+             Concedes true Riemann curvature "computationally intractable".
+             Six architectures, 124M-1.5B. Hourglass intrinsic dimension,
+             1-3% of ambient. Expressibility gap, slopes 0.87-1.12,
+             R^2 > 0.985. No explicit limitations/future work section.
+             Appears to assume tied embedding/unembedding weights.}
+}
+
+@article{wang2026fishback,
+  title   = {FishBack: Pullback Fisher Geometry for Optimal Activation
+             Steering in Transformers},
+  author  = {Wang, Sihan and Zhao, Jiayi},
+  journal = {arXiv preprint arXiv:2605.17231},
+  year    = {2026},
+  month   = may,
+  note    = {[FULL] Same pullback Fisher metric G = J'HJ. Thm 3.3 gives the
+             layer recursion G^(l) = A_l' G^(l+1) A_l with A_l = I + DF_l --
+             REUSE THIS. Fisher deviates >97% from Euclidean in relative
+             spectral norm on GPT-2; effective dimensionality only 2-17% of
+             ambient. Recipe: Jacobian via 768 backward passes, Fisher from
+             top-5000 tokens by probability mass, adaptive Tikhonov
+             alpha = c*lambda_median(G). EXPLICITLY computes no Christoffel
+             symbols, no Riemann tensor, no curvature -- spectra only.
+             GPT-2 small only; flags Jacobian cost at larger scale.}
+}
+
+@article{zaher2026geometric,
+  title   = {The Geometric Wall: Manifold Structure Predicts Layerwise
+             Sparse Autoencoder Scaling Laws},
+  author  = {Zaher, Eslam and Trzaskowski, Maciej and Nguyen, Quan and
+             Roosta, Fred},
+  journal = {arXiv preprint arXiv:2605.09887},
+  year    = {2026},
+  month   = may,
+  note    = {[ABS] Rank bound rank G(h) <= min(N-1, rank J). CAUTION: this
+             bound is NON-BINDING in our regime -- with d ~ 768 and
+             N ~ 50000 it reduces to d whenever J has full column rank. It
+             bites only when J is itself low-rank, i.e. for deep pullbacks
+             through many residual blocks. Do NOT cite it as evidence that
+             G is singular; see conditioning_check.py, which shows G is
+             generically full rank and the real obstacle is conditioning.
+             PDF text extraction FAILED; obtain HTML/LaTeX and re-read.}
+}
+
+% ============================================================
+% STREAM B -- Curvature of layer-wise LM trajectories
+% ============================================================
+
+@article{manson2025curved,
+  title   = {Curved Inference: Concern-Sensitive Geometry in Large Language
+             Model Residual Streams},
+  author  = {Manson, Rob},
+  journal = {arXiv preprint arXiv:2507.21107},
+  year    = {2025},
+  month   = jul,
+  note    = {[FULL] Uses G = U'U, the unembedding Gram matrix -- CONSTANT and
+             state-independent, therefore identically zero intrinsic
+             curvature. Measures Frenet curvature of a curve in a FLAT
+             space, not curvature of the manifold, and NOT Fisher-Rao
+             (omits Sigma_p entirely). kappa via 3-point central
+             differences; salience S(t) = ||x_{t+1}-x_t||_G.
+             LLaMA 3.2-3b: curvature/salience scale with concern
+             (p=0.006, p=0.016); Gemma 3-1b weak. salience-curvature
+             r = -0.89. Only 20 prompts, 7 domains; 1-3B models; NO
+             behavioural validation. His own future work names "singularity
+             analysis of embedding space combined with contextual
+             curvature" -- i.e. this thesis. See also the Feb 2026
+             consolidated framework paper in Bon View Press AIA.}
+}
+
+@article{king2026representational,
+  title   = {Representational Curvature Modulates Behavioral Uncertainty in
+             Large Language Models},
+  author  = {King, Jack and Fedorenko, Evelina and Hosseini, Eghbal A.},
+  journal = {arXiv preprint arXiv:2604.23985},
+  year    = {2026},
+  month   = apr,
+  note    = {[FULL] MIT; Hosseini now Google DeepMind. "Contextual
+             curvature" = angle between adjacent difference vectors,
+             3-token backward window -- plain EUCLIDEAN, no metric.
+             GPT-2 XL (48 layers), Pythia-2.8B (32 layers); LAMBADA +
+             Universal Dependencies. Middle-layer curvature correlates
+             with next-token entropy, r ~ 0.15 -- THE BASELINE TO BEAT
+             (RQ3a). Coupling emerges during pretraining; only
+             trajectory-aligned perturbations modulate entropy; curvature
+             penalty reduces entropy without hurting val loss.
+             Authors note effects were "small" at limited scale.}
+}
+
+@article{beyondscalars2026,
+  title   = {Beyond Scalars: Evaluating and Understanding LLM Reasoning via
+             Geometric Progress and Stability},
+  journal = {arXiv preprint arXiv:2603.10384},
+  year    = {2026},
+  note    = {[ABS] Trajectory geometry for reasoning quality. Stage 4
+             relevance. VERIFY authors.}
+}
+
+@article{truthtrajectory2026,
+  title   = {Truth as a Trajectory: What Internal Representations Reveal
+             About Large Language Model Reasoning},
+  journal = {arXiv preprint arXiv:2603.01326},
+  year    = {2026},
+  note    = {[ABS] Trajectory geometry and truthfulness. Relevant to RQ3c.
+             VERIFY authors.}
+}
+
+% ============================================================
+% STREAM C -- Intrinsic curvature of NN pullback metrics
+% ============================================================
+
+@inproceedings{zavatoneveth2025training,
+  title     = {How does training shape the Riemannian geometry of neural
+               network representations?},
+  author    = {Zavatone-Veth, Jacob A. and Yang, Sheng and
+               Rubinfien, Julian A. and Pehlevan, Cengiz},
+  booktitle = {NeurIPS Workshop on Symmetry and Geometry in Neural
+               Representations (NeurReps)},
+  year      = {2025},
+  note      = {[FULL] arXiv:2301.11375. Oral at NeurReps 2025; proceedings via
+             PMLR, NOT JMLR -- an earlier draft of this bibliography had the
+             venue wrong. Confirm the exact citation from OpenReview
+             id=BaVIDhh7bj. THE methodological template: pullback metric
+             g_munu = d_mu Phi_i d_nu Phi_i; computes volume element
+             sqrt(det g) AND the Ricci scalar -- genuine intrinsic
+             curvature. Index-symmetry simplification of R (CHECK whether
+             it applies to the Fisher pullback). Needs activations C^k,
+             k>=3: GELU/SiLU fine, ReLU problematic -- favourable for
+             transformers. Handles DEGENERATE metrics via singular
+             semi-Riemannian quotient M/~ with product of NON-ZERO
+             eigenvalues -- directly applicable to the singular Fisher
+             pullback. Volume peaks at decision boundaries, strengthening
+             with depth; lazy regime static. Ricci scalar
+             "computationally expensive and numerically challenging" even
+             for small nets. NO transformers -- CNNs/MLPs on MNIST/CIFAR.
+             Future work explicitly names extension to "pre-trained
+             networks for which one does not have access to training
+             classes" = a pretrained LLM. QUOTE THIS.}
+}
+
+@inproceedings{hauser2017principles,
+  title     = {Principles of Riemannian Geometry in Neural Networks},
+  author    = {Hauser, Michael and Ray, Asok},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2017},
+  note      = {[ABS] Early pullback-metric-across-layers treatment.
+               Historical framing.}
+}
+
+@article{riemanniandiffambient2021,
+  title   = {Riemannian Geometry with differentiable ambient space and
+             metric operator},
+  journal = {arXiv preprint arXiv:2105.01583},
+  year    = {2021},
+  note    = {[ABS] PRACTICALLY THE MOST USEFUL item in Stream C. Computing
+             Christoffel symbols explicitly then forming the Ricci scalar
+             is significantly LESS efficient than alternatives; with
+             autodiff only the contracted form Gamma^k_ij v^i v^j is
+             needed. READ BEFORE WRITING ANY CURVATURE CODE -- may decide
+             the whole implementation strategy. VERIFY authors.}
+}
+
+@article{emergentriemannian2025,
+  title   = {Emergent Riemannian geometry over learning discrete
+             computations on continuous manifolds},
+  journal = {arXiv preprint arXiv:2512.00196},
+  year    = {2025},
+  note    = {[ABS] Stage 1 reading. VERIFY authors.}
+}
+
+@article{rnnwarping2025,
+  title   = {RNNs perform task computations by dynamically warping neural
+             representations},
+  journal = {arXiv preprint arXiv:2512.04310},
+  year    = {2025},
+  note    = {[ABS] Sequence-model geometry. Stage 1 reading.
+             VERIFY authors.}
+}
+
+% ============================================================
+% STREAM D -- Manifold structure of LM representations
+% ============================================================
+
+@inproceedings{valeriani2023geometry,
+  title     = {The geometry of hidden representations of large transformer
+               models},
+  author    = {Valeriani, Lucrezia and Doimo, Diego and Cuturello, Francesca
+               and Laio, Alessandro and Ansuini, Alessio and
+               Cazzaniga, Alberto},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2023},
+  note      = {[ABS] arXiv:2302.00294. Canonical citation for the layer-wise
+               intrinsic-dimension profile: local minimum at 0.3-0.4
+               relative depth, second shallower peak near the end. Needed
+               to justify the manifold hypothesis. VERIFY author list.}
+}
+
+@article{modell2025origins,
+  title   = {The Origins of Representation Manifolds in Large Language
+             Models},
+  author  = {Modell, Alexander and Rubin-Delanchy, Patrick and
+             Whiteley, Nick},
+  journal = {arXiv preprint arXiv:2505.18235},
+  year    = {2025},
+  month   = may,
+  note    = {[ABS] Features are MANIFOLDS, not just linear directions.
+             Cosine similarity may encode intrinsic feature geometry via
+             shortest ON-MANIFOLD (geodesic) paths. Challenges the linear
+             representation hypothesis. Theoretical justification for
+             caring about geodesics rather than straight lines -- cite
+             early.}
+}
+
+@article{shapeoflearning2023,
+  title   = {The Shape of Learning: Anisotropy and Intrinsic Dimensions in
+             Transformer-Based Models},
+  journal = {arXiv preprint arXiv:2311.05928},
+  year    = {2023},
+  note    = {[ABS] Anisotropy of contextual embeddings -- supports the claim
+             that Euclidean coordinates are the wrong frame.
+             VERIFY authors.}
+}
+
+@article{symmetrylanguage2026,
+  title   = {Symmetry in language statistics shapes the geometry of model
+             representations},
+  journal = {arXiv preprint arXiv:2602.15029},
+  year    = {2026},
+  note    = {[ABS] Continuum features (years, number lines) form compact 1D
+             manifolds with "ripples" = extrinsic curvature. STRONG
+             candidate for validation-ladder rung 8: real LM data where
+             the answer is partly known in advance. VERIFY authors.}
+}
+
+@article{comparativeid2024,
+  title   = {A Comparative Study of Learning Paradigms in Large Language
+             Models via Intrinsic Dimension},
+  journal = {arXiv preprint arXiv:2412.06245},
+  year    = {2024},
+  note    = {[ABS] Optional, RQ5. VERIFY authors.}
+}
+
+@article{repslandscape2024,
+  title   = {The representation landscape of few-shot learning and
+             fine-tuning in large language models},
+  journal = {arXiv preprint arXiv:2409.03662},
+  year    = {2024},
+  note    = {[ABS] Optional, RQ5. VERIFY authors.}
+}
+
+% ============================================================
+% STREAM E -- Tooling, Fisher approximation, known-curvature cases
+% ============================================================
+
+@article{lebrigant2023geomstats,
+  title   = {Parametric information geometry with the package Geomstats},
+  author  = {Le Brigant, Alice and Deschamps, Jules and Collas, Antoine and
+             Miolane, Nina},
+  journal = {ACM Transactions on Mathematical Software},
+  year    = {2023},
+  doi     = {10.1145/3627538},
+  note    = {[FULL] arXiv:2211.11643. information_geometry module: Fisher-Rao
+             manifolds for normal, gamma, beta, Dirichlet as RiemannianMetric
+             subclasses, with sectional curvature via the Riemann tensor.
+             USE AS THE INDEPENDENT ORACLE for validation-ladder rungs 3-6.
+             CAUTION: check the sign and normalisation conventions before
+             comparing -- lowered-Riemann index order flips the sign, and
+             radius-2 vs unit-sphere normalisation of the simplex gives a
+             factor of 4. A disagreement of exactly -1x or 4x is a
+             convention mismatch, not a bug.}
+}
+
+@article{utpala2022rieoptax,
+  title   = {Rieoptax: Riemannian Optimization in JAX},
+  journal = {arXiv preprint arXiv:2210.04840},
+  year    = {2022},
+  note    = {[ABS] Exp/log maps, Riemannian distance. Useful if geodesic
+             integration is needed; not Fisher-specific.
+             VERIFY authors.}
+}
+
+@article{kfacfisher2020,
+  title   = {Understanding Approximate Fisher Information for Fast
+             Convergence of Natural Gradient Descent in Wide Neural
+             Networks},
+  journal = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year    = {2020},
+  note    = {[ABS] K-FAC family. CAUTION: this is the Fisher over
+             PARAMETERS (billions of dims), NOT the pullback onto hidden
+             states used in this thesis. Cite only to draw the distinction
+             explicitly. VERIFY authors.}
+}
+
+@article{grosse2023influence,
+  title   = {Studying Large Language Model Generalization with Influence
+             Functions},
+  journal = {arXiv preprint arXiv:2308.03296},
+  year    = {2023},
+  note    = {[ABS] Large-scale K-FAC in practice on LLMs. Parameter-space
+             Fisher. VERIFY authors.}
+}
+
+@article{mff2026,
+  title   = {Scalable Kronecker-Factored Fisher Approximation for Neural
+             Network Parameter Sensitivity},
+  journal = {arXiv preprint arXiv:2505.17974},
+  year    = {2026},
+  note    = {[ABS] Matrix-free Fisher Factorization. Parameter-space.
+             VERIFY authors.}
+}
+
+@article{gaussianrfcurvature2021,
+  title   = {On the curvatures of Gaussian random field manifolds},
+  journal = {arXiv preprint arXiv:2109.09204},
+  year    = {2021},
+  note    = {[ABS] Explicit Fisher-Rao curvature computations. Candidate
+             validation case. VERIFY authors.}
+}
+
+@article{fisherraogeodesics2016,
+  title   = {Geometry of the Fisher-Rao metric on the space of smooth
+             densities},
+  journal = {arXiv preprint arXiv:1607.04550},
+  year    = {2016},
+  note    = {[ABS] Fisher-Rao as the pullback of the L2 metric under the
+             square-root transform -- the cleanest route to the constant
+             +1/4 curvature result for the categorical simplex. Geodesic
+             and curvature formulas as infinite-dimensional analogues of
+             warped products. VERIFY authors.}
+}
+
+% ============================================================
+% FOUNDATIONAL TEXTS
+% ============================================================
+
+@book{amari2016information,
+  title     = {Information Geometry and Its Applications},
+  author    = {Amari, Shun-ichi},
+  publisher = {Springer},
+  series    = {Applied Mathematical Sciences},
+  volume    = {194},
+  year      = {2016},
+  note      = {THE standard reference. Fisher metric, alpha-connections,
+               dually flat structure. Read the Fisher metric and
+               alpha-connection chapters in Stage 0.}
+}
+
+@book{amari2000methods,
+  title     = {Methods of Information Geometry},
+  author    = {Amari, Shun-ichi and Nagaoka, Hiroshi},
+  publisher = {American Mathematical Society},
+  series    = {Translations of Mathematical Monographs},
+  volume    = {191},
+  year      = {2000}
+}
+
+@article{cencov1982statistical,
+  title     = {Statistical Decision Rules and Optimal Inference},
+  author    = {{\v{C}}encov, Nikolai N.},
+  journal   = {Translations of Mathematical Monographs},
+  volume    = {53},
+  publisher = {American Mathematical Society},
+  year      = {1982},
+  note      = {CENCOV'S THEOREM: the Fisher-Rao metric is the UNIQUE metric
+               (up to scale) invariant under sufficient statistics. This is
+               the thesis's central justification for the choice of metric
+               -- a uniqueness result, not a preference. Cite in the
+               introduction and again in the methodology. Verify the exact
+               theorem statement and page in the original.}
+}
+
+@misc{scholarpedia_fisherrao,
+  title  = {Fisher-Rao metric},
+  howpublished = {Scholarpedia},
+  note   = {Fast orientation. Not for citation in the thesis.}
+}
