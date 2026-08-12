@@ -1,0 +1,10 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/272 [00:00<?, ?it/s]Loading weights:  29%|##9       | 80/272 [00:00<00:00, 788.86it/s]Loading weights:  58%|#####8    | 159/272 [00:00<00:00, 760.13it/s]Loading weights:  92%|#########2| 251/272 [00:00<00:00, 825.46it/s]Loading weights: 100%|##########| 272/272 [00:00<00:00, 815.24it/s]
+HuggingFaceTB/SmolLM2-135M-Instruct
+  d = 576, N = 49152, layers = 30
+  tied embeddings : True
+  final norm      : LlamaRMSNorm (eps=1e-05, gain=yes)
+  lm_head bias    : no
+checkpoint: 0 points   budget 300s
+
+screening k_eff on 2500 of 16263 states (cheap; no curvature)...
