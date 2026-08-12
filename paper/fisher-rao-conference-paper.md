@@ -52,28 +52,28 @@ This is a `d × d` matrix, available in closed form and inexpensive to evaluate.
 
 Both normalisation layers annihilate directions exactly. RMSNorm [14] has Jacobian `A = diag(g)(1/r)(I − ĥĥᵀ)` and one null direction, `h` itself. LayerNorm [15] additionally subtracts the mean and so annihilates two: the radial direction and the all-ones direction. `G(h)` is therefore singular by construction, with rank at most `d − 1` or `d − 2`.
 
-Suppressing this with a pseudo-inverse would return a plausible wrong answer. The null space is instead quotiented explicitly: with `N` an orthonormal basis of the null directions and `P = I − N Nᵀ`, curvature is computed on the span of the top-`k` eigenvectors of `P G P`. This construction is falsifiable, and Table I reports the test. On every architecture examined the number of null directions found matches the theoretical prediction, and the model's output is invariant along them to machine precision at a step size large enough to double the norm of the state. The directions the metric calls null are exactly the directions the model cannot see, which establishes that the metric measured is the model's own.
+Suppressing this with a pseudo-inverse would return a plausible wrong answer. The null space is instead quotiented explicitly: with `N` an orthonormal basis of the null directions and `P = I − N Nᵀ`, curvature is computed on the span of the top-`k` eigenvectors of `P G P`. This construction is falsifiable, and Table I reports the test. On every architecture examined the number of null directions found matches the theoretical prediction, and the model's prediction is unmoved along them: stepping by `‖h‖`, which doubles the hidden state, changes the output distribution by a Kullback–Leibler divergence of 10⁻¹³ or less, while a random step of identical size changes it by 3 to 32 nats — a separation of twelve to sixteen orders of magnitude. The directions the metric calls null are exactly the directions the model cannot see, which establishes that the metric measured is the model's own.
 
 **TABLE I. NULL-DIRECTION FALSIFICATION TEST**
 
-| model | norm | null dirs found (expected) | output change along null |
-|---|---|---|---|
-| SmolLM2-135M | RMSNorm | 1 (1) | 5.2 × 10⁻⁸ |
-| LLaMA-160M | RMSNorm | 1 (1) | machine precision |
-| Pythia-70M | LayerNorm | 2 (2) | 3.2 × 10⁻⁷ |
-| Pythia-160M | LayerNorm | 2 (2) | machine precision |
-| GPT-2 | LayerNorm | 2 (2) | 8.4 × 10⁻⁸ |
-| GPT-Neo-125M | LayerNorm | 2 (2) | machine precision |
+| model | norm | null dirs (exp.) | KL along null | KL along random |
+|---|---|---|---|---|
+| SmolLM2-135M | RMSNorm | 1 (1) | 2.8 × 10⁻¹⁵ | 3.76 |
+| LLaMA-160M | RMSNorm | 1 (1) | 3.8 × 10⁻¹⁶ | 2.96 |
+| Pythia-70M | LayerNorm | 2 (2) | 1.6 × 10⁻¹³ | 13.41 |
+| Pythia-160M | LayerNorm | 2 (2) | 2.0 × 10⁻¹³ | 7.79 |
+| GPT-2 | LayerNorm | 2 (2) | 1.2 × 10⁻¹⁵ | 3.70 |
+| GPT-Neo-125M | LayerNorm | 2 (2) | 9.7 × 10⁻¹⁶ | 32.31 |
 
 ### C. Curvature and the working subspace
 
 On the retained `k`-dimensional subspace, Christoffel symbols and the Riemann tensor are formed by nested reverse-mode differentiation of (1), and the sectional curvature of the plane spanned by `u, v` follows in the standard way [16]. All differentiation is reverse-mode automatic differentiation in double precision [17].
 
-The cost of the Riemann tensor grows by a factor of about 2.7 per unit increase in `k`, which places a hard ceiling at `k ≤ 8` on the hardware used. All curvature results below are computed at `k` = 4, 5 and 6, with `k` = 5 as the default, and the retained subspace holds approximately 88 % of the metric's trace. The reported curvature is accordingly that of a `k`-dimensional slice under the induced metric, and the stability of the central result across the accessible range of `k` is reported explicitly in Section V.B.
+The cost of the Riemann tensor grows by a factor of about 2.7 per unit increase in `k`, which places a hard ceiling at `k ≤ 8` on the hardware used. All curvature results below are computed at `k` = 4, 5 and 6, with `k` = 5 as the default, and the retained subspace holds a median 96 % of the quotiented metric's trace at `k` = 5 (mean 91 %, measured over 60 states). The reported curvature is accordingly that of a `k`-dimensional slice under the induced metric, and the stability of the central result across the accessible range of `k` is reported explicitly in Section V.B.
 
-In absolute terms the cost is modest at the working dimension and rises steeply beyond it: a full sectional-curvature evaluation takes about 2.6 s per state at `k` = 5 and about 46 s at `k` = 8 on a single CPU core, which is why the sweep is reported at `k` = 4 to 6. The metric itself, being closed-form, is negligible by comparison; the expense is entirely in the second derivatives. This matters for the recommendation in Section VI, since it is precisely the expensive quantity that turns out to carry the signal.
+In absolute terms the cost is modest at the working dimension and rises steeply beyond it: a full sectional-curvature evaluation takes about 2.6 s per state at `k` = 5 and about 46 s at `k` = 8, which is why the sweep is reported at `k` = 4 to 6. The metric itself, being closed-form, is negligible by comparison; the expense is entirely in the second derivatives. This matters for the recommendation in Section VI, since it is precisely the expensive quantity that turns out to carry the signal.
 
-Measurements are taken on GPT-2 [18], Pythia-70M and Pythia-160M [19], LLaMA-160M and SmolLM2-135M, spanning both normalisation schemes, tied and untied embeddings, depths from 12 to 30 layers and widths from 512 to 768. Text is drawn from WikiText-2 [20] and from hand-written probe sentences; the sense-disambiguation probe of Section V.F follows the design of the word-in-context task [21].
+Measurements are taken on GPT-2 [18], Pythia-70M and Pythia-160M [19], LLaMA-160M and SmolLM2-135M, spanning both normalisation schemes, tied and untied embeddings, depths from 6 to 30 layers and widths from 512 to 768. Text is drawn from WikiText-2 [20] and from hand-written probe sentences; the sense-disambiguation probe of Section V.F follows the design of the word-in-context task [21].
 
 ---
 
@@ -89,14 +89,17 @@ Seven manifolds with analytically known curvature are run through the same code 
 
 | rung | manifold | expected | measured | worst error |
 |---|---|---|---|---|
-| 2 | Poincaré half-plane | K = −1 | −1.000000 | 1.3 × 10⁻¹⁴ |
-| 3 | Categorical simplex | K = +1/4 | +0.250000 | 2.6 × 10⁻¹⁴ |
-| 4 | Gamma family | negative | −0.463903 | 2.5 × 10⁻¹⁴ |
-| 5 | Beta family | negative | −0.456795 | 3.2 × 10⁻¹⁴ |
-| 6 | Univariate Gaussian | K = −1/2 | −0.500000 | 1.1 × 10⁻¹⁶ |
+| 1 | Sphere, radius 2 | K = +1/4 | +0.250000 | 1.8 × 10⁻¹⁵ |
+| 2 | Poincaré half-plane | K = −1 | −1.000000 | 1.0 × 10⁻¹³ |
+| 3 | Categorical simplex | K = +1/4 | +0.250000 | 6.6 × 10⁻¹⁰ |
+| 4 | Gamma family | negative | −0.463903 | 2.3 × 10⁻¹³ * |
+| 5 | Beta family | negative | −0.456795 | 4.9 × 10⁻¹⁴ * |
+| 6 | Univariate Gaussian | K = −1/2 | −0.500000 | 2.6 × 10⁻¹⁵ |
 | 7 | Synthetic pullback | K = +1/4 | +0.250000 | 9.7 × 10⁻¹² |
 
-Rung 3 is load-bearing: the categorical simplex under the full Fisher–Rao metric is isometric to the positive orthant of a radius-2 sphere and therefore has constant `K = +1/4`. It is the same metric family as the object under study.
+Errors are worst-case over twelve random base points and random 2-planes per rung. Rungs 4 and 5 have no closed-form constant, so the starred entries are worst-case disagreement with the independent library of Section III.B rather than with an analytic value; the claim tested for those two families is that the curvature is everywhere negative, and it is.
+
+Rung 3 is load-bearing: the categorical simplex under the full Fisher–Rao metric is isometric to the positive orthant of a radius-2 sphere and so has constant `K = +1/4`. It is the same metric family as the object under study.
 
 Rung 7 validates the assembly of (1) specifically, which no other rung does. With a synthetic linear model `p(h) = softmax(U h)` and `d = N − 1`, the map `h → p` is a diffeomorphism onto the simplex interior, so the pullback metric is the simplex metric in different coordinates and the curvature must be exactly +1/4 for every valid `U`. Three further checks accompany it: reparameterisation invariance under `U → UM`, to which curvature must be blind (worst error 1.9 × 10⁻¹¹); scalar curvature `R = k(k−1)/4` recovered through the pullback (4.9 × 10⁻¹²); and a deliberately broken assembly, with the outer-product term of (1) dropped, which must fail and does, at 0.263. A test that cannot fail carries no information.
 
@@ -104,7 +107,7 @@ Rung 7 validates the assembly of (1) specifically, which no other rung does. Wit
 
 Equation (2) was verified on a real model through a separate code path. Sweeping `ε` produces the expected plateau at relative error 8.7 × 10⁻⁶, confirming that the assembled `G(h)` is the Hessian of the model's own divergence rather than an unrelated quadratic form.
 
-Rungs 2 to 6 were additionally re-run against the `information_geometry` module of an independently implemented, peer-reviewed library [22] on identical inputs. Three families agree at machine precision across eight comparisons: univariate normal to 1.1 × 10⁻¹⁶, gamma to 2.5 × 10⁻¹⁴ and beta to 3.2 × 10⁻¹⁴, the last two being exactly the rungs added for this cross-check. On the two families where the libraries differ, the diagnostic applied was to compare the *metrics* rather than the curvatures: in both cases the metrics agree exactly, to 1 × 10⁻¹² and 7 × 10⁻¹⁵, so the difference is localised to a curvature routine rather than a parameterisation convention. The +1/4 reported here is independently corroborated three ways — by the analytic radius-2 sphere isometry, by rung 3, and by rung 7's separate code path — and the remaining discrepancy is recorded as open.
+Rungs 2 to 6 were additionally re-run against the `information_geometry` module of an independently implemented, peer-reviewed library [22] on identical inputs. Three families agree at machine precision across eight comparisons: univariate normal to 2.2 × 10⁻¹⁶, gamma to 2.3 × 10⁻¹³ and beta to 4.9 × 10⁻¹⁴ at worst, the last two being exactly the rungs added for this cross-check. On the two families where the libraries differ, the diagnostic applied was to compare the *metrics* rather than the curvatures: in both cases the metrics agree exactly, to 1 × 10⁻¹² and 7 × 10⁻¹⁵, so the difference is localised to a curvature routine rather than a parameterisation convention. The +1/4 reported here is independently corroborated three ways — by the analytic radius-2 sphere isometry, by rung 3, and by rung 7's separate code path — and the remaining discrepancy is recorded as open.
 
 ---
 
@@ -177,7 +180,7 @@ The collapse is not uniform across depth. Table V gives the fraction of the real
 | retained | 2.3 % | 2.3 % | 1.5 % | 1.7 % | −5.3 % | −95.5 % | 7.0 % | 25.8 % | 61.4 % |
 | sign | 19/21 | 17/17 | 22/25 | 23/24 | 28/29 | 20/20 | 20/23 | 30/35 | 22/27 |
 
-The learned assignment does nearly all of the work through the middle of the network, where under 3 % of the curvature survives its destruction, and least at the two ends. That pattern matches what the two ends are doing: at layer 1 the context has barely been integrated, so there is less learned assignment to destroy, while by layer 30 the prediction is close to committed and concentration alone fixes much of the geometry. The direction of the effect is unanimous or near-unanimous at every layer, so the depth dependence is one of magnitude rather than of sign.
+The learned assignment does nearly all of the work through the first two thirds of the network: under 3 % of the curvature survives its destruction at every layer up to 15, and at layers 20 and 25 the scrambled value is driven negative outright. It does least at the two ends. That pattern matches what the two ends are doing: at layer 1 the context has barely been integrated, so there is less learned assignment to destroy, while by layer 30 the prediction is close to committed and concentration alone fixes much of the geometry. The direction of the effect is unanimous or near-unanimous at every layer, so the depth dependence is one of magnitude rather than of sign.
 
 ### D. The assignment stabilises curvature, it does not merely add it
 
@@ -195,11 +198,11 @@ Resolving the same 221 states by predictive entropy sharpens the finding conside
 
 The real curvature is close to constant across the full range: from a near-deterministic prediction to a highly diffuse one, the median moves only from 0.275 to 0.206, staying at the simplex value throughout. The scrambled curvature does nothing of the kind — it swings across roughly 1.4 units, from strongly negative where the prediction is concentrated to mildly positive where it is diffuse.
 
-This is the most informative single comparison in the study. It shows that the learned token-to-direction assignment does not simply contribute curvature on top of whatever concentration provides; it *holds the manifold at the ambient simplex value irrespective of how concentrated the prediction is*. Concentration alone produces a geometry that varies wildly with the entropy of the prediction. The trained assignment removes that dependence. The effect is also strongest exactly where it should be if this reading is correct — in the low-entropy bands, where 35 of 38 and 36 of 37 states move in the same direction — because a concentrated `p` gives the assignment the most to encode.
+This is the most informative single comparison in the study. The learned assignment does not simply contribute curvature on top of whatever concentration provides; it *holds the manifold at the ambient simplex value irrespective of how concentrated the prediction is*. Concentration alone produces a geometry that varies wildly with predictive entropy, and the trained assignment removes that dependence. The effect is strongest where it should be if this reading is correct — in the low-entropy bands, 35 of 38 and 36 of 37 — because a concentrated `p` gives the assignment the most to encode.
 
 ### E. The instruments measure different things
 
-If the intrinsic curvature and the published proxies were reading the same underlying property, they would correlate. Computed at the same 360 states, they do not: the largest absolute rank correlation between any two different instrument families is 0.248, and the pairs involving intrinsic curvature fall at or below 0.144. By contrast the two intrinsic quantities computed here, sectional `K` and scalar `R`, correlate with each other at +0.69 to +0.74. That is what internal consistency looks like, and the cross-family pairs do not exhibit it.
+If the intrinsic curvature and the published proxies were reading the same underlying property, they would correlate. Computed at 360 sampled states, pairwise complete, they do not: the largest absolute rank correlation between any two different instrument families is 0.248, and the pairs involving intrinsic curvature fall at or below 0.144. By contrast the two intrinsic quantities computed here, sectional `K` and scalar `R`, correlate with each other at +0.69 to +0.74. That is what internal consistency looks like, and the cross-family pairs do not exhibit it.
 
 Corpus stability discriminates further. Moving from hand-written probe sentences to WikiText-2 across 653 states, the intrinsic instrument's correlation with predictive entropy moves by 0.028 for sectional curvature and 0.034 for scalar curvature, while the three proxies move by 0.104, 0.126 and 0.194 respectively, the last of them changing sign. The intrinsic instrument returns essentially the same reading on both corpora; the proxies do not. An instrument whose reading depends this strongly on the text it is given is measuring a property of the text.
 
@@ -215,7 +218,7 @@ If the metric tracks the model's predictive state, distance under it should resp
 | Euclidean | 260.0 | 552.5 | 2.13× | 32/32 | +5.66 |
 | Unembedding `UᵀU` | 10459 | 17838 | 1.71× | 23/32 | +2.47 |
 
-The Fisher–Rao geodesic distance separates a sense change from a matched context change by a factor of 2.03 at 30 of 32 pairs, and does so considerably more reliably than the unembedding metric used in the comparison literature, which reaches 1.71× at 23 of 32. On this particular probe a plain Euclidean distance performs comparably to Fisher–Rao. The probe therefore establishes that the metric is behaviourally meaningful, and the experiment that would separate it from Euclidean distance — perturbation along high-curvature directions at the disambiguation layer, testing whether the resolved sense flips — is identified as the natural next step.
+The Fisher–Rao geodesic distance separates a sense change from a matched context change by a factor of 2.03 at 30 of 32 pairs, and considerably more reliably than the unembedding metric used in the comparison literature, which reaches 1.71× at 23 of 32. On this probe a plain Euclidean distance performs comparably to Fisher–Rao. The probe therefore establishes that the metric is behaviourally meaningful; separating it from Euclidean distance requires the causal experiment named in Section VI.
 
 ### G. A near-zero reading is not evidence of flatness
 
@@ -240,7 +243,7 @@ Three findings stand, in decreasing order of how firmly they are established.
 
 **The metric is the model's own, demonstrably.** The directions the metric calls null are directions the model is exactly invariant to, on six architectures, at a step size that doubles the norm of the state. Curvature is not being measured on an arbitrary quadratic form fitted to activations; it is measured on the model's predictive geometry, and Equation (2) confirms this through an independent code path.
 
-**Future work follows directly from the separation.** Three experiments are indicated. The first is the causal one: perturbing a state along its high-curvature directions at the layer where a sense is resolved, and testing whether the resolved sense flips. That would connect the geometric measurement to behaviour in the strongest available way, and Section V.F identifies it as the experiment this probe does not yet perform. The second is to apply the matched-entropy control of Section IV to an ambient nearest-neighbour intrinsic-dimension estimate, which would settle whether the published depth profile shares the character established here for the metric's spectrum. The third is scale: the models used here are 70M to 160M parameters, and repeating the measurement at 1B and above would test whether the simplex value and the separation both persist. A fourth and cheaper line is suggested by the minority of states carrying a negatively curved plane — 10.7 % of the sample — which have twice the effective dimension of the rest at indistinguishable predictive entropy. That is the one place where absolute curvature, rather than its response to a control, appears to carry model-specific information.
+**Future work follows directly from the separation.** The decisive experiment is causal: perturbing a state along its high-curvature directions at the layer where a sense is resolved, and testing whether the resolved sense flips. A second line is suggested by the minority of states carrying a negatively curved plane — 10.7 % of the sample — which have twice the effective dimension of the rest at indistinguishable predictive entropy. That is the one place where absolute curvature, rather than its response to a control, appears to carry model-specific information.
 
 One methodological point is worth recording, since it shaped what is reported. Several intermediate claims in this work were revised as sample sizes grew and as controls were tightened, and each was caught by a check constructed for that purpose. The rule adopted here is that a result at one sample size, one `k`, or one control is a hypothesis, and becomes a finding when it survives the second. The separation in Section V.B survives all three, and the numbers above are those that did.
 
@@ -250,7 +253,7 @@ One methodological point is worth recording, since it shaped what is reported. S
 
 **Scale.** Models range from 70M to 160M parameters. Nothing here rules out the geometry changing at 1B and above.
 
-**The `k` ≤ 8 ceiling.** Riemann-derived quantities are computed on a slice of dimension 4 to 6 holding about 88 % of the metric's trace. The central result is stable across that range, but the slice remains a slice.
+**The `k` ≤ 8 ceiling.** Riemann-derived quantities are computed on a slice of dimension 4 to 6, holding a median 92 % to 97 % of the metric's trace. The central result is stable across that range, but the slice remains a slice.
 
 **Cell sizes.** Pooled samples run from 221 to 653 states; per-layer cells are smaller, and the pooled figures are the ones to rely on.
 

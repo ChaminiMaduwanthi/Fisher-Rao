@@ -1,0 +1,30 @@
+[
+  {
+    "rung": 1,
+    "manifold": "Sphere, radius 2",
+    "expect": 0.25,
+    "n": 12,
+    "worst": 1.8041124150158794e-15
+  },
+  {
+    "rung": 2,
+    "manifold": "Poincare half-plane",
+    "expect": -1.0,
+    "n": 12,
+    "worst": 1.0325074129013956e-13
+  },
+  {
+    "rung": 3,
+    "manifold": "Categorical simplex",
+    "expect": 0.25,
+    "n": 12,
+    "worst": 6.584193468217592e-10
+  },
+  {
+    "rung": 6,
+    "manifold": "Univariate Gaussian",
+    "expect": -0.5,
+    "n": 12,
+    "worst": 2.55351295663786e-15
+  }
+]
