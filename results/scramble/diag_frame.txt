@@ -1,0 +1,42 @@
+Loading weights:   0%|          | 0/272 [00:00<?, ?it/s]Loading weights:  65%|######5   | 178/272 [00:00<00:00, 1762.07it/s]Loading weights: 100%|##########| 272/272 [00:00<00:00, 1982.13it/s]
+HuggingFaceTB/SmolLM2-135M-Instruct
+  d = 576, N = 49152, layers = 30
+  tied embeddings : True
+  final norm      : LlamaRMSNorm (eps=1e-05, gain=yes)
+  lm_head bias    : no
+
+==========================================================================
+SUBSPACE DIAGNOSIS -- no curvature computed, this is all linear algebra
+==========================================================================
+
+1. ARE THE TWO SUBSPACES THE SAME?
+   principal angles between F_real and F_scr, over n=40 points
+     smallest angle : median  64.42 deg   min  23.29   max  78.45
+     largest  angle : median  89.35 deg   min  86.93   max  89.97
+   (90 deg = completely orthogonal subspaces, 0 = identical)
+   CONTROLS -- the same statistic against the two null baselines:
+     F_real vs RANDOM subspace : smallest  81.06   largest  89.32
+     F_scr1 vs F_scr2 (indep.) : smallest  58.59   largest  89.30
+
+2. HOW MUCH OF EACH METRIC LIVES IN EACH SUBSPACE?
+   trace fraction captured by the retained k=5 subspace:
+     real metric   in its own frame : 0.8785
+     real metric   in scrambled frame: 4.34e-02
+     scrambled met in its own frame : 0.8759
+     scrambled met in real frame    : 3.86e-02
+     scr1 metric   in scr2 frame    : 6.43e-02   [paired null]
+     real metric   in RANDOM frame  : 8.55e-03   [control]
+     (isotropic floor would be k/d  = 8.68e-03)
+
+3. CONDITIONING OF THE RESTRICTED (k x k) METRIC
+   curvature needs to invert this; a huge cond means 1/det blowup:
+     real       in own frame  : 2.121e+01
+     scrambled  in own frame  : 1.790e+01
+     scrambled  in REAL frame : 1.887e+02   <-- the 5.21 case
+     real       in SCR  frame : 2.900e+02
+     scr1       in SCR2 frame : 1.610e+02   [paired null]
+     real       in RANDOM frm : 3.032e+01   [control]
+
+4. SPECTRAL CONCENTRATION OF THE TWO METRICS (dims for 99% of trace)
+     real      : median k99 = 33
+     scrambled : median k99 = 31

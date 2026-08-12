@@ -1,0 +1,50 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/272 [00:00<?, ?it/s]HuggingFaceTB/SmolLM2-135M-Instruct
+  d = 576, N = 49152, layers = 30
+  tied embeddings : True
+  final norm      : LlamaRMSNorm (eps=1e-05, gain=yes)
+  lm_head bias    : no
+   5/30  (411s)
+   10/30  (1645s)
+   15/30  (3314s)
+   20/30  (3911s)
+   25/30  (4999s)
+   30/30  (6099s)
+
+==========================================================================
+n = 15 points completed (15 failed)
+==========================================================================
+
+A. ROTATION INVARIANCE -- is this a   5/20  (1358s)
+all?
+   relative change in scalar R under an arbitrary rotation of the frame:
+     real condition      : median 1.34e-13   max 2.07e-07
+     scrambled condition : median 8.90e-14   max 9.80e-10
+   -> FRAME-INVARIANT in both conditions   (worst 2.1e-07)
+      So 'frame sensitivity' is a MISNOMER: rotating the basis changes
+      nothing.  What changed was the SUBSPACE.
+
+B. OWN-SUBSPACE EFFECT ACROSS k -- is the verdict k-stable?
+     k     K_real     K_scr    ratio      sign test        z
+     4     0.2589   -0.0303     -8.5x      15/15        +3.87
+     5     0.2609   -0.0150    -17.4x      14/15        +3.36
+     6     0.2544   -0.0010   -242.8x      14/15        +3.36
+
+C. CONDITIONING-MATCHED (k chosen per point by cond_eff <= 100)
+   k selected   real median 6.0   scrambled median 5.0
+   cond_eff     real median 84.2   scrambled median 75.8   <-- matched by construction
+   K_real median 0.2552   K_scr median -0.0121
+   sign test 15/15 positive   z = +3.87   SIGNIFICANT
+
+D. THE CROSS-FRAME ARM, for the record (this is the arm being retired)
+   measurement                          median K      |K| p90
+   K_scr  in the REAL frame            -723.5379    2.845e+05
+     (its own-frame value)               -0.0150        8.197
+   K_real in the SCRAMBLED frame          0.1215        11.24
+     (its own-frame value)                0.2609       0.4836
+   Read the p90 column, not the median: the cross-frame arm's failure
+   mode is a heavy tail from near-degenerate restrictions, which a
+   median hides.  Whether the inflation is symmetric across the two
+   directions is reported here rather than assumed.
+
+wrote results\scramble\frame_resolution.json
