@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# scratch output captured from terminal runs
+scr.txt
+results/xl_check.log
+
+# rendered previews, regenerable from the markdown
+paper/_preview/
+
+# internal drafts, not part of the record
+drafts/
+
+.DS_Store
+Thumbs.db

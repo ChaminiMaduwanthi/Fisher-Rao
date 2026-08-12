@@ -1,0 +1,13 @@
+# Pinned to the versions Stage 0 was verified against (2026-08-10).
+torch==2.12.0
+transformers==5.14.1
+numpy==2.3.3
+scipy==1.16.2
+matplotlib==3.10.6
+
+# Stage 3.  Not yet installed -- blocked by the TLS problem in 05-stage0-log.md
+# section 0.  PyTorch torch.func (jacrev/jvp/vmap) is the fallback.
+# jax[cpu]==0.*
+
+# Stage 3 validation oracle (rungs 3-6).  Also blocked.
+# geomstats==2.*
