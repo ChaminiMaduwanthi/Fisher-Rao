@@ -278,12 +278,6 @@ Future work divides into three lines. The first is scale: the geometry reported 
 
 ---
 
-## Reproduction
-
-All code, saved result files and figure-generation scripts are available at `https://github.com/ChaminiMaduwanthi/Fisher-Rao`. Every figure is regenerated from the saved result files by `make_figures.py`; no number in a figure is entered by hand. The validation ladder is implemented in `validate_curvature.py`, `validate_pullback.py` and `validate_geomstats.py`, each of which prints a pass or fail verdict.
-
----
-
 ## References
 
 [1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention is all you need," in *Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)*, 2017, pp. 5998–6008.
