@@ -61,7 +61,7 @@ The Gaussian-unembedding control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, whic
 
 ## 4. Proposed framing (to be agreed with the supervisor)
 
-**Working title:** *What Does Fisher–Rao Geometry Measure in Transformer Representations? A Controlled Study of Curvature and Spectrum*
+**Title.** The paper keeps the thesis topic and its main title, *Intrinsic Fisher–Rao Curvature of Transformer Representations*; only the subtitle, which states the claim, changes. An alternative if the supervisor prefers: *What Does Fisher–Rao Geometry Measure in Transformer Representations? A Controlled Study of Curvature and Spectrum*
 
 **Problem statement (draft).** Geometric summaries of the Fisher–Rao metric on transformer hidden states — its spectrum, effective dimension, volume and curvature — are increasingly used to describe what language models represent. Whether these quantities reflect learned structure, or are fixed by the predictive distribution and the geometry of the probability simplex, has not been tested with controls that hold the predictive distribution fixed and remain genuine pullbacks.
 
