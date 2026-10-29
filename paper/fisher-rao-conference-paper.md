@@ -109,7 +109,7 @@ Seven manifolds with analytically known curvature are run through the same code 
 | 6 | Univariate Gaussian | K = −1/2 | −0.500000 | 2.6 × 10⁻¹⁵ |
 | 7 | Synthetic pullback | K = +1/4 | +0.250000 | 9.7 × 10⁻¹² |
 
-Errors are worst-case over twelve random base points and random 2-planes per rung. Rungs 4 and 5 have no closed-form constant, so the starred entries are worst-case disagreement with the independent library of Section III.B rather than with an analytic value; the claim tested for those two families is that the curvature is everywhere negative, and it is.
+Errors are worst-case over twelve random base points and random 2-planes per rung. Rungs 4 and 5 have no closed-form constant, so the starred entries are worst-case disagreement with the independent library of Section IV.B rather than with an analytic value; the claim tested for those two families is that the curvature is everywhere negative, and it is.
 
 Rung 3 is load-bearing: the categorical simplex under the full Fisher–Rao metric is isometric to the positive orthant of a radius-2 sphere and so has constant `K = +1/4`. It is the same metric family as the object under study.
 
