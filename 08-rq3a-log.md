@@ -108,7 +108,7 @@ The original plan set the target as *"beat the `r ≈ 0.15` curvature–entropy 
 | §5.1–5.3 | **Gaussian** `U` | ⚠️ suggestive, but changes everything at once |
 | **§5.4** | **paired scramble** — real `p`, permuted directions | ⚠️ ~~decisive: learned structure, not concentration~~ **not a pullback; see §5.7** |
 | **§5.5** | the same control on the **volume profile** | 🔴 **that one *is* largely definitional** |
-| **§5.7** | **consistent** scramble — the same permutation as a genuine pullback | 🔴 **§5.4's collapse does not survive (pilot, n = 30)** |
+| **§5.7** | **consistent** scramble — the same permutation as a genuine pullback | 🔴 **§5.4's collapse does not survive: 186 states, LLaMA-160M, and a Gaussian control ([14-revision-log.md](14-revision-log.md) §4–§6)** |
 
 Entropy and curvature are both computed from the same `p(h)`. As `p` concentrates, the reachable simplex region shrinks toward a low-dimensional face and the induced geometry changes **whether or not the model learned anything**. So the correlation could be a mathematical consequence of concentration rather than a fact about the network.
 
@@ -283,7 +283,7 @@ This is the **third** control in this document that changed more than one thing 
 >
 > This does not contradict §5.1–5.2. A Gaussian `U` reproduces the real median `K`; a *paired scramble* does not. The difference is informative: a Gaussian unembedding has, by symmetry, no relationship between probability mass and direction to destroy, whereas the real one does — and it is that relationship, not the spectrum or the row norms, that the curvature is reading.
 >
-> ⚠️ **29 October 2026 — not supported as stated.** The `within` metric is not a Fisher pullback: `p` comes from the real model and the Jacobian from the permuted rows. Realised as a genuine pullback, the same scramble leaves `K` at the real value (0.2532 against 0.2554, 15/30 paired). See §5.7.
+> ⚠️ **29 October 2026 — not supported as stated.** The `within` metric is not a Fisher pullback: `p` comes from the real model and the Jacobian from the permuted rows. Realised as a genuine pullback, the same scramble leaves `K` at the real value (0.2565 against the real 0.2547 on the paper's 186 distinct states; an entropy-matched Gaussian control gives 0.2730). See §5.7 and [14-revision-log.md](14-revision-log.md) §4–§6.
 
 **(e) The cross-frame arm, recorded rather than hidden** (n = 17):
 
