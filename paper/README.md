@@ -1,38 +1,43 @@
-# Conference paper
+# Conference paper — ICARC 2027 revision
 
-**[fisher-rao-conference-paper.md](fisher-rao-conference-paper.md)** — full draft, ~5,600 words + tables.
+**[fisher-rao-conference-paper.md](fisher-rao-conference-paper.md)** is the source of the revised paper. It builds to six A4 pages in the IEEE template: [PDF](Fisher-Rao-Curvature-IEEE.pdf) and [Word](Fisher-Rao-Curvature-IEEE.docx). The version rejected at NSBM ICACT 2026 is kept at the repository root as [fisher-rao.pdf](../fisher-rao.pdf).
 
-## The argument, in one line
+## The argument
 
-Everything derived from the Fisher metric's **spectrum** reads predictive concentration; only **curvature** reads the model. One control, three quantities, a clean split.
+| Research question | Answer | Evidence |
+|---|---|---|
+| RQ1 — can the intrinsic curvature of the Fisher–Rao pullback metric be computed reliably on transformer hidden states? | Yes | Table II: seven manifolds of known curvature, the Kullback–Leibler identity, null directions on six models, slice against manifold |
+| RQ2 — what value does it take, and is that value learned? | Slice curvature sits near 1/4 on four models. Genuine-pullback controls give the same value to within 0.035, so it is inherited from the simplex; learning leaves a small offset, 0.002–0.024 below a scramble of the same rows | Table III, Fig. 2 |
+| RQ3 — what do the spectral summaries measure? | The predictive distribution: a scramble of the readout reproduces them, and effective dimension tracks predictive entropy | Table IV, Fig. 3 |
 
-## Why this argument and not the `+1/4` headline
-
-`K ≈ +1/4` versus the published `10⁻⁵` is the eye-catching number, but it is the weaker paper. It invites a magnitude dispute, and §6.4 shows that dispute is void — at its own threshold the published proxy reads a unit 3-sphere as flat to 10⁻³¹, so the two numbers are not measuring one thing and cannot be ranked.
-
-The spectrum/curvature separation is the stronger contribution because it is **prescriptive** (it tells other people which quantities to compute), **survives its own audit** (the corrected control made the split *wider*, §5.3), and **makes a falsifiable prediction about an active literature** (§7.4 — apply a matched-entropy control to ambient TWO-NN intrinsic dimension and see whether the hourglass survives).
-
-`+1/4` is still in the paper, as §7.5. It is a supporting result, not the claim.
+The submitted paper's central claim, that curvature carries learned structure, rested on a control that is not a pullback. The claim is withdrawn, and the paper shows why the control fails (Section IV-D, Table II). [16-reviewer-response.md](../16-reviewer-response.md) maps every reviewer comment to the part of the paper that answers it.
 
 ## Structure
 
-| § | Content |
+The section order and budgets follow the supervisor's six-page guideline.
+
+| Section | Content |
 |---|---|
-| 1–2 | Setting, the four-instrument disagreement, the gap |
-| 3 | The metric: pullback, exact null directions, quotient-then-restrict |
-| 4 | **Validation** — 6-rung ladder, geomstats cross-check, KL–Hessian, causal null test, 2 silent bugs |
-| 5 | **The control** — all three failed attempts, then the clean one |
-| 6 | Instruments do not agree (n = 360) + replication and diagnosis of the flat result |
-| 7 | ⭐ **The central result** + the prediction + cross-architecture |
-| 8 | Behavioural: a 21.75-layer disagreement about when the model decided |
-| 9 | Six of our own claims that controls killed |
-| 10–11 | Limitations, conclusion |
-| — | Reproduction table: every § → script → output |
+| Abstract | 218 words, beginning "This article"; no first-person pronouns anywhere in the paper |
+| I. Introduction | the problem and its significance for interpretability, two gaps, RQ1–RQ3, three contributions |
+| II. Related Work and Research Gap | three themes, Table I of the closest studies, the gap |
+| III. Research Methodology | design, models and data, comparators, metrics, statistics and the decision rule; Fig. 1 |
+| IV. Pipeline Design and Implementation | equations (1)–(5), null directions, slices and the Gauss equation, the three controls, validation, implementation; Table II |
+| V. Results and Discussion | RQ1–RQ3, comparison with published instruments, implications, threats to validity; Tables III–V, Figs. 2–3 |
+| VI. Conclusion and Future Work | answers to RQ1–RQ3, limitations, next steps |
+
+## Building it
+
+1. `python make_tables.py` rebuilds every table from the saved results and checks 69 stored summaries.
+2. `python make_figures.py` writes `figures/fig1_pipeline.png`, `fig2_controls.png` and `fig3_spectral.png`.
+3. `python check_paper_numbers.py` recomputes the 96 numbers the paper quotes and checks that each appears in the text.
+4. `python build_paper_docx.py <template.docx>` writes the Word manuscript into the IEEE template, which is `IEEE_Template.docx` in the repository history. The document properties are left blank.
+5. Export the PDF from Word and confirm that it has six pages.
 
 ## Before submission
 
-- [ ] **References** — §12 is a placeholder. Needs Čencov, the simplex–sphere isometry, TWO-NN, geomstats, the two replicated proxies, WiC.
-- [ ] **Pick a venue and cut to its page limit.** At full length this is ~9–10 pages of two-column. §4 and §9 are the compressible parts; §5 and §7 are not.
-- [ ] **Figures.** None yet — everything is text and tables. Three would earn their space: the layer profile with real vs scrambled overlaid (§7.1), the four-instrument correlation matrix (§6.2), and the `d_FR` vs Euclidean separation curves (§8).
-- [ ] **Anonymise** the repository link for double-blind review.
-- [ ] Decide whether §9 stays. It is unusual and it is honest; it also hands a reviewer a list of things that went wrong. Recommendation: **keep it** — every entry is paired with the control that caught it, which is an argument for the methodology rather than against the results.
+- [ ] Mirror the code to an anonymous host and put the link in reference [16].
+- [ ] Agree the AI-use disclosure (the Acknowledgment) with the supervisor, or place it where the organisers advise.
+- [ ] Supervisor reads the PDF; similarity check below 30 %.
+- [ ] If the Word file is edited and saved, run *File → Info → Inspect Document* before exporting the PDF, because Word writes the editor's name into the document properties.
+- [ ] Check the PDF with IEEE PDF eXpress if ICARC requires it.
