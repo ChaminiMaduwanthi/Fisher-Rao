@@ -272,3 +272,7 @@ A consistent version of the same scramble ([run_scramble_consistent.py](run_scra
 ### 8.3 The rule this adds
 
 > **A control must belong to the class of objects it controls for.** A scrambled metric that is not the pullback of any model does not answer "what does learning contribute to the pullback geometry"; it answers "what happens when the metric stops being a pullback". The Gaussian-`U` control (08 §5.1) was a genuine pullback and agreed with the real model. It was set aside as blunt, and the one control that disagreed was the one that broke the construction. Before reading anything into a control, check that it preserves the defining structure — here, that `p` and its Jacobian come from the same map.
+
+### 8.4 🟡 n = 221 is 186 distinct states
+
+§3 above noted that 35 `_i` values recur in `within_points.jsonl` but kept n = 221. The recurring rows are identical to their first occurrence, so they are not independent observations: on distinct states the sign test is **168/186, z = +11.00** (medians 0.2547 → 0.0096), not 201/221, z = +12.18. Every figure computed from these rows must use the 186 distinct states. Details: [14-revision-log.md](14-revision-log.md) §1.
