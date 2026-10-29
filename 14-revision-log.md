@@ -402,3 +402,15 @@ The paper ([paper/fisher-rao-conference-paper.md](paper/fisher-rao-conference-pa
 - **Builder.** [build_paper_docx.py](build_paper_docx.py) now takes the template's path and sets numbered equations in Times New Roman. The template's equation style uses Symbol, which turned Latin letters into Greek in the first build. The builder also supports subscripts, keeps each table with its title, and sizes columns by their content.
 
 **Open before submission:** the anonymous code link (reference [16]), the AI-use disclosure, the supervisor's reading and a similarity check.
+
+---
+
+## 17. A line-by-line review of the paper (29 October 2026)
+
+The paper was read again as a reviewer would read it. No number changed: [check_paper_numbers.py](check_paper_numbers.py) still passes 96 of 96. What changed is precision, in five groups, each committed separately:
+
+1. **Symbols.** `R` named both scalar curvature (Table V) and the Riemann tensor (equation 3); the tensor is now `Rm`. `h₀`, `d`, KL, `n₊`, `k` and the `M` of the reparameterisation check are defined where first used.
+2. **Cited work.** Each study is now described as its authors report it: Mudarisov et al. relate the loss-to-go Hessian to the pullback operator, up to a bounded residual; Konior et al. suggest that the gain of pullback-metric pooling comes from aggregation; PersonaManifold's curvature is a discrete graph curvature; Valeriani et al. report intrinsic dimension contracting in the intermediate layers, not a minimum at one third of the depth; and Čencov's theorem is stated for a finite outcome space.
+3. **Samples and comparators.** The five samples and their sources are stated; the published instruments are external comparators, mapped to RQ1, not RQ3; the trace share and the conditioning check are attributed to SmolLM2; the profile values of the LayerNorm models are said to predate the Jacobian correction.
+4. **Claims.** Where the evidence is narrower than the wording, the wording is narrowed. C2 shows that a value near 1/4 needs no learned readout, which is narrower than "no learning". The "closer to 1/4" test is defined. The conditioning is "not shifted systematically", not "unchanged". The identity row of Table II is a plateau value, not a worst case.
+5. **Layout.** Table columns are never narrower than their longest word, and equation (3) and Table IV fit their column.
