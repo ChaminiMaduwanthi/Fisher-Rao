@@ -160,6 +160,8 @@ Preparing the revision exposed a problem with the paper's central control. The p
 
 What stands: the validation ladder, the null-direction test, `K ≈ +1/4` as a measurement, the spectral results (they depend only on `G(h0)`, where both controls coincide, and replicate on all four models, §12), the Mabrok calibration and RQ3b. The status table below predates this and should be read with it.
 
+The paper has been rewritten for ICARC 2027: six pages in the IEEE template ([paper/](paper/)), every number checked against the results by [check_paper_numbers.py](check_paper_numbers.py), and each reviewer comment mapped to its answer in [16-reviewer-response.md](16-reviewer-response.md).
+
 ---
 
 ## Status as of 11 August 2026
