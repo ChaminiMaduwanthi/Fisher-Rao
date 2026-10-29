@@ -95,3 +95,21 @@ The Gaussian-unembedding control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, whic
 | E6 | Scale (optional) | One model near 1B parameters (Pythia-1B or SmolLM2-1.7B), feasibility first | Unknown | Only if E1–E4 finish by 12 November |
 | E7 | Theory (optional) | Conditions under which a slice of a softmax pullback is locally close to a face of the simplex, extending rung 7 | Unknown | Drop if not complete by 12 November |
 | E8 | Spectrum from `p` (optional) | Predict the effective dimension from the predictive distribution alone, in the spirit of Picozzi (2026) | Small | Supports contribution 3 |
+
+## 6. Literature to add
+
+Five papers from 2026 are now in [references.bib](references.bib) and summarised in [01-literature-review.md](01-literature-review.md) §9. None computes the Riemann tensor of the Fisher pullback.
+
+| Paper | What it does | Use in the paper |
+|---|---|---|
+| Picozzi, `arXiv:2609.11063` | Spectrum and effective dimension of the same pullback, Pythia 70M–6.9B; spectrum predictable from token probabilities | Closest work; supports contribution 3 |
+| Mudarisov et al., `arXiv:2609.37717` | The pullback operator as the loss-to-go Hessian, 1B–9B models; its "curvature score" is a trace | Scale contrast; distinguish the terminology |
+| Xu et al., `arXiv:2609.34571` (listed for NeurIPS 2026) | Ollivier-Ricci curvature of persona activations; geodesic steering | Curvature with behavioural consequences, a different notion |
+| Pandey et al., `arXiv:2606.09287` | Ambient-space trajectory curvature with shuffled controls | Flat-metric curvature group |
+| Konior et al., `arXiv:2607.07047` | Pullback metrics of encoders; a random encoder recovers much of the gain | Precedent for random-network controls (E2) |
+
+**Still to read:** Zhang, *A Markov Categorical Framework for Language Modeling*, `arXiv:2507.19247`, found by search and not yet read. Repeat the search in the week before submission.
+
+**Related Work structure.** (a) The Fisher pullback metric on hidden states: Mabrok, FishBack, Zaher et al., Picozzi, Mudarisov et al. (b) Curvature under flat metrics: Manson, King et al., Pandey et al. (c) Other curvature notions and other networks: Zavatone-Veth et al., PersonaManifold. (d) Intrinsic dimension and representation manifolds: Valeriani et al., Facco et al., Modell et al. Each group ends with what it leaves open.
+
+**Rules.** 35–40 references in IEEE style, with every preprint's authors and venue re-checked. One known inconsistency to resolve against arXiv: FishBack's authors are "Sihan Wang, Jiayi Zhao" in [references.bib](references.bib) but "Y. Wang and L. Zhao" in the paper's reference [4]. No reused source text — ICARC desk-rejects above 30 % similarity.
