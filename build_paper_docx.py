@@ -21,16 +21,20 @@ The document properties are written blank, so the file names no person, as
 double-blind review requires.
 
 Usage:  python build_paper_docx.py [template.docx]
+        Without an argument the IEEE template is read from the repository
+        history, where it has been kept since it left the working tree.
 Output: paper/Fisher-Rao-Curvature-IEEE.docx
         (export to PDF from Word; see paper/README.md)
 """
 
 from __future__ import annotations
 
+import io
 import os
 import re
 import shutil
 import struct
+import subprocess
 import sys
 import zipfile
 
@@ -39,6 +43,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 SRC_MD = os.path.join("paper", "fisher-rao-conference-paper.md")
 TEMPLATE = "IEEE_Template.docx"
+TEMPLATE_COMMIT = "a5648ef"   # the commit that added the template to the repository
 OUT = os.path.join("paper", "Fisher-Rao-Curvature-IEEE.docx")
 FIGDIR = os.path.join("paper", "figures")
 
@@ -392,7 +397,13 @@ def main() -> int:
         f"<w:body>{body}{sectpr(2)}"
         "</w:body></w:document>")
 
-    src = zipfile.ZipFile(template)
+    if os.path.exists(template):
+        src = zipfile.ZipFile(template)
+    else:                       # not in the working tree: take it from the repository history
+        data = subprocess.run(["git", "show", f"{TEMPLATE_COMMIT}:{TEMPLATE}"], capture_output=True,
+                              check=True).stdout
+        src = zipfile.ZipFile(io.BytesIO(data))
+        print(f"template read from the repository history ({TEMPLATE_COMMIT}:{TEMPLATE})")
     rels = src.read("word/_rels/document.xml.rels").decode("utf-8")
     add = "".join(
         f'<Relationship Id="{f["rid"]}" '
