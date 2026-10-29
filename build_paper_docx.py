@@ -8,9 +8,10 @@ the template's own `word/styles.xml`, theme and section geometry are preserved
 byte-for-byte and only `word/document.xml` is replaced, with the three figures
 added as new media parts.
 
-Layout follows IEEE practice: the title block spans the page, the body is two
-columns, and full-width figures sit in their own single-column continuous
-sections so they span both columns instead of being squeezed into one.
+Layout follows IEEE practice: the title block spans the page, the body -- from
+the abstract onwards -- is two columns, and full-width figures sit in their own
+single-column continuous sections so they span both columns instead of being
+squeezed into one.
 
 Usage:  python build_paper_docx.py
 Output: paper/Fisher-Rao-Curvature-IEEE.docx
@@ -210,12 +211,18 @@ def build_body(md: str, figs: dict) -> str:
         if ln.startswith("## "):
             head = re.sub(r"^[IVX]+\.\s*", "", ln[3:])
             if head == "Abstract":
+                # IEEE practice: the abstract already sits in the two-column
+                # body, so the title block's single-column section closes here.
+                if cols_state == 1:
+                    out.append(para("", "BodyText", sect=sectpr(1)))
+                    cols_state = 2
                 i, txt = swallow(lines, i)
                 out.append(para("Abstract— " + txt, "Abstract"))
                 continue
             if head.startswith("Index Terms"):
                 continue
-            # the first numbered section opens the two-column body
+            # fallback: if there was no abstract, the first numbered section
+            # opens the two-column body instead
             sect = None
             if cols_state == 1 and re.match(r"^[IVX]+\.", ln[3:]):
                 sect = sectpr(1)
