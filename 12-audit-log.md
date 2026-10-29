@@ -280,3 +280,19 @@ A consistent version of the same scramble ([run_scramble_consistent.py](run_scra
 ### 8.5 🟡 My own slip: summary medians taken with `torch.median`
 
 The scripts added for the revision (`run_scramble_consistent.py`, `check_slice_gauss.py`, `check_control_validity.py`) first summarised across states with `torch.median`, which returns the lower of the two middle values — the convention §4 above had already retired. They now use `fisherrao.stats.median`. Every affected figure in [14-revision-log.md](14-revision-log.md) and [08-rq3a-log.md](08-rq3a-log.md) §5.7 has been recomputed. The changes are in the third or fourth decimal, except in the pilot's six-state entropy bands. Per-state `K` still uses `torch.median` over its 16 planes: that is the definition every saved `K` in the project uses, and changing it would break comparability.
+
+### 8.6 🔴 Further errors in the submitted paper, found by rebuilding its tables
+
+[make_tables.py](make_tables.py) rebuilds each table from per-state rows ([results/tables/tables.md](results/tables/tables.md)); [audit_duplicates.py](audit_duplicates.py) does the same for counts ([14-revision-log.md](14-revision-log.md) §7–§8).
+
+| where | as submitted | correct |
+|---|---|---|
+| abstract, Section VI.B, Tables III, V, VI | n = 221 (201/221, z = +12.18) | 186 distinct states (168/186, z = +11.00); 35 rows were copies |
+| Section VI.A, Fig. 1, Section VII | 456 states; Pythia-160M 0.2738; negative planes 49/456 | 425 distinct states; 0.2721; 48/425; 31 rows were copies |
+| Section V | the scramble holds conditioning fixed exactly | not state by state; median 15.6 against 15.1, no systematic shift |
+| Section VI.E | pairs involving intrinsic curvature have \|ρ\| ≤ 0.144; largest cross-family 0.248 | true for `K` only; `R` reaches −0.273 against the local-PCA proxy |
+| Table VII | Fisher–Rao 0.754 → 1.532 (2.03×) | true medians 0.774 → 1.537 (1.98×); the submitted values are lower medians |
+| Sections III.D and VI.E | WikiText-2 | WikiText-103, validation split |
+| Section VI.F | "places it at layer 4.5" | a mean half-separation depth (4.53), to be called one |
+
+None of these reverses a conclusion. They are listed because the revision must quote the right numbers.
