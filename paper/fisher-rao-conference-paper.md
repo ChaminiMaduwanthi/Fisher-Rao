@@ -123,16 +123,11 @@ Rungs 2 to 6 were additionally re-run against the `information_geometry` module 
 
 ---
 
-## IV. The Control
+## V. Experimental Control
 
 The central result rests on one control, so its construction is given precisely.
 
-Let `idx` be the indices of the vocabulary rows retained at a given state. The **paired within-set scramble** replaces `idx` by `idx[randperm(len(idx))]`: the same rows are used, permuted in their assignment to probabilities. This holds fixed, exactly:
-
-- the predictive distribution `p`, and therefore the entropy, to machine precision;
-- the multiset of retained unembedding rows, and therefore their norms and their spectrum;
-- the conditioning of the retained subspace;
-- the working dimension `k`.
+Let `idx` be the indices of the vocabulary rows retained at a given state. The paired within-set scramble replaces `idx` by `idx[randperm(len(idx))]`: the same rows are used, permuted in their assignment to probabilities. Four quantities are thereby held fixed exactly, namely (i) the predictive distribution `p`, and therefore the entropy, to machine precision, (ii) the multiset of retained unembedding rows, and therefore their norms and their spectrum, (iii) the conditioning of the retained subspace, and (iv) the working dimension `k`.
 
 What it destroys is only *which probability sits on which direction* — the learned assignment. Because the comparison is paired at the same state, and every confound is held fixed by construction rather than by matching, any surviving difference is attributable to that assignment alone.
 
