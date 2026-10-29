@@ -78,11 +78,12 @@ Runtimes are wall-clock on the machine in §1.
 | `K` across architectures | `python run_profiles.py` | `results/profiles/` | about 3 s per state at `k` = 5 |
 | paper's scramble (`within`) | `python run_scramble_within.py` | `results/scramble/within_points.jsonl` | about 3 s per state per condition |
 | consistent scramble, SmolLM2 | `python run_scramble_consistent.py --points paper --ksweep` | `results/scramble/consistent_SmolLM2-135M-Instruct_paper*.json*` | about 8 s per state for three conditions at `k` = 5, about 30 s with the `k` sweep |
-| consistent scramble, LLaMA-160M | `python run_scramble_consistent.py --model JackFram/llama-160m --per-bin 24 --ksweep` | `results/scramble/consistent_llama-160m_draw*.json*` | as above |
-| Gaussian control, entropy-matched | `python run_gaussian_matched.py --points paper` and `--model JackFram/llama-160m --points draw` | `results/scramble/gaussian_*` | about 4 s per state |
+| consistent scramble, LLaMA-160M, GPT-2, Pythia-160M | `python run_scramble_consistent.py --model <id> --per-bin 24 --ksweep`, with `<id>` = `JackFram/llama-160m`, `gpt2`, `EleutherAI/pythia-160m` | `results/scramble/consistent_<model>_draw*.json*` | as above; 36 and 39 min for GPT-2 and Pythia-160M |
+| Gaussian control, entropy-matched | `python run_gaussian_matched.py --points paper`, and `--model <id> --points draw` for the other three | `results/scramble/gaussian_*` | 4–5 s per state |
+| Gaussian control without the LayerNorm bias | `python check_gaussian_bias.py gpt2` (and `EleutherAI/pythia-160m`) | `results/scramble/gaussian_nobias_*` | about 5 min per model |
 | control validity (Gate A off the base point, Jacobian, conditioning) | `python check_control_validity.py` | `results/scramble/control_validity.json` | about 2 min |
 | slice against manifold curvature | `python check_slice_gauss.py 20` | `results/slice/slice_gauss.json` | 2–6 min |
-| spectral profiles | `python run_volume_scramble.py` | `results/volume_scramble/volume_scramble.json` | minutes |
+| spectral profiles | `python run_volume_scramble.py 40 [<id>]`, SmolLM2 by default | `results/volume_scramble/volume_scramble.json` (SmolLM2), `volume_scramble_<model>.json` | 4–7 min per model |
 | instrument agreement (E2) | `python run_stage4.py` | `results/stage4/stage4.json` | about 3 s per state |
 | two corpora | `python run_corpus_compare.py` | `results/corpus_compare/` | about 3 s per state |
 | behavioural probes | `python run_samesense.py`, `run_polysemy.py`, `run_wic.py` | `results/samesense/`, `results/polysemy/`, `results/wic/` | minutes |
