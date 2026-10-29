@@ -73,20 +73,20 @@ A Fisher pullback `G` of a map `x → p(x)` is the Hessian of that map's KL dive
 
 | metric | against the KL of | median \|ratio − 1\| at `h₀` | at `x₁` |
 |---|---|---|---|
-| real | `p_real` | 9.9e−4 | 8.5e−4 |
+| real | `p_real` | 1.0e−3 | 8.6e−4 |
 | consistent | `p_cons` | 1.1e−3 | 1.1e−3 |
-| `within` (the paper's) | `p_real` | 0.83 | 0.93 |
-| `within` (the paper's) | `p_cons` | 1.1e−3 | **0.65** |
+| `within` (the paper's) | `p_real` | 0.86 | 0.93 |
+| `within` (the paper's) | `p_cons` | 1.1e−3 | **0.66** |
 
-The real and consistent metrics are the KL Hessians of their own maps at every point tested. The paper's `within` metric agrees with the consistent map at the base point only — where the two are identical by construction — and with no map once it leaves it (`p_real` and `p_cons` themselves differ there by a median KL of 0.67 nats). Its derivatives, which are what curvature is built from, belong to no probability map. **This is the defect the reviewer named, now measured.**
+The real and consistent metrics are the KL Hessians of their own maps at every point tested. The paper's `within` metric agrees with the consistent map at the base point only — where the two are identical by construction — and with no map once it leaves it (`p_real` and `p_cons` themselves differ there by a median KL of 0.68 nats). Its derivatives, which are what curvature is built from, belong to no probability map. **This is the defect the reviewer named, now measured.**
 
 ### 3.2 The RMSNorm Jacobian
 
-`fisher_metric_projected` uses the projector `I − ĥĥᵀ`, which drops `eps`; the exact Jacobian is `diag(g)/r · (I − hhᵀ/(d r²))`. The exact form matches autodiff to 4.8e−16. The closed form differs from it by a median 2.6e−10 (relative), and recomputing `K` with the exact Jacobian changes it by 0.0 at float64 resolution, for both the real and the consistent metric, on 6 states. The consistent control is a pullback to that precision.
+`fisher_metric_projected` uses the projector `I − ĥĥᵀ`, which drops `eps`; the exact Jacobian is `diag(g)/r · (I − hhᵀ/(d r²))`. The exact form matches autodiff to 4.8e−16. The closed form differs from it by a median 2.6e−10 (relative), and recomputing `K` with the exact Jacobian changes it by a median 1.5e−8 for the real metric and by 0 for the consistent one, on 6 states. The consistent control is a pullback to that precision.
 
 ### 3.3 Conditioning
 
-The paper states that the scramble holds "the conditioning of the retained subspace" fixed exactly. **It does not.** `λ₁/λ₅` of the top-5 block of `PGP` changes from point to point (for example 13.1 → 7.0 and 7.5 → 3.3), because permuting which probability sits on which row changes the spectrum of `UᵀΣ_pU` even though the row multiset is fixed. It is not shifted systematically: median 15.6 real against 14.9 scrambled, scrambled higher at 14/30, z = −0.37.
+The paper states that the scramble holds "the conditioning of the retained subspace" fixed exactly. **It does not.** `λ₁/λ₅` of the top-5 block of `PGP` changes from point to point (for example 13.1 → 7.0 and 7.5 → 3.3), because permuting which probability sits on which row changes the spectrum of `UᵀΣ_pU` even though the row multiset is fixed. It is not shifted systematically: median 15.6 real against 15.1 scrambled, scrambled higher at 14/30, z = −0.37.
 
 **For the paper.** Section V must (1) present the consistent control and say why the `within` construction is not a pullback, with the Gate A table above as the evidence, and (2) replace "held fixed exactly" for conditioning with the measured medians. [08-rq3a-log.md](08-rq3a-log.md) §5.4(d)'s conditioning-matched comparison stays as the supplementary check.
 
