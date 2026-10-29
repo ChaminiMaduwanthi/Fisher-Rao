@@ -31,7 +31,7 @@ The section order and budgets follow the supervisor's six-page guideline.
 1. `python make_tables.py` rebuilds every table from the saved results and checks 69 stored summaries.
 2. `python make_figures.py` writes `figures/fig1_pipeline.png`, `fig2_controls.png` and `fig3_spectral.png`.
 3. `python check_paper_numbers.py` recomputes the 96 numbers the paper quotes and checks that each appears in the text.
-4. `python build_paper_docx.py <template.docx>` writes the Word manuscript into the IEEE template, which is `IEEE_Template.docx` in the repository history. The document properties are left blank.
+4. `python build_paper_docx.py` writes the Word manuscript into the IEEE template, which it reads from the repository history; pass a path to use another copy. The document properties are left blank.
 5. Export the PDF from Word and confirm that it has six pages.
 
 ## Before submission

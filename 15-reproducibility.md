@@ -92,7 +92,7 @@ Runtimes are wall-clock on the machine in §1.
 | every table | `python make_tables.py` | `results/tables/tables.md`, `tables.json` | seconds |
 | figures | `python make_figures.py` | `paper/figures/fig1_pipeline.png`, `fig2_controls.png`, `fig3_spectral.png` | seconds |
 | every number in the paper | `python check_paper_numbers.py` | console: 96 checks | seconds |
-| Word manuscript | `python build_paper_docx.py <IEEE template>`, then export the PDF from Word | `paper/Fisher-Rao-Curvature-IEEE.docx`, `.pdf` | seconds |
+| Word manuscript | `python build_paper_docx.py` (it reads the IEEE template from the repository history), then export the PDF from Word | `paper/Fisher-Rao-Curvature-IEEE.docx`, `.pdf` | seconds |
 
 Checkpointed scripts (`run_*` with a `_points.jsonl`) resume where they stopped. Re-running a finished one only rebuilds its summary.
 
