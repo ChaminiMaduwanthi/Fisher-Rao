@@ -136,7 +136,7 @@ def image_para(rid: str, w_in: float, path: str, name: str) -> str:
         '<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="120" '
         'w:after="60"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" '
         'distL="0" distR="0">'
-        f'<wp:extent cx="{cx}" cy="{cy}"/><wp:docPr id="{abs(hash(name))%9000+10}" '
+        f'<wp:extent cx="{cx}" cy="{cy}"/><wp:docPr id="{10 + int(re.sub(r"[^0-9]", "", rid))}" '
         f'name="{name}"/>'
         "<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">"
         '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">'
