@@ -282,6 +282,8 @@ This is the **third** control in this document that changed more than one thing 
 > **At exactly matched entropy, matched conditioning, matched direction set, and stably across `k` = 4, 5, 6, destroying the learned token→direction assignment collapses intrinsic curvature from `K ≈ +0.255` to `K ≈ 0`.** The geometry is **not** a function of predictive concentration alone. **Which probability sits on which direction** is what puts the manifold at the simplex value.
 >
 > This does not contradict §5.1–5.2. A Gaussian `U` reproduces the real median `K`; a *paired scramble* does not. The difference is informative: a Gaussian unembedding has, by symmetry, no relationship between probability mass and direction to destroy, whereas the real one does — and it is that relationship, not the spectrum or the row norms, that the curvature is reading.
+>
+> ⚠️ **29 October 2026 — not supported as stated.** The `within` metric is not a Fisher pullback: `p` comes from the real model and the Jacobian from the permuted rows. Realised as a genuine pullback, the same scramble leaves `K` at the real value (0.2532 against 0.2554, 15/30 paired). See §5.7.
 
 **(e) The cross-frame arm, recorded rather than hidden** (n = 17):
 
