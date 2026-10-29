@@ -1,327 +1,275 @@
-# Intrinsic Fisher–Rao Curvature of Transformer Representations: Curvature Carries Learned Structure, the Spectrum Carries Entropy
+# Information-Geometric Curvature Analysis of Transformer Representations Using Fisher–Rao Metrics and Genuine-Pullback Controls
 
-**Chamini Maduwanthi**
+**Anonymous Authors**
 
----
+*Affiliation withheld for double-blind review*
 
 ## Abstract
 
-This article computes the intrinsic Riemannian curvature of the Fisher–Rao metric pulled back onto the hidden states of transformer language models, and establishes what that curvature measures. The pullback metric has been derived before and used for activation steering, but the curvature tensor itself has not been formed for a transformer: existing geometric readings either measure curvature under a flat Euclidean metric or substitute a local-PCA residual for it. Christoffel symbols, the Riemann tensor, and sectional and scalar curvature are computed here directly, on a subspace obtained by quotienting out the exact null directions of the normalisation layer. Across four architectures and 456 sampled states the median sectional curvature lies between +0.2548 and +0.2738, a spread of 0.019 about the ambient simplex value of +1/4. The principal finding is a separation between geometric quantities. A paired scramble that destroys the learned token-to-direction assignment, while holding the predictive distribution, the conditioning and the retained direction set exactly fixed, collapses sectional curvature from 0.2546 to 0.0109 (201 of 221 states, sign test z = +12.18), yet reproduces the layer-wise log-volume profile at Spearman rho = +0.957 and the effective-dimension profile at rho = +0.991 over 360 states, with the same minimum layer in each case. Quantities derived from the metric's spectrum therefore track predictive concentration, while curvature tracks the learned assignment. A seven-rung validation ladder, a Kullback–Leibler Hessian identity, and agreement with an independent information-geometry library support the measurements.
+This article computes the intrinsic curvature of the Fisher–Rao metric on the hidden states of transformer language models and tests whether that curvature reflects learned structure. Geometric summaries of hidden states increasingly serve as interpretability evidence, yet the Riemann tensor of this singular metric has not been formed for a transformer, and Fisher–Rao quantities have not been tested against controls that are themselves valid statistical models. The proposed pipeline removes the exact null directions of the normalisation layer, computes sectional curvature on low-dimensional slices by automatic differentiation, and compares each trained model with two genuine-pullback controls: a consistent scramble of the readout rows and an entropy-matched random readout. The pipeline reproduces seven manifolds of known curvature and a Kullback–Leibler Hessian identity. Across four models and 425 hidden states, median curvature lies between 0.255 and 0.272, close to the simplex value of one quarter. Both controls give 0.230 to 0.285, so the value is inherited from the probability simplex rather than learned, although the trained models sit 0.002 to 0.024 below the consistent scramble on every model. A control that is not a genuine pullback instead manufactures a spurious collapse to near zero. The spectral summaries of the metric survive the same scramble, and effective dimension tracks predictive entropy. These findings identify which Fisher–Rao quantities can support interpretability claims.
 
-**Index Terms** — information geometry, Fisher–Rao metric, Riemannian curvature, transformer representations, interpretability, intrinsic dimension.
-
----
+**Index Terms**— explainable artificial intelligence, information geometry, language models, representation geometry, Riemannian curvature
 
 ## I. Introduction
 
-The hidden state of a transformer language model [1] is ordinarily treated as a point in flat Euclidean space. Distances are cosine or L2, directions are compared by inner product, and the geometry of the space is taken to be the geometry of the coordinates in which it happens to be written. That is a modelling choice, and a different one is available.
+Interpretability research increasingly describes what language models represent through the geometry of their hidden states: the intrinsic dimension of representations across depth [1], [2], the curvature of layer-to-layer trajectories [3]–[5], curved manifolds of features and personas [6], [7], and the Fisher information of the model's prediction [8]–[11]. These quantities are already used as evidence: trajectory curvature has been linked to behavioural uncertainty [4], and Fisher geometry has been used to steer activations [9] and to price interventions [10]. A geometric quantity is informative about a model only if it responds to what the model has learned. The same requirement underlies sanity checks for saliency maps [12] and control tasks for probing classifiers [13], but it has rarely been applied to representation geometry.
 
-A transformer with hidden state `h` and unembedding matrix `U` defines a distribution over the next token, `p(h) = softmax(U · norm(h))`. The map `h → p(h)` carries hidden states into the interior of the vocabulary simplex, which is a statistical manifold. On such a manifold one Riemannian metric is distinguished: Čencov's theorem [2] establishes that the Fisher information metric is, up to scale, the only metric on a space of probability distributions invariant under sufficient statistics [3]. Pulling it back through `h → p(h)` yields a metric on hidden-state space derived from the model's own predictive behaviour rather than imposed by the coordinate system.
+Among candidate geometries, the Fisher–Rao metric is distinguished: up to scale, it is the only Riemannian metric on probability distributions that is invariant under sufficient statistics [14], [15]. Pulled back through the model's readout, it measures how a small change of a hidden state changes the next-token distribution [8], [9]. Existing work uses this pullback metric through its spectrum, volume or trace [9]–[11]. Curvature, the quantity that separates an intrinsically curved space from a flat space written in curved coordinates, has been measured only under Euclidean or constant metrics [3]–[5], or replaced by a local principal-component residual whose value of about 10⁻⁵ was read as near-flatness [8].
 
-The pullback itself is established, and has been used both to steer activations and to analyse the scaling of sparse autoencoders. What has not been done is the step after it. A metric supplies lengths, angles and volumes; curvature requires the second derivatives of the metric, and it is curvature, not the metric, that distinguishes a manifold which is intrinsically bent from one merely written in curvilinear coordinates.
+Two gaps follow. First, the intrinsic Riemannian curvature of the Fisher–Rao pullback metric has not been computed for a transformer: the metric is singular along the directions removed by the normalisation layer, and curvature requires second derivatives of a state-dependent metric, a step described as computationally intractable [8]. Second, Fisher–Rao quantities have not been tested against controls that are themselves genuine pullbacks, that is, controls in which the predictive distribution and the metric derive from one and the same map. Without such controls, a change in a geometric quantity cannot be attributed to the removal of learned structure rather than to an invalid construction.
 
-Section II sets out what has been measured to date, and the gap it leaves is precise: the pullback metric has been derived, and layer-wise curvature has been measured under flat metrics, but the intrinsic Riemannian curvature of the state-dependent Fisher–Rao metric — Christoffel symbols through Riemann tensor to sectional and scalar curvature — has not been computed for a transformer at any scale or any layer. This article computes it, and then asks the more useful question: once computed, what does curvature measure that cheaper quantities do not? Three quantities are put through a single control. Two of them — the log volume element and the effective dimension of the metric — are reproduced almost exactly when all learned structure is destroyed. Sectional curvature is not.
+This article addresses both gaps. It computes the sectional curvature of the Fisher–Rao pullback metric after quotienting the exact null directions of the normalisation layer, validates the computation against manifolds of known curvature, and compares four trained models with two genuine-pullback controls: a consistent scramble of the readout rows and an entropy-matched random readout. Three research questions are addressed. RQ1: Can the intrinsic curvature of the Fisher–Rao pullback metric be computed reliably on transformer hidden states? RQ2: What value does this curvature take across architectures, and is that value produced by learning? RQ3: What do the spectral summaries of the same metric, log-volume and effective dimension, measure?
 
-The article makes three contributions. (i) It computes the intrinsic Riemannian curvature of the Fisher–Rao pullback metric on transformer hidden states, validated on a seven-rung ladder of manifolds with analytically known curvature and measured at +1/4 across four architectures. (ii) It establishes a separation result, in which one paired control divides three geometric quantities into those that read predictive concentration and the one that reads learned structure; the division is prescriptive, since it identifies which geometric quantities repay the cost of computing. (iii) It calibrates the near-flat reading already in the literature, by showing that the estimator producing 10⁻⁵ reports, at the threshold that produces that value, a unit 3-sphere as flat to 10⁻³¹.
+This work makes three contributions: (1) a validated pipeline for the intrinsic curvature of the Fisher–Rao pullback metric on transformer hidden states (RQ1); (2) evidence on four architectures that the measured curvature, close to one quarter, is inherited from the probability simplex rather than produced by learning, together with a demonstration that a control which is not a pullback manufactures a spurious collapse (RQ2); and (3) evidence that the metric's spectral summaries depend on the predictive distribution rather than on learned structure, with a comparison against three published curvature instruments (RQ3). The results address researchers who use geometric quantities as interpretability evidence. Code, per-state results and a script for every table are available in an anonymised repository [16].
 
----
+## II. Related Work and Research Gap
 
-## II. Related Work
+*Fisher–Rao pullback metric.* The pullback of the Fisher–Rao metric onto transformer hidden states was derived by Mabrok [8], who defined its Riemann tensor but estimated curvature with local principal-component (PCA) and second-fundamental-form proxies, reporting values near 10⁻⁵. FishBack [9] uses the same metric to select steering directions in GPT-2 and analyses its spectrum without forming Christoffel symbols. Picozzi [10] studies the spectrum and effective dimension of the output Fisher–Rao geometry for models of up to 7B parameters and finds the spectrum predictable from token probabilities; the full text contains no Christoffel symbols, Riemann tensor or sectional curvature. Mudarisov et al. [11] identify the pullback operator with the Hessian of the loss-to-go in models of 1B to 9B parameters, and their curvature score is a trace of that operator. Zaher et al. [17] relate the rank of the metric to sparse-autoencoder scaling.
 
-The pullback of the Fisher–Rao metric onto hidden-state space has been derived before and put to work: it has been applied to activation steering [4] and to the analysis of sparse autoencoder scaling [5]. Both stop at the metric itself; neither forms its curvature.
+*Curvature of representations.* Curvature of transformer representations has so far been measured under flat geometry. Manson [3] computes the Frenet curvature of residual-stream trajectories under the constant metric UᵀU, whose intrinsic curvature is identically zero. King et al. [4] use the Euclidean angle between successive difference vectors and report a correlation of about 0.15 with next-token entropy. Pandey et al. [5] measure ambient trajectory curvature and find that its effects vanish under shuffled-layer and random-embedding controls. PersonaManifold [7] estimates Ollivier–Ricci curvature, a discrete notion, on persona activations. Intrinsic curvature of a pullback metric has been computed for convolutional and fully connected networks under a data-induced metric [18], following earlier Riemannian treatments of neural networks [19], but not for transformers and not for the Fisher–Rao metric.
 
-Existing geometric readings of transformers stop short of the curvature step in one of two ways. (i) Curvature is measured under a flat metric, as in a Frenet-style curvature of residual-stream trajectories [6] and an angular curvature between successive difference vectors [7]. Both report that curvature varies with semantic content and predictive uncertainty, which is good evidence that geometry carries signal; but both compute the quantity in Euclidean coordinates, so what varies is a property of the coordinate chart together with the trajectory rather than an invariant of a manifold. (ii) A local-PCA residual on the ambient activation cloud is reported as a curvature of order 10⁻⁵ and read as near-flatness [8]. Section VI.G returns to that reading with the same estimator.
+*Representation manifolds and controls.* Intrinsic-dimension studies report a characteristic profile across depth [1], [2], estimated by nearest-neighbour methods [20], and representation manifolds have been given a theoretical account [6]. Controls that remove learned structure are standard for other interpretability methods [12], [13], and a randomly initialised encoder recovers much of the benefit of pullback-metric pooling [21]. Such controls have not been applied to Fisher–Rao curvature. Table I places the closest studies side by side.
 
-Intrinsic Riemannian curvature has been computed for neural representations under a data-induced metric [9], which establishes that the machinery is tractable, but the metric there is not Fisher–Rao and the models are not transformers.
+**TABLE I. CLOSEST STUDIES AND THE CURVATURE EACH COMPUTES**
 
-Outside the curvature literature, a parallel line of work measures intrinsic dimension across depth and reports a characteristic profile with a minimum roughly one third of the way through the network [10], usually estimated by a nearest-neighbour method [11] and more recently given a manifold-theoretic account [12]. Section VI.B shows that the analogous profile under the Fisher–Rao metric is reproduced almost exactly by a control containing no learned structure, which raises a testable question for that literature.
+| Study | Metric on hidden states | Curvature quantity |
+|---|---|---|
+| Mabrok [8] | Fisher–Rao pullback | local-PCA proxy; tensor defined only |
+| FishBack [9] | Fisher–Rao pullback | none (spectrum) |
+| Picozzi [10] | Fisher–Rao pullback | none (spectrum, effective dimension) |
+| Mudarisov et al. [11] | Fisher pullback operator | trace score |
+| Manson [3] | constant UᵀU | Frenet curvature, flat space |
+| King et al. [4] | Euclidean | angle between steps |
+| Pandey et al. [5] | Euclidean | trajectory angle |
+| Zavatone-Veth et al. [18] | data-induced, not transformers | Ricci scalar |
+| This article | Fisher–Rao pullback, null directions quotiented | sectional and scalar, on slices |
 
----
+The research gap is therefore twofold. No study computes the Riemann tensor of the Fisher–Rao pullback metric on transformer hidden states, and no study tests whether Fisher–Rao quantities survive controls that remove learned structure while remaining genuine pullbacks. The second gap matters as much as the first: Section V shows that a natural but inconsistent control manufactures a collapse of curvature that a consistent control does not reproduce.
 
-## III. Methodology
+## III. Research Methodology
 
-### A. The pullback
+### A. Research Design
 
-Write `norm` for the model's final normalisation layer and `A(h)` for its Jacobian. With `J = U · A(h)` and `p = p(h)`, the Fisher information metric on the simplex pulls back to
+The study is a controlled measurement study. Each hidden state is measured under the trained readout and, at the same base point, under each control, so that every comparison is paired within a state. Known-answer validation addresses RQ1, the paired controls address RQ2, and the same controls, applied to the spectral summaries together with three published curvature instruments as external comparators, address RQ3. Fig. 1 shows the workflow.
 
-> **G(h) = Jᵀ (diag(p) − p pᵀ) J.**  (1)
+**[FIGURE 1: fig1_pipeline.png | full]**
+*Fig. 1. Workflow of the study. The measurement chain (top) is repeated at the same base point with the readout replaced by each control (bottom left); validation (bottom centre) tests the chain against known answers. Equation numbers refer to Section IV.*
 
-This is a `d × d` matrix, available in closed form and inexpensive to evaluate. It is distinct from the parameter-space Fisher matrix used in second-order optimisation [13], which is intractable at this scale. Equation (1) is the metric of the model's *output distribution* expressed in the coordinates of its *hidden state*, and every quantity in this article derives from it.
+### B. Models and Data
 
-`G(h)` is the Hessian of the Kullback–Leibler divergence at zero displacement, which supplies a falsification test independent of how (1) is implemented:
+Four pretrained models span both normalisation schemes and both embedding regimes: SmolLM2-135M-Instruct [22] (RMSNorm [23], tied embeddings, 30 layers, width 576, 49 152 tokens), LLaMA-160M [24] (RMSNorm, untied, 12 layers, width 768, 32 000 tokens), GPT-2 [25] (LayerNorm [26], tied, 12 layers, width 768, 50 257 tokens) and Pythia-160M [27] (LayerNorm, untied, 12 layers, width 768, 50 304 tokens). Pythia-70M and GPT-Neo-125M [28] are added for the null-direction test. The inputs are 148 hand-written probe sentences, released with the code, and sentences from the WikiText-103 validation split [29]. Hidden states are taken from the residual stream at nine relative depths (layers 1, 5, 10, 15, 20, 25, 28, 29 and 30 for SmolLM2) and at every token position.
 
-> **KL(p(h) ‖ p(h + εv)) = ½ ε² vᵀ G(h) v + O(ε³).**  (2)
+Three samples are used. The profile sample holds 12 states per depth, 425 distinct states over the four models. The control sample holds 186 SmolLM2 states and, for each other model, 120 states drawn as 24 per band of predictive entropy: [0, 0.5), [0.5, 1), [1, 2), [2, 4) and [4, ∞) nats. The spectral sample holds 40 states per depth, 360 per model. LLaMA-160M's start-of-sequence state is exactly zero at every layer, so its prediction is uniform and the metric is undefined there; these 34 states are excluded. Rows duplicated by resumed runs are removed before any statistic is computed.
 
-Two evaluation choices matter here. The sum in (1) is taken over the 512 tokens of highest probability, renormalised, rather than over the whole vocabulary; measured on SmolLM2-135M against its full 49 152 tokens, the relative error of the truncated metric is 3.2 × 10⁻³ at 500 retained tokens and 8.8 × 10⁻⁴ at 2000. That index set is then frozen at the base point before any derivative is taken. Were it re-selected at each evaluation, membership would change discretely as `h` moves, `G(h)` would be only piecewise smooth, and its second derivatives meaningless.
+### C. Evaluation Protocol
 
-### B. Exact null directions
+*Comparators.* Three controls replace the readout while keeping the hidden state, the final normalisation and the retained-token set fixed (Section IV-D): C0, an inconsistent scramble used in a preliminary version of this analysis; C1, a consistent scramble; and C2, an entropy-matched Gaussian readout. For RQ3, the local-PCA residual [8], Frenet curvature under UᵀU [3] and the Euclidean angle [4] are computed on 360 SmolLM2 states as external comparators.
 
-Both normalisation layers annihilate directions exactly. RMSNorm [14] has Jacobian `A = diag(g)(1/r)(I − ĥĥᵀ)` and one null direction, `h` itself. LayerNorm [15] additionally subtracts the mean and so annihilates two: the radial direction and the all-ones direction. `G(h)` is therefore singular by construction, with rank at most `d − 1` or `d − 2`.
+*Metrics.* The primary metric is slice sectional curvature K, the median over 16 random planes per state; scalar curvature R is also reported. The spectral summaries are the effective dimension k<sub>eff</sub>, the number of eigenvalues of the quotiented metric that hold 99 % of its trace, and the log-volume per dimension of its top-k block, ℓ = (1/2k) Σᵢ log(r² λᵢ), where r, the root-mean-square (RMSNorm) or standard deviation (LayerNorm) of h, removes the metric's 1/r² scaling.
 
-Suppressing this with a pseudo-inverse would return a plausible wrong answer. The null space is instead quotiented explicitly: with `N` an orthonormal basis of the null directions and `P = I − N Nᵀ`, curvature is computed on the span of the top-`k` eigenvectors of `P G P`. This construction is falsifiable, and Table I reports the test. On every architecture examined the number of null directions found matches the theoretical prediction, and the model's prediction is unmoved along them: stepping by `‖h‖`, which doubles the hidden state, changes the output distribution by a Kullback–Leibler divergence of 10⁻¹³ or less, while a random step of identical size changes it by 3 to 32 nats — a separation of thirteen to sixteen orders of magnitude. The directions the metric calls null are exactly the directions the model cannot see, which establishes that the metric measured is the model's own.
+*Statistics.* Medians are reported. Trained and control values are compared by a paired sign test, z = (n₊ − n/2)/(√n/2), and monotone agreement by Spearman's ρ with midranks. A decision rule was fixed after a 30-state pilot and before the reported runs: a trained model and a control agree when |z| < 2 and their medians differ by less than 0.01; agreement on at least three of the four models would indicate that learning leaves curvature unchanged, and otherwise the differences are reported.
 
-**TABLE I. NULL-DIRECTION FALSIFICATION TEST**
+## IV. Pipeline Design and Implementation
 
-| model | norm | null dirs (exp.) | KL along null | KL along random |
+### A. The Pullback Metric
+
+For a hidden state h, the model predicts p(h) = softmax(U n(h)), where n is the final normalisation and U is the readout restricted to the 512 most probable tokens at the base point. With A(h) the Jacobian of n and J = U A(h), the Fisher–Rao metric of the simplex pulls back to
+
+> G(h) = Jᵀ (diag p − p pᵀ) J. (1)
+
+The metric is the Hessian of the Kullback–Leibler divergence at zero displacement,
+
+> KL(p(h) ‖ p(h + εv)) = ½ ε² vᵀ G(h) v + O(ε³), (2)
+
+which tests an implementation of (1) independently. The retained token set is frozen at the base point before any derivative is taken, because re-selecting it would make G only piecewise smooth; on SmolLM2, truncation to 500 tokens changes the metric by 3.2 × 10⁻³ (relative norm). G is a d × d matrix in closed form, distinct from the parameter-space Fisher matrix of second-order optimisation.
+
+### B. Exact Null Directions and Slices
+
+Both normalisation layers annihilate directions exactly. RMSNorm has one null direction, h itself, and LayerNorm two, the centred state and the all-ones vector, so G(h) is singular by construction. Instead of a pseudo-inverse, the null space is quotiented: with N an orthonormal null basis and P = I − NNᵀ, curvature is computed on the slice S = h₀ + span(F), where F holds the top-k eigenvectors of P G(h₀) P. The default is k = 5, with k = 4 and 6 as checks; at k = 5 the slice holds a median 95.6 % of the quotiented trace (60 states).
+
+### C. Curvature on a Slice
+
+On S, the Christoffel symbols and the Riemann tensor R of the induced metric g are formed by nested reverse-mode automatic differentiation of (1) in double precision [30]. The sectional curvature of the plane spanned by u and v is [31]
+
+> K(u, v) = R(u, v, v, u) / (g(u, u) g(v, v) − g(u, v)²), (3)
+
+and the value reported for a state is the median over 16 random planes. Every number is therefore a slice sectional curvature K<sub>S</sub>. For orthonormal u and v it differs from the curvature K<sub>M</sub> of the full quotient manifold through the Gauss equation [31],
+
+> K<sub>S</sub> = K<sub>M</sub> + ⟨II(u, u), II(v, v)⟩ − ‖II(u, v)‖², (4)
+
+where II is the second fundamental form of S in the manifold. The extrinsic term was measured where K<sub>M</sub> is known exactly (Table II), and each model and its controls are compared on slices of the same dimension and construction.
+
+### D. Genuine-Pullback Controls
+
+Let Π permute the retained rows of U. C0 takes p from the trained readout but the Jacobian from ΠU. At h₀ it changes only which probability sits on which direction, but away from h₀ its metric is the Hessian of no probability map, so the derivatives from which curvature is built belong to no model. C1 realises the same permutation as a model with logits
+
+> z(h) = U n(h₀) + ΠU (n(h) − n(h₀)) (5)
+
+and p(h) = softmax(z(h)). It coincides with C0 at h₀ (same p, metric, slice and row multiset) and is a genuine pullback everywhere; with Π the identity it reproduces the trained metric to 2.4 × 10⁻¹⁴ on GPT-2 and 1.2 × 10⁻¹³ on Pythia-160M. The permutation does not hold the conditioning of the slice fixed state by state, but it leaves its distribution unchanged (median ratio of first to fifth eigenvalue 15.6 against 15.1, z = −0.4, on 30 SmolLM2 states). C2 removes the trained readout altogether: p(h) = softmax(sW n(h)), with W one fixed Gaussian matrix with entries of variance 1/d and s chosen per state so that the predictive entropy equals the trained model's, to within 10⁻¹³ nats. C2 keeps the trained hidden states and final normalisation, including LayerNorm's learned bias.
+
+### E. Validation and Implementation
+
+Table II lists the validation. Seven manifolds of known curvature are run through the code path used for the transformers, among them the categorical simplex, which under the Fisher–Rao metric is part of a sphere of radius 2 with K = 1/4 [15], and a synthetic pullback softmax(Uh) with d equal to the number of outcomes minus one, whose curvature must be exactly 1/4. A deliberately broken assembly of (1) must fail. Identity (2) is evaluated on SmolLM2 at the base point and, for each control, 5 % of ‖h₀‖ away from it, which separates genuine pullbacks from C0. An independent implementation, geomstats [32], provides a second opinion on the parametric families.
+
+The implementation uses Python 3.13, PyTorch 2.12 in float64 on a four-core laptop CPU without a GPU, Transformers [33] with pinned model revisions, and geomstats 2.8. A state costs about 3 s at k = 5. Seeds are fixed: 0 for planes and for W, and 1000 plus the state index for Π. One correction was made during the study: the projected metric had used the RMSNorm Jacobian for LayerNorm models; the exact form changes K by at most 1.1 × 10⁻³ (median 6 × 10⁻⁵), and every control run uses it.
+
+**TABLE II. VALIDATION OF THE PIPELINE: WORST-CASE ERROR UNLESS MARKED AS A MEDIAN**
+
+| Check | Expected | Observed |
+|---|---|---|
+| Sphere of radius 2 | K = 1/4 | 1.8 × 10⁻¹⁵ |
+| Poincaré half-plane | K = −1 | 1.0 × 10⁻¹³ |
+| Categorical simplex | K = 1/4 | 6.6 × 10⁻¹⁰ |
+| Univariate Gaussian | K = −1/2 | 2.6 × 10⁻¹⁵ |
+| Gamma, beta families | geomstats [32] | 2.3 × 10⁻¹³ |
+| Synthetic pullback | K = 1/4 | 9.7 × 10⁻¹² |
+| Reparameterised, U → UM | invariant | 1.9 × 10⁻¹¹ |
+| Outer product of (1) dropped | must fail | fails, 0.263 |
+| Identity (2), SmolLM2 | ratio 1 | 4.3 × 10⁻⁵ |
+| (2) off h₀: trained, C1 (median) | ratio 1 | 8.5 × 10⁻⁴, 1.1 × 10⁻³ |
+| (2) off h₀: C0 (median) | ratio 1 | 0.66–0.93, fails |
+| Null directions, six models | KL = 0 | ≤ 2.0 × 10⁻¹³ nats |
+| Eigen-frame slice, 0.5–4 nats (median) | K<sub>S</sub> = K<sub>M</sub> = 1/4 | 0.005–0.028 |
+
+## V. Results and Discussion
+
+### A. Validation (RQ1)
+
+Table II answers RQ1. The pipeline reproduces every analytic curvature to 6.6 × 10⁻¹⁰ or better, including the categorical simplex, which carries the metric under study, and the synthetic pullback, which tests the assembly of (1). It is blind to reparameterisation and fails, as it must, when the outer-product term of (1) is dropped. On SmolLM2, (2) holds to 4.3 × 10⁻⁵. On all six models the number of null directions matches the normalisation type, and a step of length ‖h‖ along them changes the prediction by at most 2.0 × 10⁻¹³ nats, against 2.96 to 32.3 nats for a random step of the same length; the quotiented metric is therefore the model's own. The independent library agrees on three families; on the Poincaré half-plane and the categorical simplex it reports different curvatures from identical metrics, whereas this pipeline reproduces the analytic values; the difference therefore arises in the curvature computation rather than in the metric, and its cause is not resolved. Eigen-frame slices deviate from the known manifold curvature by 0.005 to 0.028 between 0.5 and 4 nats, against 0.04 to 0.16 for random slices, and by 0.20 and 0.12 below 0.5 and above 4 nats.
+
+### B. Curvature Across Architectures and Controls (RQ2)
+
+On the profile sample, median slice curvature is 0.255 for SmolLM2 (quartiles 0.251–0.261), 0.256 for LLaMA-160M (0.240–0.286), 0.260 for GPT-2 (0.240–0.294) and 0.272 for Pythia-160M (0.261–0.308): a spread of 0.017 around the simplex value of 1/4 across both normalisation schemes and both embedding regimes. Table III and Fig. 2 compare the trained models with the controls.
+
+**TABLE III. SLICE SECTIONAL CURVATURE ON FIVE-DIMENSIONAL SLICES: MEDIANS, WITH THE SIGN-TEST STATISTIC FOR TRAINED ABOVE CONTROL IN PARENTHESES**
+
+| | SmolLM2 | LLaMA | GPT-2 | Pythia |
 |---|---|---|---|---|
-| SmolLM2-135M | RMSNorm | 1 (1) | 2.8 × 10⁻¹⁵ | 3.76 |
-| LLaMA-160M | RMSNorm | 1 (1) | 3.8 × 10⁻¹⁶ | 2.96 |
-| Pythia-70M | LayerNorm | 2 (2) | 1.6 × 10⁻¹³ | 13.41 |
-| Pythia-160M | LayerNorm | 2 (2) | 2.0 × 10⁻¹³ | 7.79 |
-| GPT-2 | LayerNorm | 2 (2) | 1.2 × 10⁻¹⁵ | 3.70 |
-| GPT-Neo-125M | LayerNorm | 2 (2) | 9.7 × 10⁻¹⁶ | 32.31 |
+| States | 186 | 118 | 120 | 120 |
+| Trained | 0.2547 | 0.2565 | 0.2580 | 0.2696 |
+| C0, inconsistent | 0.0096 (+11.0) | −0.0056 (+10.5) | 0.0095 (+9.5) | 0.0218 (+10.4) |
+| C1, consistent | 0.2565 (−3.1) | 0.2794 (−4.8) | 0.2823 (−5.3) | 0.2827 (−4.0) |
+| C2, Gaussian | 0.2730 (−7.8) | 0.2846 (−4.4) | 0.2303 (+7.3) | 0.2816 (−3.8) |
 
-### C. Curvature and the working subspace
+**[FIGURE 2: fig2_controls.png]**
+*Fig. 2. Median slice sectional curvature by predictive-entropy band for the trained models and the three controls. Dashed line: K = 1/4. C0 values below the axis are marked by triangles on its lower edge.*
 
-On the retained `k`-dimensional subspace, Christoffel symbols and the Riemann tensor are formed by nested reverse-mode differentiation of (1), and the sectional curvature of the plane spanned by `u, v` follows in the standard way [16]. All differentiation is reverse-mode automatic differentiation in double precision [17].
+The inconsistent control C0 collapses curvature on all four models (z from +9.5 to +11.0), which reproduces the preliminary result. The two genuine pullbacks do not: C1 and C2 give medians from 0.230 to 0.285, within 0.035 of 1/4, although neither contains the learned pairing between readout rows and probabilities and C2 contains no trained readout at all. The collapse is therefore an artefact of a control whose derivatives belong to no probability map (Table II), and a value near 1/4 does not require learning. It is inherited from the simplex and the slice construction: with no learning at all, the eigen-frame slices of the synthetic pullback give 0.25 to 0.28 between 0.5 and 4 nats.
 
-The cost of the Riemann tensor grows by a factor of about 2.7 per unit increase in `k`, which places a hard ceiling at `k ≤ 8` on the hardware used. All curvature results below are computed at `k` = 4, 5 and 6, with `k` = 5 as the default, and the retained subspace holds a median 96 % of the quotiented metric's trace at `k` = 5 (mean 91 %, measured over 60 states). The reported curvature is accordingly that of a `k`-dimensional slice under the induced metric, and the stability of the central result across the accessible range of `k` is reported explicitly in Section VI.B.
+Learning nevertheless leaves a trace. By the decision rule of Section III-C, the trained models agree with neither control on any model. They lie below C1 on all four models, by 0.002 to 0.024 at the median (z from −3.1 to −5.3); the direction is the same at k = 4 and k = 6 in all eight cases (|z| ≥ 2 in six), and in every entropy band fewer than half of the states have the trained value higher. Against C2 the direction depends on the model: GPT-2's Gaussian readout gives the lower curvature (0.230 against 0.258), the other three the higher. Removing LayerNorm's bias from C2 leaves the GPT-2 result unchanged (0.114 against 0.117 above 4 nats, where the trained model gives 0.209), and its cause remains open. A further hypothesis from the preliminary analysis, that learning moves curvature towards 1/4, is not supported: the trained value is significantly closer to 1/4 in only four of the eight model–control comparisons.
 
-The slice is not the manifold, and the difference has a closed form. For orthonormal `u, v` spanning a plane in the slice `S = h₀ + span(F)`, the Gauss equation gives `K_S(u, v) = K_M(u, v) + ⟨II(u,u), II(v,v)⟩ − ‖II(u,v)‖²`, where `M` is the full quotient manifold and `II` the second fundamental form of `S` in `M`. Every Riemann-derived number in this article is therefore a slice sectional curvature. The size of the extrinsic term was measured where `K_M` is known exactly, on the synthetic pullback of ladder rung 7 with 512 retained tokens: slices spanned by the top five eigenvectors of `G(h₀)`, the construction used throughout, deviate from `K_M = 1/4` by a median of 0.005 to 0.028 for predictive entropies between 0.5 and 4 nats, against 0.04 to 0.16 for random slices of the same dimension. The deviation is larger at the extremes, 0.20 below 0.5 nats and 0.12 above 4 nats, and it vanishes when the slice is the whole manifold. Comparisons between a model and its controls therefore use slices of identical dimension and construction.
+Fig. 2 locates the differences. Between 0.5 and 4 nats the trained medians stay within 0.02 of 1/4 and the genuine controls within 0.06; the larger departures occur below 0.5 and above 4 nats, the bands with the largest extrinsic term in Table II. Because the trained and control slices are chosen from different metrics, their extrinsic terms in (4) differ, and the offset, 0.002 to 0.024, is of the same order as that term. It is therefore a property of slice curvature; whether it reflects the curvature of the full manifold cannot be settled with slices of dimension k ≤ 6.
 
-In absolute terms the cost is modest at the working dimension and rises steeply beyond it: a full sectional-curvature evaluation takes about 2.6 s per state at `k` = 5 and about 46 s at `k` = 8, which is why the sweep is reported at `k` = 4 to 6. The metric itself, being closed-form, is negligible by comparison; the expense is entirely in the second derivatives. This matters for the recommendation in Section VII, since it is precisely the expensive quantity that turns out to carry the signal.
+### C. Spectral Summaries (RQ3)
 
-Sectional curvature is a property of a 2-plane rather than of a point, so the value reported at a state is the median over 16 random 2-planes drawn in the retained subspace, with 32 planes where the tail of that distribution is the quantity of interest.
+Both spectral summaries are evaluated at h₀, where C0 coincides with C1, so for them C0 is a valid control. Table IV and Fig. 3 show that the control reproduces both summaries on every model, with the same lowest layer for both. Effective dimension is reproduced closely, with rank correlations across states of 0.97 to 0.99 and 94 % to 99 % of the range of the depth profile; log-volume is reproduced less tightly (0.85 to 0.96). Both summaries therefore depend on the predictive distribution and the multiset of readout rows rather than on their learned pairing. Effective dimension tracks predictive entropy on every model (ρ = 0.71 to 0.90), in line with the finding that the Fisher spectrum is predictable from token probabilities [10]; log-volume does so clearly on SmolLM2 and Pythia-160M and weakly on LLaMA-160M and GPT-2. The depth profile itself is model-specific: SmolLM2's effective dimension is lowest at layer 10 of 30, near the one-third depth reported for intrinsic dimension [2], whereas the 12-layer models are lowest at layer 9 or 11. A control without the learned pairing reproduces each profile, which suggests applying such controls before reading intrinsic-dimension profiles as learned structure.
 
-### D. Models and data
+**TABLE IV. SPECTRAL SUMMARIES UNDER THE CONTROL: RANK CORRELATION WITH THE TRAINED VALUE, AND WITH PREDICTIVE ENTROPY**
 
-Measurements are taken on GPT-2 [18], Pythia-70M and Pythia-160M [19], LLaMA-160M and SmolLM2-135M, spanning both normalisation schemes, tied and untied embeddings, depths from 6 to 30 layers and widths from 512 to 768. Text is drawn from WikiText-2 [20] and from hand-written probe sentences; the sense-disambiguation probe of Section VI.F follows the design of the word-in-context task [21].
-
-States are sampled at nine relative depths in each network and at token positions drawn uniformly from the corpus sentences. The cross-architecture sweep of Section VI.A gives 101 to 130 states per model and 456 in all; the paired control of Section VI.B is applied at 221 states for curvature and, for the two spectral quantities, at 40 states in each of nine layers, giving 360.
-
----
-
-## IV. Validation
-
-Intrinsic curvature is expensive, silent when wrong, and plausible either way. Validation therefore precedes results and is reported in full.
-
-### A. The ladder
-
-Seven manifolds with analytically known curvature are run through the same code path used for the transformer. Table II reports the outcome.
-
-**TABLE II. VALIDATION LADDER**
-
-| rung | manifold | expected | measured | worst error |
+| Model (states) | ρ, log-volume | ρ, k<sub>eff</sub> | Lowest layer | ρ with entropy, k<sub>eff</sub> / log-volume |
 |---|---|---|---|---|
-| 1 | Sphere, radius 2 | K = +1/4 | +0.250000 | 1.8 × 10⁻¹⁵ |
-| 2 | Poincaré half-plane | K = −1 | −1.000000 | 1.0 × 10⁻¹³ |
-| 3 | Categorical simplex | K = +1/4 | +0.250000 | 6.6 × 10⁻¹⁰ |
-| 4 | Gamma family | negative | −0.463903 | 2.3 × 10⁻¹³ * |
-| 5 | Beta family | negative | −0.456795 | 4.9 × 10⁻¹⁴ * |
-| 6 | Univariate Gaussian | K = −1/2 | −0.500000 | 2.6 × 10⁻¹⁵ |
-| 7 | Synthetic pullback | K = +1/4 | +0.250000 | 9.7 × 10⁻¹² |
+| SmolLM2 (360) | 0.957 | 0.991 | 10 / 10 | 0.71 / 0.86 |
+| LLaMA (335) | 0.847 | 0.988 | 11 / 11 | 0.90 / 0.38 |
+| GPT-2 (360) | 0.879 | 0.972 | 9 / 9 | 0.79 / 0.45 |
+| Pythia (360) | 0.958 | 0.994 | 11 / 11 | 0.78 / 0.69 |
 
-Errors are worst-case over twelve random base points and random 2-planes per rung. Rungs 4 and 5 have no closed-form constant, so the starred entries are worst-case disagreement with the independent library of Section IV.B rather than with an analytic value; the claim tested for those two families is that the curvature is everywhere negative, and it is.
+**[FIGURE 3: fig3_spectral.png]**
+*Fig. 3. Median effective dimension by layer for the trained metric and the scrambled readout, which coincides with C1 at the base point; ρ is the rank correlation across states.*
 
-Rung 3 is load-bearing: the categorical simplex under the full Fisher–Rao metric is isometric to the positive orthant of a radius-2 sphere and so has constant `K = +1/4`. It is the same metric family as the object under study.
+### D. Comparison With Published Instruments
 
-Rung 7 validates the assembly of (1) specifically, which no other rung does. With a synthetic linear model `p(h) = softmax(U h)` and `d = N − 1`, the map `h → p` is a diffeomorphism onto the simplex interior, so the pullback metric is the simplex metric in different coordinates and the curvature must be exactly +1/4 for every valid `U`. Three further checks accompany it: reparameterisation invariance under `U → UM`, to which curvature must be blind (worst error 1.9 × 10⁻¹¹); scalar curvature `R = k(k−1)/4` recovered through the pullback (4.9 × 10⁻¹²); and a deliberately broken assembly, with the outer-product term of (1) dropped, which must fail and does, at 0.263. A test that cannot fail carries no information.
+Table V compares intrinsic curvature with the three published instruments on 360 SmolLM2 states, and their stability on 293 hand-written and 360 WikiText-103 states. The two intrinsic quantities agree with each other (ρ = 0.72) but not with the instruments: |ρ| ≤ 0.144 between K and each instrument pooled over layers, and ≤ 0.112 within layers, so the instruments measure different properties. The intrinsic quantities are also the most stable across corpora: their correlation with predictive entropy shifts by 0.028 and 0.034, against 0.104 to 0.194 for the instruments, one of which changes sign. Finally, the published near-flat value is reproduced and calibrated. On GPT-2's last layer the local-PCA residual reaches 6.2 × 10⁻⁵ at a retained-variance threshold of 0.9999 with 200 neighbours and underflows to about 10⁻³² with fewer, while at a threshold of 0.999 the same estimator reports a unit 3-sphere, whose curvature is +1, as 1.5 × 10⁻³¹. A residual near zero is a property of the estimator's operating point, not evidence of flatness.
 
-### B. The Hessian identity and an independent implementation
+**TABLE V. INTRINSIC CURVATURE AGAINST PUBLISHED INSTRUMENTS (SMOLLM2)**
 
-Equation (2) was verified on a real model through a separate code path. Sweeping `ε` produces the expected plateau at relative error 8.7 × 10⁻⁶, confirming that the assembled `G(h)` is the Hessian of the model's own divergence rather than an unrelated quadratic form.
+| Instrument | ρ with K, pooled / within layer | ρ with entropy, hand-written → WikiText |
+|---|---|---|
+| Intrinsic K (this article) | — | −0.447 → −0.475 |
+| Intrinsic R (this article) | +0.720 / +0.689 | −0.579 → −0.544 |
+| Local-PCA residual [8] | −0.144 / −0.001 | +0.175 → +0.050 |
+| Frenet curvature, UᵀU [3] | +0.133 / −0.003 | −0.113 → −0.217 |
+| Euclidean angle [4] | +0.137 / +0.112 | +0.043 → −0.151 |
 
-Rungs 2 to 6 were additionally re-run against the `information_geometry` module of an independently implemented, peer-reviewed library [22] on identical inputs. Three families agree at machine precision across eight comparisons: univariate normal to 2.2 × 10⁻¹⁶, gamma to 2.3 × 10⁻¹³ and beta to 4.9 × 10⁻¹⁴ at worst, the last two being exactly the rungs added for this cross-check. On the two families where the libraries differ, the diagnostic applied was to compare the *metrics* rather than the curvatures: in both cases the metrics agree exactly, to 1 × 10⁻¹² and 7 × 10⁻¹⁵, so the difference is localised to a curvature routine rather than a parameterisation convention. The +1/4 reported here is independently corroborated three ways — by the analytic radius-2 sphere isometry, by rung 3, and by rung 7's separate code path — and the remaining discrepancy is recorded as open.
+### E. Implications for Interpretability
 
----
+Three practical rules follow for studies that use Fisher–Rao geometry as evidence. First, a curvature near 1/4 is the expected value of a softmax pullback and is not by itself evidence of learned structure; claims should rest on differences from genuine-pullback controls computed on slices of identical construction. Second, every control should be checked with identity (2) away from the base point, since a control that fails it can manufacture a large effect, as C0 does. Third, spectral summaries of the metric should be read as summaries of predictive concentration unless a control shows otherwise.
 
-## V. Experimental Control
+### F. Threats to Validity
 
-The central result rests on one control, so its construction is given precisely.
+*Construct.* Every reported curvature is a slice curvature (4); the extrinsic term was sized only on a synthetic pullback, and the learned offset is of the same order. *Internal.* C2 keeps the trained hidden states and normalisation, and a randomly initialised network was not tested; C0 shows that a control must be checked with (2) away from the base point; the token truncation changes the metric by about 3 × 10⁻³; states from one sentence and adjacent layers are not independent, so z values are approximate, and only the fixed decision rule guards against multiple comparisons. *External.* The models have at most 160M parameters and the text is English; spectral studies now reach 7B parameters [10], and the curvature results have not been tested at that scale. *Reliability.* The independent library disagrees on two families, and the zero start-of-sequence states of LLaMA-160M are excluded. All tables are regenerated from saved per-state results by one script that checks 69 stored summaries.
 
-Let `idx` be the indices of the vocabulary rows retained at a given state. The paired within-set scramble replaces `idx` by `idx[randperm(len(idx))]`: the same rows are used, permuted in their assignment to probabilities. Four quantities are thereby held fixed exactly, namely (i) the predictive distribution `p`, and therefore the entropy, to machine precision, (ii) the multiset of retained unembedding rows, and therefore their norms and their spectrum, (iii) the conditioning of the retained subspace, and (iv) the working dimension `k`.
+## VI. Conclusion and Future Work
 
-What it destroys is only *which probability sits on which direction* — the learned assignment. Because the comparison is paired at the same state, and every confound is held fixed by construction rather than by matching, any surviving difference is attributable to that assignment alone.
+This article asked what the intrinsic curvature of the Fisher–Rao metric on transformer hidden states measures. A pipeline that quotients the normalisation layer's null directions and differentiates the metric twice on low-dimensional slices was validated against seven manifolds of known curvature and a Kullback–Leibler identity, which answers RQ1. On four models, slice curvature sits near the simplex value of 1/4 (medians 0.255 to 0.272), and two genuine-pullback controls without learned structure give 0.230 to 0.285, so the value is inherited rather than learned; learning leaves a small offset, 0.002 to 0.024 below a scramble of the same rows on every model, while an inconsistent control manufactures a spurious collapse (RQ2). The metric's spectral summaries are reproduced by the same control, and effective dimension tracks predictive entropy (RQ3). For interpretability, the curvature and spectrum of this metric are dominated by the predictive distribution and the simplex, and geometric controls must themselves be genuine pullbacks. The main limitations are the slice construction and model scale. Future work will test models above 1B parameters, add randomly initialised networks as controls, and estimate the extrinsic term on real models.
 
----
+## Acknowledgment
 
-## VI. Results
-
-### A. Curvature sits at the simplex value across architectures
-
-Fig. 1 shows sectional curvature at 456 sampled states across four architectures.
-
-**[FIGURE 1: fig1_curvature.png]**
-*Fig. 1. Sectional curvature across four architectures. Dashed line, +1/4; boxes, quartiles; bars, medians.*
-
-Median values are +0.2599 for GPT-2, +0.2738 for Pythia-160M, +0.2559 for LLaMA-160M and +0.2548 for SmolLM2-135M — a spread of 0.019 across models differing in normalisation scheme, embedding tying, depth and width. The representation manifold under this metric is strongly positively curved, at the ambient simplex value, and consistently so across architecture. This is a direct measurement of the quantity, and it is a large number: the manifold is about as curved as the simplex it predicts into.
-
-The deviation from exactly +1/4 is not advanced as a model-specific signal. It varies with `k` and its layer ranking does not survive resampling, so the informative quantity is not the absolute magnitude but the response to the control that follows.
-
-### B. The separation
-
-Fig. 2 presents the central result: one control, three quantities, two outcomes. Table III gives the numbers. Sectional curvature falls from a median of 0.2546 to 0.0109 and retains 4 % of its value, while the log volume element is reproduced at rho = +0.957 and the effective dimension at rho = +0.991, retaining 96 % and 99 % respectively. Throughout, rho is a Spearman rank correlation across states, and z is a normal-approximation test statistic, from a paired sign test except where another test is named.
-
-**[FIGURE 2: fig2_split.png]**
-*Fig. 2. (a) sectional curvature, (b) log volume element, (c) effective dimension, across depth. Solid, real; dashed, scrambled.*
-
-**TABLE III. ONE CONTROL, THREE QUANTITIES**
-
-| quantity | real | scrambled | retained |
-|---|---|---|---|
-| sectional curvature `K` (n = 221) | 0.2546 | **0.0109** | **4 %** |
-| log volume element (n = 360) | rho = 1 by definition | **rho = +0.957** | 96 % |
-| effective dimension (n = 360) | rho = 1 by definition | **rho = +0.991** | 99 % |
-
-The curvature collapse runs in the same direction at 201 of 221 states, z = +12.18, and it is stable across the accessible range of `k`: at `k` = 4 the median falls from 0.2543 to 0.0137 (63 of 69, z = +6.86), and at `k` = 6 from 0.2532 to 0.0512 (58 of 69, z = +5.66). This is the one Riemann-derived quantity in this work that is insensitive to the choice of `k`, which is precisely what makes it usable.
-
-The two spectral quantities behave in the opposite way. The scrambled log-volume profile places its minimum at the same layer as the real one, and the scrambled effective-dimension profile does likewise, retaining 99.5 % of the real profile's range. Table IV gives that profile in full.
-
-**TABLE IV. EFFECTIVE DIMENSION BY LAYER, REAL AND SCRAMBLED**
-
-| layer | 1 | 5 | 10 | 15 | 20 | 25 | 28 | 29 | 30 |
-|---|---|---|---|---|---|---|---|---|---|
-| real | 14 | 8 | **6** | 7 | 6 | 22 | 77 | 167 | 217 |
-| scrambled | 13 | 8 | **5** | 6 | 6 | 24 | 54 | 150 | 215 |
-
-The characteristic dip near one third of the way through the network — the "hourglass" — is present in both rows, at the same layer, with the same range. A control containing no learned structure at all reproduces it.
-
-The interpretation is direct. Quantities computed from the *spectrum* of `G(h)` — its determinant, its eigenvalue decay — are recovered by a structure-free control at matched entropy, so they largely restate the predictive concentration profile. Curvature requires the *second derivatives* of the metric, and it is the quantity that responds to the assignment.
-
-### C. Where in the network the assignment does its work
-
-The collapse is not uniform across depth. Table V gives the fraction of the real curvature that survives the control at each layer, with the paired sign count.
-
-**TABLE V. CURVATURE RETAINED UNDER THE CONTROL, BY LAYER**
-
-| layer | 1 | 5 | 10 | 15 | 20 | 25 | 28 | 29 | 30 |
-|---|---|---|---|---|---|---|---|---|---|
-| retained | 2.3 % | 2.3 % | 1.5 % | 1.7 % | −5.3 % | −95.5 % | 7.0 % | 25.8 % | 61.4 % |
-| sign | 19/21 | 17/17 | 22/25 | 23/24 | 28/29 | 20/20 | 20/23 | 30/35 | 22/27 |
-
-The learned assignment does nearly all of the work through the first two thirds of the network: under 3 % of the curvature survives its destruction at every layer up to 15, and at layers 20 and 25 the scrambled value is driven negative outright. It does least at the two ends. That pattern matches what the two ends are doing: at layer 1 the context has barely been integrated, so there is less learned assignment to destroy, while by layer 30 the prediction is close to committed and concentration alone fixes much of the geometry. The direction of the effect is unanimous or near-unanimous at every layer, so the depth dependence is one of magnitude rather than of sign.
-
-### D. The assignment stabilises curvature, it does not merely add it
-
-Resolving the same 221 states by predictive entropy sharpens the finding considerably. Table VI reports both conditions across five entropy bands.
-
-**TABLE VI. CURVATURE BY PREDICTIVE ENTROPY**
-
-| entropy (nats) | n | real | scrambled | sign |
-|---|---|---|---|---|
-| [0, 0.5) | 38 | **0.2750** | −1.2756 | 35/38 |
-| [0.5, 1) | 37 | **0.2587** | −0.1165 | 36/37 |
-| [1, 2) | 68 | **0.2555** | +0.0110 | 66/68 |
-| [2, 4) | 36 | **0.2528** | +0.1310 | 31/36 |
-| [4, ∞) | 42 | **0.2064** | +0.1238 | 33/42 |
-
-The real curvature is close to constant across the full range: from a near-deterministic prediction to a highly diffuse one, the median moves only from 0.275 to 0.206, staying at the simplex value throughout. The scrambled curvature does nothing of the kind — it swings across roughly 1.4 units, from strongly negative where the prediction is concentrated to mildly positive where it is diffuse.
-
-This is the most informative single comparison in the study. The learned assignment does not simply contribute curvature on top of whatever concentration provides; it *holds the manifold at the ambient simplex value irrespective of how concentrated the prediction is*. Concentration alone produces a geometry that varies wildly with predictive entropy, and the trained assignment removes that dependence. The effect is strongest where it should be if this reading is correct — in the low-entropy bands, 35 of 38 and 36 of 37 — because a concentrated `p` gives the assignment the most to encode.
-
-### E. The instruments measure different things
-
-If the intrinsic curvature and the published proxies were reading the same underlying property, they would correlate. Computed at 360 sampled states, pairwise complete, they do not: the largest absolute rank correlation between any two different instrument families is 0.248, and the pairs involving intrinsic curvature fall at or below 0.144. By contrast the two intrinsic quantities computed here, sectional `K` and scalar `R`, correlate with each other at +0.69 to +0.74. That is what internal consistency looks like, and the cross-family pairs do not exhibit it.
-
-Corpus stability discriminates further. Moving from hand-written probe sentences to WikiText-2 across 653 states, the intrinsic instrument's correlation with predictive entropy moves by 0.028 for sectional curvature and 0.034 for scalar curvature, while the three proxies move by 0.104, 0.126 and 0.194 respectively, the last of them changing sign. The intrinsic instrument returns essentially the same reading on both corpora; the proxies do not. An instrument whose reading depends this strongly on the text it is given is measuring a property of the text.
-
-### F. A behavioural probe
-
-If the metric tracks the model's predictive state, distance under it should respond to a change in word sense. On 32 polysemous words, each compared against a same-sense control built to an identical syntactic frame, the two arms are matched for lexical overlap — 0.250 for the sense-change arm against 0.235 for the same-sense arm — so the sense arm is not simply the more lexically distant one. Table VII reports three metrics on the same pairs.
-
-**TABLE VII. SENSE CHANGE VERSUS MATCHED SAME-SENSE CONTROL**
-
-| metric | same sense | sense change | ratio | sign | z |
-|---|---|---|---|---|---|
-| **Fisher–Rao geodesic** | 0.754 | 1.532 | **2.03×** | 30/32 | **+4.95** |
-| Euclidean | 260.0 | 552.5 | 2.13× | 32/32 | +5.66 |
-| Unembedding `UᵀU` | 10459 | 17838 | 1.71× | 23/32 | +2.47 |
-
-The Fisher–Rao geodesic distance separates a sense change from a matched context change by a factor of 2.03 at 30 of 32 pairs, and considerably more reliably than the unembedding metric used in the comparison literature, which reaches 1.71× at 23 of 32. On this probe a plain Euclidean distance performs comparably to Fisher–Rao. The probe therefore establishes that the metric is behaviourally meaningful; separating it from Euclidean distance requires the causal experiment named in Section VII.
-
-Magnitude is not the only axis. Half-separation depth is the first layer at which a pair reaches half of its final separation; over 64 hand-written different-sense pairs the Fisher–Rao distance places it at layer 4.5 while the Euclidean and unembedding distances place it at 26.6 and 26.3. The paired gap against the unembedding metric is 21.8 layers, 95 % bootstrap interval [20.5, 22.9], with Fisher–Rao earlier in 64 of 64 pairs. It reproduces on the 163 different-sense pairs of the word-in-context set whose target is the same token in both sentences, at 6.7 against 26.6 for both flat measures. The mechanism is scale invariance rather than Fisher–Rao specifically: dividing the Euclidean distance by the residual norm at each layer moves its half-depth from 26.6 to 5.2. Fisher–Rao gets that invariance by construction, from the null direction of Section III.B.
-
-### G. A near-zero reading is not evidence of flatness
-
-The published value of order 10⁻⁵ reproduces exactly, and Fig. 3(a) shows it: with a tight retained-variance threshold the local-PCA residual on GPT-2 falls below 10⁻⁵ and continues falling until it underflows. What that number licenses is a separate question.
-
-**[FIGURE 3: fig3_threshold.png]**
-*Fig. 3. (a) The local-PCA residual on GPT-2 layer 12 against its retained-variance threshold, several neighbourhood sizes. (b) The same estimator on manifolds of known curvature; bars at the axis floor are numerically zero.*
-
-Fig. 3(b) applies the same estimator, at the same thresholds, to a unit 3-sphere embedded in 12 dimensions — a manifold whose sectional curvature is exactly +1 everywhere — and to a flat 3-plane, whose curvature is exactly 0. At loose thresholds the estimator separates them cleanly. At the threshold that produces the published value it does not: the sphere's residual falls to order 10⁻³¹, numerically indistinguishable from the plane's exact zero.
-
-An estimator that reports a unit sphere as flat to 10⁻³¹ cannot support the inference from "the residual is 10⁻⁵" to "the manifold is flat"; the residual is a function of the threshold at least as much as of the geometry. Measured intrinsically, the same states give `K ≈ +1/4`. The original observation replicates exactly; the reading that follows from it is that the representation manifold is strongly curved, and that the apparent flatness is a property of the estimator's operating point.
-
-### H. A causal probe, and where it stops
-
-Equation (2) has one further use. If two directions are scaled to the same Fisher norm, `vᵀG(h)v` = 1, the metric predicts the same change in the output distribution along both to leading order, so any systematic difference at a larger step is beyond what the metric alone encodes, and is where curvature has room to act. The prediction tested is that directions of high Ricci curvature, taken from the generalised eigenproblem `Ric v = λ G v`, leave the quadratic sooner than directions of low Ricci curvature. Over 14 runs on six models at `k` = 4 to 6, a paired sign test at a unit Fisher step supports it on both GPT-NeoX models at every `k` tested, at z = +4.75, +4.54 and +3.86 on Pythia-160M and +3.65 on Pythia-70M, while the other four models are `k`-dependent or at chance. The same 14 runs confirm the null-direction prediction of Table I without exception. What separates the two groups of models is not established here, and the result is reported as a hypothesis.
-
----
-
-## VII. Discussion
-
-Three findings stand, in decreasing order of how firmly they are established.
-
-The first is that the representation manifold is strongly positively curved, at the ambient simplex value, across architectures. Four models agree to within 0.019, spanning both normalisation schemes and both embedding regimes. The value is not small, and Section VI.G accounts for the earlier near-flat reading without contradicting its measurement.
-
-The second is that only curvature reads the model, while the spectrum reads concentration. Under one control, applied to three quantities, sectional curvature collapses to 4 % of its value while log-volume and effective dimension are reproduced at rho = +0.957 and +0.991. This is the most useful result here because it is actionable — it says which quantities are worth computing, and it says so on the basis of a control rather than an argument. It also places a testable question against the intrinsic-dimension literature: the characteristic depth profile is reproduced under this metric by a control with no learned structure, so applying a matched-entropy control to an ambient nearest-neighbour estimate would establish whether the published profile has the same character.
-
-The third is that the metric is demonstrably the model's own. The directions the metric calls null are directions the model is exactly invariant to, on six architectures, at a step size that doubles the norm of the state. Curvature is not being measured on an arbitrary quadratic form fitted to activations; it is measured on the model's predictive geometry, and Equation (2) confirms this through an independent code path.
-
-Future work follows directly from the separation. The decisive experiment is causal: perturbing a state along its high-curvature directions at the layer where a sense is resolved, and testing whether the resolved sense flips. A second line is suggested by the minority of states carrying a negatively curved plane — 10.7 % of the sample — which have twice the effective dimension of the rest at indistinguishable predictive entropy. Tested as a grouping rather than as a rank correlation, the separation is modest but real: 49 of 456 states carry a negatively curved plane, with a median effective dimension of 248 against 122 (Mann–Whitney area under the curve 0.618, z = +2.69), while entropy, at 1.91 against 1.95 nats, and conditioning separate the two groups not at all (z = −0.45 and −1.39). That is the one place where absolute curvature, rather than its response to a control, appears to carry model-specific information.
-
-One methodological point is worth recording, since it shaped what is reported. Several intermediate claims in this work were revised as sample sizes grew and as controls were tightened, and each was caught by a check constructed for that purpose. The rule adopted here is that a result at one sample size, one `k`, or one control is a hypothesis, and becomes a finding when it survives the second. The separation in Section VI.B survives all three, and the numbers above are those that did.
-
----
-
-## VIII. Limitations
-
-Five limitations bound what has been established here. (i) Scale: the models examined range from 70M to 160M parameters, and nothing reported here rules out the geometry changing at 1B parameters and above. (ii) The `k` ≤ 8 ceiling: Riemann-derived quantities are computed on a slice of dimension 4 to 6, holding a median 92 % to 97 % of the metric's trace, and although the central result is stable across that range, the slice remains a slice. (iii) Cell sizes: pooled samples run from 221 to 653 states, per-layer cells are smaller than that, and the pooled figures are accordingly the ones to rely on. (iv) Corpora: two were used, both of them English edited prose. (v) One validation arm remains open, in that the independent library agrees on three Fisher–Rao families and differs on two, with the metrics themselves agreeing exactly in both of the differing cases, as reported in Section IV.B.
-
----
-
-## IX. Conclusion and Future Work
-
-The intrinsic Riemannian curvature of the Fisher–Rao pullback metric on transformer hidden states is computable at practical cost, validates against seven manifolds of known curvature, and sits at the ambient simplex value of +1/4 across four architectures. The representation manifold is not flat; it is about as curved as the simplex it predicts into.
-
-The result expected to be most useful is the separation. A single control — destroying the learned token-to-direction assignment while holding entropy, conditioning and the direction set exactly fixed — collapses sectional curvature from 0.2546 to 0.0109 while reproducing the layer-wise log-volume profile at rho = +0.957 and the effective-dimension profile at rho = +0.991. Stability and informativeness proved to be different axes, pointing in opposite directions: the well-conditioned, `k`-robust, cheaply computed spectral quantities largely restate the predictive entropy profile, while the more delicate curvature is the quantity carrying learned structure. For anyone choosing a geometric probe of a language model, that is a concrete instruction about where the signal is.
-
-Future work divides into three lines. The first is scale: the geometry reported here is measured between 70M and 160M parameters, and the cheapest decisive test is to repeat the four-architecture sweep an order of magnitude above that. The second is the causal line of Section VI.H, whose boundary is unexplained: the curvature ranking predicts behaviour on the GPT-NeoX models and not on the rest of the set, and separating family from training corpus from embedding regime requires models chosen to break those pairings. The third is the control this work puts to the intrinsic-dimension literature: applying a matched-entropy scramble to an ambient nearest-neighbour estimate would establish whether the published depth profile is reproduced by structure-free data in the way the Fisher–Rao profile is.
-
----
+An AI assistant (Claude, Anthropic) was used to draft analysis code and text and to check figures and references. The authors directed the work, reviewed every section, and regenerated every reported number from the released results.
 
 ## References
 
-[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention is all you need," in *Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)*, 2017, pp. 5998–6008.
+[1] A. Ansuini, A. Laio, J. H. Macke, and D. Zoccolan, "Intrinsic dimension of data representations in deep neural networks," in *Adv. Neural Inf. Process. Syst. (NeurIPS)*, vol. 32, 2019.
 
-[2] N. N. Čencov, *Statistical Decision Rules and Optimal Inference*. Providence, RI, USA: American Mathematical Society, 1982.
+[2] L. Valeriani, D. Doimo, F. Cuturello, A. Laio, A. Ansuini, and A. Cazzaniga, "The geometry of hidden representations of large transformer models," in *Adv. Neural Inf. Process. Syst. (NeurIPS)*, vol. 36, 2023.
 
-[3] S. Amari and H. Nagaoka, *Methods of Information Geometry*. Providence, RI, USA: American Mathematical Society, 2000.
+[3] R. Manson, "Curved inference: Concern-sensitive geometry in large language model residual streams," arXiv:2507.21107, 2025.
 
-[4] Y. Wang and L. Zhao, "FishBack: Pullback Fisher geometry for optimal activation steering in transformers," *arXiv:2605.17231*, 2026.
+[4] J. King, E. Fedorenko, and E. A. Hosseini, "Representational curvature modulates behavioral uncertainty in large language models," arXiv:2604.23985, 2026.
 
-[5] A. Zaher, M. Trzaskowski, D. Nguyen, and F. Roosta, "The geometric wall: Manifold structure predicts layerwise sparse autoencoder scaling laws," *arXiv:2605.09887*, 2026.
+[5] V. Pandey, G. Singh, and Y. Mahdid, "Trajectory geometry of transformer representations across layers," arXiv:2606.09287, 2026.
 
-[6] R. Manson, "Curved inference: Concern-sensitive geometry in large language model residual streams," *arXiv:2507.21107*, 2025.
+[6] A. Modell, P. Rubin-Delanchy, and N. Whiteley, "The origins of representation manifolds in large language models," arXiv:2505.18235, 2025.
 
-[7] M. King, E. Fedorenko, and E. A. Hosseini, "Representational curvature modulates behavioral uncertainty in large language models," *arXiv:2604.23985*, 2026.
+[7] R. Xu, Y. Xu, and L. Wu, "PersonaManifold: Revealing and exploiting curved geometry in LLM persona representations," arXiv:2609.34571, 2026 (accepted to NeurIPS 2026).
 
-[8] M. A. Mabrok, "Latent semantic manifolds in large language models," *arXiv:2603.22301*, 2026.
+[8] M. A. Mabrok, "Latent semantic manifolds in large language models," arXiv:2603.22301, 2026.
 
-[9] J. A. Zavatone-Veth, S. Yang, J. A. Rubinfien, and C. Pehlevan, "How does training shape the Riemannian geometry of neural network representations?," *arXiv:2301.11375*, 2025.
+[9] S. Wang, J. Zhao, Q. Cao, H. Yao, and L. Shu, "FishBack: Pullback Fisher geometry for optimal activation steering in transformers," arXiv:2605.17231, 2026.
 
-[10] L. Valeriani, D. Doimo, F. Cuturello, A. Laio, A. Ansuini, and A. Cazzaniga, "The geometry of hidden representations of large transformer models," in *Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)*, 2023.
+[10] D. Picozzi, "The information geometry of large language models is shared, learned, and controllable," arXiv:2609.11063, 2026.
 
-[11] E. Facco, M. d'Errico, A. Rodriguez, and A. Laio, "Estimating the intrinsic dimension of datasets by a minimal neighborhood information," *Sci. Rep.*, vol. 7, no. 1, p. 12140, 2017.
+[11] T. Mudarisov, M. Burtsev, T. Petrova, and R. State, "Predictive geometry of hidden trajectories in transformers," arXiv:2609.37717, 2026.
 
-[12] A. Modell, P. Rubin-Delanchy, and N. Whiteley, "The origins of representation manifolds in large language models," *arXiv:2505.18235*, 2025.
+[12] J. Adebayo, J. Gilmer, M. Muelly, I. Goodfellow, M. Hardt, and B. Kim, "Sanity checks for saliency maps," in *Adv. Neural Inf. Process. Syst. (NeurIPS)*, vol. 31, 2018.
 
-[13] J. Martens and R. Grosse, "Optimizing neural networks with Kronecker-factored approximate curvature," in *Proc. Int. Conf. Mach. Learn. (ICML)*, 2015, pp. 2408–2417.
+[13] J. Hewitt and P. Liang, "Designing and interpreting probes with control tasks," in *Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP-IJCNLP)*, 2019, pp. 2733–2743.
 
-[14] B. Zhang and R. Sennrich, "Root mean square layer normalization," in *Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)*, 2019.
+[14] N. N. Čencov, *Statistical Decision Rules and Optimal Inference* (Transl. Math. Monographs, vol. 53). Providence, RI, USA: Amer. Math. Soc., 1982.
 
-[15] J. L. Ba, J. R. Kiros, and G. E. Hinton, "Layer normalization," *arXiv:1607.06450*, 2016.
+[15] S. Amari, *Information Geometry and Its Applications* (Appl. Math. Sci., vol. 194). Tokyo, Japan: Springer, 2016.
 
-[16] M. P. do Carmo, *Riemannian Geometry*. Boston, MA, USA: Birkhäuser, 1992.
+[16] Anonymous, "Code, per-state results and table scripts for this article," 2026. [Online]. Available: https://anonymous.4open.science (link to be inserted before submission).
 
-[17] A. Paszke et al., "PyTorch: An imperative style, high-performance deep learning library," in *Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)*, 2019, pp. 8026–8037.
+[17] E. Zaher, M. Trzaskowski, Q. Nguyen, and F. Roosta, "The geometric wall: Manifold structure predicts layerwise sparse autoencoder scaling laws," arXiv:2605.09887, 2026.
 
-[18] A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, and I. Sutskever, "Language models are unsupervised multitask learners," OpenAI Tech. Rep., 2019.
+[18] J. A. Zavatone-Veth, S. Yang, J. A. Rubinfien, and C. Pehlevan, "How does training shape the Riemannian geometry of neural network representations?" in *Proc. 3rd Workshop Symmetry Geometry Neural Represent. (NeurReps)*, 2025, arXiv:2301.11375.
 
-[19] S. Biderman et al., "Pythia: A suite for analyzing large language models across training and scaling," in *Proc. Int. Conf. Mach. Learn. (ICML)*, 2023, pp. 2397–2430.
+[19] M. Hauser and A. Ray, "Principles of Riemannian geometry in neural networks," in *Adv. Neural Inf. Process. Syst. (NeurIPS)*, vol. 30, 2017.
 
-[20] S. Merity, C. Xiong, J. Bradbury, and R. Socher, "Pointer sentinel mixture models," in *Proc. Int. Conf. Learn. Represent. (ICLR)*, 2017.
+[20] E. Facco, M. d'Errico, A. Rodriguez, and A. Laio, "Estimating the intrinsic dimension of datasets by a minimal neighborhood information," *Sci. Rep.*, vol. 7, Art. no. 12140, 2017.
 
-[21] M. T. Pilehvar and J. Camacho-Collados, "WiC: The word-in-context dataset for evaluating context-sensitive meaning representations," in *Proc. NAACL-HLT*, 2019, pp. 1267–1273.
+[21] S. Konior, A. Quemy, P. Klocek, B. Sobieski, and G. Cattan, "Riemannian geometry for pre-trained language model embeddings," arXiv:2607.07047, 2026.
 
-[22] A. Le Brigant, J. Deschamps, A. Collas, and N. Miolane, "Parametric information geometry with the package Geomstats," *ACM Trans. Math. Softw.*, vol. 49, no. 4, pp. 1–26, 2023.
+[22] L. Ben Allal *et al.*, "SmolLM2: When Smol goes big—Data-centric training of a small language model," arXiv:2502.02737, 2025.
+
+[23] B. Zhang and R. Sennrich, "Root mean square layer normalization," in *Adv. Neural Inf. Process. Syst. (NeurIPS)*, vol. 32, 2019.
+
+[24] X. Miao *et al.*, "SpecInfer: Accelerating generative LLM serving with speculative inference and token tree verification," arXiv:2305.09781, 2023.
+
+[25] A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, and I. Sutskever, "Language models are unsupervised multitask learners," OpenAI, Tech. Rep., 2019.
+
+[26] J. L. Ba, J. R. Kiros, and G. E. Hinton, "Layer normalization," arXiv:1607.06450, 2016.
+
+[27] S. Biderman *et al.*, "Pythia: A suite for analyzing large language models across training and scaling," in *Proc. 40th Int. Conf. Mach. Learn. (ICML)*, 2023, pp. 2397–2430.
+
+[28] S. Black, L. Gao, P. Wang, C. Leahy, and S. Biderman, "GPT-Neo: Large scale autoregressive language modeling with Mesh-Tensorflow," Zenodo, 2021.
+
+[29] S. Merity, C. Xiong, J. Bradbury, and R. Socher, "Pointer sentinel mixture models," in *Proc. Int. Conf. Learn. Represent. (ICLR)*, 2017.
+
+[30] A. Paszke *et al.*, "PyTorch: An imperative style, high-performance deep learning library," in *Adv. Neural Inf. Process. Syst. (NeurIPS)*, vol. 32, 2019.
+
+[31] M. P. do Carmo, *Riemannian Geometry*. Boston, MA, USA: Birkhäuser, 1992.
+
+[32] A. Le Brigant, J. Deschamps, A. Collas, and N. Miolane, "Parametric information geometry with the package Geomstats," *ACM Trans. Math. Softw.*, vol. 49, no. 4, 2023, doi: 10.1145/3627538.
+
+[33] T. Wolf *et al.*, "Transformers: State-of-the-art natural language processing," in *Proc. Conf. Empirical Methods Natural Lang. Process.: Syst. Demonstrations (EMNLP)*, 2020, pp. 38–45.
