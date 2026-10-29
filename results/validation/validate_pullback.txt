@@ -1,0 +1,36 @@
+==========================================================================
+RUNG 7 -- THE PULLBACK STEP, AGAINST A KNOWN ANSWER
+==========================================================================
+p(h) = softmax(U h), d = N-1, no normalisation layer.
+h -> p is then a diffeomorphism onto the simplex interior, so the
+pullback metric IS the simplex metric in other coordinates and
+K = +1/4 exactly, for every valid U.
+
+1. SECTIONAL CURVATURE THROUGH THE PULLBACK
+     N   d  points   expect   worst |err|   verdict
+     3   2       4     0.25      1.47e-13   PASS
+     4   3       4     0.25      2.61e-14   PASS
+     5   4       4     0.25      9.73e-12   PASS
+
+2. REPARAMETERISATION INVARIANCE  (h = M x, so U -> U M)
+   Same manifold, different coordinates: K must be UNCHANGED.
+   This is what catches transpose and index-order errors.
+     N         K(U)       K(U M)       |diff|   verdict
+     3   0.25000000   0.25000000     1.89e-14   PASS
+     4   0.25000000   0.25000000     5.16e-13   PASS
+     5   0.25000000   0.25000000     1.94e-11   PASS
+
+3. SCALAR CURVATURE THROUGH THE PULLBACK   (R = k(k-1)/4)
+     N   k    expect     measured     rel.err   verdict
+     3   2     0.500   0.50000000    1.32e-14   PASS
+     4   3     1.500   1.50000000    4.94e-12   PASS
+     5   4     3.000   3.00000000    2.98e-12   PASS
+
+4. NEGATIVE CONTROL -- a deliberately broken assembly MUST fail
+   Drops the -(J^T p)(J^T p)^T term, i.e. uses J^T diag(p) J.
+   A test that cannot fail proves nothing.
+   worst |K - 1/4| with the term dropped: 0.2634   CAUGHT
+
+==========================================================================
+RUNG 7: PASS   -- the pullback assembly is now validated DIRECTLY,
+   not only through Gate A and the null-space test.
