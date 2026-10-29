@@ -133,7 +133,7 @@ What it destroys is only *which probability sits on which direction* — the lea
 
 ---
 
-## V. Results
+## VI. Results
 
 ### A. Curvature sits at the simplex value across architectures
 
