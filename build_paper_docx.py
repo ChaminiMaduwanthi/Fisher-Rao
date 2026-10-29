@@ -202,9 +202,11 @@ def build_body(md: str, figs: dict) -> str:
         if ln.startswith("# "):
             out.append(para(ln[2:], "papertitle", jc="center"))
             continue
-        if ln.startswith("**Chamini"):
-            out.append(para("Chamini Maduwanthi", "Author", jc="center"))
-            out.append(para("Department of Computer Science", "Author", jc="center"))
+        if cols_state == 1 and re.fullmatch(r"\*\*[^*]+\*\*", ln):
+            out.append(para(ln.strip("*"), "Author", jc="center"))
+            continue
+        if cols_state == 1 and re.fullmatch(r"\*[^*]+\*", ln):
+            out.append(para(ln.strip("*"), "Affiliation", jc="center"))
             continue
 
         # ---- headings ----------------------------------------------------
@@ -297,7 +299,27 @@ def swallow(lines: list[str], i: int) -> tuple[int, str]:
 
 
 # ------------------------------------------------------------------- build
+FIG_RE = r"^\*\*\[FIGURE \d+: ([^\]|\s]+)(?:\s*\|\s*(full))?\]\*\*"
+
+
+def properties(title: str) -> tuple[str, str]:
+    """Blank core and app properties: no author, editor or company is named."""
+    core = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" '
+            'xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" '
+            'xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+            f"<dc:title>{esc(title)}</dc:title><dc:creator></dc:creator><cp:lastModifiedBy></cp:lastModifiedBy>"
+            "<cp:revision>1</cp:revision></cp:coreProperties>")
+    app = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+           '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" '
+           'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">'
+           "<Template>Normal.dotm</Template><Application>Microsoft Office Word</Application>"
+           "<Company></Company></Properties>")
+    return core, app
+
+
 def main() -> int:
+    template = sys.argv[1] if len(sys.argv) > 1 else TEMPLATE
     md = open(SRC_MD, encoding="utf-8").read()
 
     figs = {}
@@ -310,6 +332,7 @@ def main() -> int:
             return 1
 
     body = build_body(md, figs)
+    title = re.search(r"^# (.+)$", md, re.M).group(1).strip()
 
     doc = (
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
@@ -320,7 +343,7 @@ def main() -> int:
         f"<w:body>{body}{sectpr(2)}"
         "</w:body></w:document>")
 
-    src = zipfile.ZipFile(TEMPLATE)
+    src = zipfile.ZipFile(template)
     rels = src.read("word/_rels/document.xml.rels").decode("utf-8")
     add = "".join(
         f'<Relationship Id="{f["rid"]}" '
@@ -334,7 +357,9 @@ def main() -> int:
             "</Types>", '<Default Extension="png" ContentType="image/png"/></Types>')
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    skip = {"word/document.xml", "word/_rels/document.xml.rels", "[Content_Types].xml"}
+    skip = {"word/document.xml", "word/_rels/document.xml.rels", "[Content_Types].xml",
+            "docProps/core.xml", "docProps/app.xml"}
+    core, app = properties(title)
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
         for item in src.infolist():
             if item.filename in skip:
@@ -343,6 +368,8 @@ def main() -> int:
         z.writestr("[Content_Types].xml", ct)
         z.writestr("word/document.xml", doc)
         z.writestr("word/_rels/document.xml.rels", rels)
+        z.writestr("docProps/core.xml", core)
+        z.writestr("docProps/app.xml", app)
         for f in figs.values():
             z.writestr("word/" + f["media"], open(f["path"], "rb").read())
     src.close()
