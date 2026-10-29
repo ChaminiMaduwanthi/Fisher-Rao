@@ -268,11 +268,13 @@ Five limitations bound what has been established here. (i) Scale: the models exa
 
 ---
 
-## VIII. Conclusion
+## IX. Conclusion and Future Work
 
 The intrinsic Riemannian curvature of the Fisher–Rao pullback metric on transformer hidden states is computable at practical cost, validates against seven manifolds of known curvature, and sits at the ambient simplex value of +1/4 across four architectures. The representation manifold is not flat; it is about as curved as the simplex it predicts into.
 
 The result expected to be most useful is the separation. A single control — destroying the learned token-to-direction assignment while holding entropy, conditioning and the direction set exactly fixed — collapses sectional curvature from 0.2546 to 0.0109 while reproducing the layer-wise log-volume profile at rho = +0.957 and the effective-dimension profile at rho = +0.991. Stability and informativeness proved to be different axes, pointing in opposite directions: the well-conditioned, `k`-robust, cheaply computed spectral quantities largely restate the predictive entropy profile, while the more delicate curvature is the quantity carrying learned structure. For anyone choosing a geometric probe of a language model, that is a concrete instruction about where the signal is.
+
+Future work divides into three lines. The first is scale: the geometry reported here is measured between 70M and 160M parameters, and the cheapest decisive test is to repeat the four-architecture sweep an order of magnitude above that. The second is the causal line of Section VI.H, whose boundary is unexplained: the curvature ranking predicts behaviour on the GPT-NeoX models and not on the rest of the set, and separating family from training corpus from embedding regime requires models chosen to break those pairings. The third is the control this work puts to the intrinsic-dimension literature: applying a matched-entropy scramble to an ambient nearest-neighbour estimate would establish whether the published depth profile is reproduced by structure-free data in the way the Fisher–Rao profile is.
 
 ---
 
