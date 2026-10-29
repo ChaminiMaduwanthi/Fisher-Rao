@@ -89,7 +89,7 @@ States are sampled at nine relative depths in each network and at token position
 
 ---
 
-## III. Validation
+## IV. Validation
 
 Intrinsic curvature is expensive, silent when wrong, and plausible either way. Validation therefore precedes results and is reported in full.
 
