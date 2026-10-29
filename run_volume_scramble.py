@@ -127,7 +127,7 @@ def main():
 
     print(f"\nPAIRED volume control: {per_layer} points/layer x {len(LAYERS)} layers,"
           f" k={K_DIM}\n")
-    rows, t0 = [], time.time()
+    rows, errors, t0 = [], [], time.time()
     for l in LAYERS:
         pool = by_layer[l]
         idxs = torch.randperm(len(pool), generator=gen)[:per_layer].tolist()
@@ -136,18 +136,24 @@ def main():
             idx = topk_indices(lm, h, TOP_K)
             lp = torch.log_softmax(lm.logits(h), -1)
             within = idx[torch.randperm(len(idx), generator=gen)]
-            G_r = fisher_metric(lm, h, idx=idx)
-            G_w = fisher_metric_scrambled(lm, h, idx=idx, rows=within)
-            G_g = fisher_metric_scrambled(lm, h, perm, idx=idx)
-            rows.append(dict(
-                layer=l,
-                entropy=float(-(lp.exp() * lp).sum()),
-                lv_real=log_vol_per_dim(lm, h, G_r, K_DIM),
-                lv_within=log_vol_per_dim(lm, h, G_w, K_DIM),
-                lv_scr=log_vol_per_dim(lm, h, G_g, K_DIM),
-                ke_real=k_eff_99(lm, h, G_r),
-                ke_within=k_eff_99(lm, h, G_w),
-                ke_scr=k_eff_99(lm, h, G_g)))
+            # An ill-conditioned metric can make eigvalsh fail to converge (seen on
+            # LLaMA-160M at extreme entropy).  Record it and move on; the random
+            # draws above come first, so states without errors are unaffected.
+            try:
+                G_r = fisher_metric(lm, h, idx=idx)
+                G_w = fisher_metric_scrambled(lm, h, idx=idx, rows=within)
+                G_g = fisher_metric_scrambled(lm, h, perm, idx=idx)
+                rows.append(dict(
+                    layer=l,
+                    entropy=float(-(lp.exp() * lp).sum()),
+                    lv_real=log_vol_per_dim(lm, h, G_r, K_DIM),
+                    lv_within=log_vol_per_dim(lm, h, G_w, K_DIM),
+                    lv_scr=log_vol_per_dim(lm, h, G_g, K_DIM),
+                    ke_real=k_eff_99(lm, h, G_r),
+                    ke_within=k_eff_99(lm, h, G_w),
+                    ke_scr=k_eff_99(lm, h, G_g)))
+            except Exception as e:                               # noqa: BLE001
+                errors.append(dict(layer=l, entropy=float(-(lp.exp() * lp).sum()), error=repr(e)[:120]))
         print(f"   layer {l:>2}  ({time.time()-t0:.0f}s)", flush=True)
 
     print(f"\n{'='*74}\nLAYER-WISE log-volume per dimension, on the sphere"
@@ -243,7 +249,8 @@ def main():
                  for q in ("lv", "ke") for c in ("within", "scr")}
     print(f"\n   per-state rho with the real value: {point_rho}")
     (OUT / out_name).write_text(json.dumps(dict(
-        model=lm.model_id, layers=LAYERS, n_per_layer=per_layer, k=K_DIM, profile=prof,
+        model=lm.model_id, layers=LAYERS, n_per_layer=per_layer, k=K_DIM, n_errors=len(errors),
+        errors=errors, profile=prof,
         k_eff_profile=kprof, shape_rho=shape, k_eff_shape_rho=kshape, point_rho=point_rho,
         stats=stats, rho_real_entropy=rho_re, rows=rows), indent=2),
         encoding="utf-8")
