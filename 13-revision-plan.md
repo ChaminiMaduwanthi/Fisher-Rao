@@ -54,7 +54,7 @@ which agrees with the paper's control exactly at the base point (same `p`, metri
 
 The earlier Gaussian control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, matched by entropy band rather than state by state, had already pointed the same way.
 
-**What it implies.** The collapse reported in the paper comes from the scrambled metric not being a pullback, not from destroying the learned assignment. `K ≈ +1/4` appears to be a property of softmax-pullback geometry rather than of learning. The trained models sit slightly *below* both learning-free controls (by 0.002–0.028), so learning, if anything, pulls `K` towards +1/4 rather than creating it.
+**What it implies.** The collapse reported in the paper comes from the scrambled metric not being a pullback, not from destroying the learned assignment. `K ≈ +1/4` is a property of softmax-pullback geometry rather than of learning: every genuine pullback gives 0.230–0.285. The trained models are not identical to the controls, though. They sit below the consistent scramble on all four models (by 0.002–0.024), and differ from the Gaussian readout by 0.012–0.028 in a direction that depends on the model (GPT-2 above, the others below). By the E1 decision rule (§5) they agree on none of the four, so the paper reports that offset ([14-revision-log.md](14-revision-log.md) §14). The earlier reading, that learning pulls `K` towards +1/4, is not supported state by state.
 
 **What it does not affect.** The spectral results (log-volume ρ = +0.957, effective dimension ρ = +0.991) are functions of `G(h0)` alone, and at `h0` the two controls are identical. The validation ladder, the null-direction test, `K ≈ +1/4` as a measurement, the calibration of the 10⁻⁵ reading and the behavioural probe also stand.
 
