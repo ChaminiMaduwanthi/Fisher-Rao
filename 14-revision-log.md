@@ -121,3 +121,31 @@ By entropy, `k` = 5:
 3. By layer the picture is the same. No layer has the real model above the control (largest z = +0.45, layer 10); four of nine have it slightly below (z between −2.06 and −2.24, layers 1, 5, 25 and 28).
 
 **What the paper can now say.** `K ≈ +1/4` is not produced by learning: a structure-free pullback with the same predictive distribution, row multiset and slice construction gives the same median. The separation claim of the submitted paper is withdrawn. Its spectral half — log-volume and effective dimension track predictive concentration — is unaffected, because both are functions of `G(h₀)`, where the two scrambles coincide (§3, [08-rq3a-log.md](08-rq3a-log.md) §5.7).
+
+---
+
+## 5. E1 — the consistent control on a second model (LLaMA-160M)
+
+Entropy-stratified draw, 24 states per band, nine relative depths ([results/scramble/consistent_llama-160m_draw.json](results/scramble/consistent_llama-160m_draw.json)). Two of 120 states fail — the pseudo-inverse in `christoffel()` does not converge at entropy 10.4 nats — and are excluded.
+
+| `k` | n | real | `within` | consistent | real > `within` | real > consistent |
+|---|---|---|---|---|---|---|
+| 4 | 30 | 0.2592 | -3.0151 | 0.3375 | 30/30, z = +5.48 | 7/30, z = -2.92 |
+| **5** | **118** | **0.2565** | **-0.0056** | **0.2794** | **116/118, z = +10.49** | **33/118, z = -4.79** |
+| 6 | 30 | 0.2549 | -8.3461 | 0.3823 | 30/30, z = +5.48 | 5/30, z = -3.65 |
+
+By entropy, `k` = 5:
+
+| entropy (nats) | n | real | `within` | consistent | real > consistent |
+|---|---|---|---|---|---|
+| [0, 0.5) | 24 | 0.3740 | -8.7943 | 0.4238 | 8/24, z = -1.63 |
+| [0.5, 1) | 24 | 0.2564 | -0.3659 | 0.2818 | 5/24, z = -2.86 |
+| [1, 2) | 24 | 0.2574 | -0.0056 | 0.2687 | 7/24, z = -2.04 |
+| [2, 4) | 24 | 0.2518 | +0.0269 | 0.2699 | 7/24, z = -2.04 |
+| [4, ∞) | 22 | 0.2438 | +0.0780 | 0.2694 | 6/22, z = -2.13 |
+
+**Reading.**
+
+1. The paper's scramble collapses on this model too (116/118). The consistent one does not: 0.2794 against the real 0.2565.
+2. Unlike SmolLM2, the trained model sits *below* the structure-free control in every band, including 0.5–4 nats where §2 found slice curvature reliable (z between −2.04 and −2.86). The gap is about 0.01–0.03 at `k` = 5 and larger at `k` = 4 and 6.
+3. Across both models, then, learning leaves `K` near +1/4. Where it moves it at all, it moves it *down towards* +1/4 relative to a structure-free pullback — the opposite direction to the submitted claim, and of model-dependent size (0.002 on SmolLM2, 0.023 on LLaMA-160M). This is a small, secondary observation, not a replacement headline.
