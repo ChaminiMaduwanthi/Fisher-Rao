@@ -9,5 +9,9 @@ matplotlib==3.10.6
 # section 0.  PyTorch torch.func (jacrev/jvp/vmap) is the fallback.
 # jax[cpu]==0.*
 
-# Stage 3 validation oracle (rungs 3-6).  Also blocked.
-# geomstats==2.*
+# Stage 3 validation oracle (rungs 2-6, validate_geomstats.py).
+geomstats==2.8.0
+
+# Data access: WikiText-103 and WiC parquet files (fisherrao/corpus.py, run_wic.py).
+huggingface_hub==1.19.0
+pyarrow==24.0.0
