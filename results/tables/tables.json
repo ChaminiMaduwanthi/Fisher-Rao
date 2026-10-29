@@ -1,0 +1,455 @@
+{
+  "controls": {
+    "SmolLM2-135M": {
+      "n": 186,
+      "real": 0.25472813844680786,
+      "within": 0.009551174007356167,
+      "real_gt_within": {
+        "pos": 168,
+        "n": 186,
+        "z": 10.998533626601498
+      },
+      "consistent": 0.25646181404590607,
+      "real_gt_consistent": {
+        "pos": 72,
+        "n": 186,
+        "z": -3.079589415448419
+      },
+      "gauss_n": 186,
+      "gauss": 0.2729555666446686,
+      "real_on_gauss_states": 0.25472813844680786,
+      "real_gt_gauss": {
+        "pos": 40,
+        "n": 186,
+        "z": -7.772297096131725
+      },
+      "k4": {
+        "n": 60,
+        "real": 0.2553810477256775,
+        "within": 0.011002876795828342,
+        "consistent": 0.25895509123802185,
+        "real_gt_consistent": {
+          "pos": 22,
+          "n": 60,
+          "z": -2.065591117977289
+        }
+      },
+      "k6": {
+        "n": 60,
+        "real": 0.2543802559375763,
+        "within": 0.030398832634091377,
+        "consistent": 0.2560281306505203,
+        "real_gt_consistent": {
+          "pos": 26,
+          "n": 60,
+          "z": -1.0327955589886444
+        }
+      }
+    },
+    "LLaMA-160M": {
+      "n": 118,
+      "real": 0.25650475919246674,
+      "within": -0.00562843115767464,
+      "real_gt_within": {
+        "pos": 116,
+        "n": 118,
+        "z": 10.494550644040887
+      },
+      "consistent": 0.2794288247823715,
+      "real_gt_consistent": {
+        "pos": 33,
+        "n": 118,
+        "z": -4.786988013071282
+      },
+      "gauss_n": 118,
+      "gauss": 0.284574419260025,
+      "real_on_gauss_states": 0.25650475919246674,
+      "real_gt_gauss": {
+        "pos": 35,
+        "n": 118,
+        "z": -4.418758165911952
+      },
+      "k4": {
+        "n": 30,
+        "real": 0.2591716945171356,
+        "within": -3.0150694847106934,
+        "consistent": 0.3374750465154648,
+        "real_gt_consistent": {
+          "pos": 7,
+          "n": 30,
+          "z": -2.9211869733608857
+        }
+      },
+      "k6": {
+        "n": 30,
+        "real": 0.2549210786819458,
+        "within": -8.346078395843506,
+        "consistent": 0.3823120892047882,
+        "real_gt_consistent": {
+          "pos": 5,
+          "n": 30,
+          "z": -3.6514837167011076
+        }
+      }
+    }
+  },
+  "architectures": {
+    "EleutherAI/pythia-160m": {
+      "n": 108,
+      "median": 0.2720853336971807,
+      "q1": 0.2606242754614255,
+      "q3": 0.30801109786401887
+    },
+    "HuggingFaceTB/SmolLM2-135M-Instruct": {
+      "n": 108,
+      "median": 0.25478206453451424,
+      "q1": 0.25071039849058724,
+      "q3": 0.26088660142745707
+    },
+    "JackFram/llama-160m": {
+      "n": 101,
+      "median": 0.25586329133314556,
+      "q1": 0.24007527001416884,
+      "q3": 0.28603842890170245
+    },
+    "gpt2": {
+      "n": 108,
+      "median": 0.26010120878432985,
+      "q1": 0.24004544275527123,
+      "q3": 0.2935871978201085
+    }
+  },
+  "agreement": {
+    "n": 360,
+    "pairs": {
+      "intrinsic_K|intrinsic_R": {
+        "n": 360,
+        "pooled": 0.7204716500937379,
+        "within": 0.6887701369081469
+      },
+      "intrinsic_K|pca": {
+        "n": 360,
+        "pooled": -0.14415709877799993,
+        "within": -0.0006253853331635554
+      },
+      "intrinsic_K|manson": {
+        "n": 320,
+        "pooled": 0.13338844866812238,
+        "within": -0.0027246033996062347
+      },
+      "intrinsic_K|king": {
+        "n": 338,
+        "pooled": 0.1365353422143301,
+        "within": 0.11209927119369843
+      },
+      "intrinsic_R|pca": {
+        "n": 360,
+        "pooled": -0.2730826295479166,
+        "within": 0.08601139121452954
+      },
+      "intrinsic_R|manson": {
+        "n": 320,
+        "pooled": 0.2029033513236378,
+        "within": 0.047684847284399874
+      },
+      "intrinsic_R|king": {
+        "n": 338,
+        "pooled": 0.09427755132356458,
+        "within": 0.09950271122871741
+      },
+      "pca|manson": {
+        "n": 320,
+        "pooled": 0.07064985322093616,
+        "within": 0.017874859503560173
+      },
+      "pca|king": {
+        "n": 338,
+        "pooled": 0.17785058371893672,
+        "within": -0.09869708621127918
+      },
+      "manson|king": {
+        "n": 302,
+        "pooled": 0.24799615558132346,
+        "within": 0.06265697871251277
+      }
+    }
+  },
+  "corpus": {
+    "n": {
+      "handwritten": 293,
+      "wikitext": 360
+    },
+    "rho_with_entropy": {
+      "K": {
+        "handwritten": -0.44706084126446094,
+        "wikitext": -0.47545377150543855,
+        "shift": 0.02839293024097761
+      },
+      "R": {
+        "handwritten": -0.5786855561839658,
+        "wikitext": -0.5444648492658123,
+        "shift": 0.03422070691815349
+      },
+      "pca": {
+        "handwritten": 0.1754483555495987,
+        "wikitext": 0.049660751604356075,
+        "shift": 0.12578760394524263
+      },
+      "manson": {
+        "handwritten": -0.11320073565023676,
+        "wikitext": -0.21689567280930477,
+        "shift": 0.10369493715906801
+      },
+      "king": {
+        "handwritten": 0.04276266554487106,
+        "wikitext": -0.15091693762583758,
+        "shift": 0.19367960317070865
+      }
+    },
+    "K_vs_R": {
+      "handwritten": 0.7419487495578136,
+      "wikitext": 0.6948538697572255
+    }
+  },
+  "behaviour": {
+    "n_pairs": 32,
+    "final_layer": {
+      "d_fr": {
+        "label": "Fisher–Rao geodesic",
+        "same": 0.7743796776964953,
+        "diff": 1.5366606019837952,
+        "ratio": 1.9843761997406946,
+        "pos": 30,
+        "n": 32,
+        "z": 4.949747468305833,
+        "same_lower": 0.7540767363138084,
+        "diff_lower": 1.5316303278509098
+      },
+      "d_euc": {
+        "label": "Euclidean",
+        "same": 262.446739531441,
+        "diff": 559.1454990638936,
+        "ratio": 2.1305103658828584,
+        "pos": 32,
+        "n": 32,
+        "z": 5.65685424949238,
+        "same_lower": 259.97429908680687,
+        "diff_lower": 552.5213801061566
+      },
+      "d_uu": {
+        "label": "UᵀU",
+        "same": 10629.715160208098,
+        "diff": 17953.08831559259,
+        "ratio": 1.6889529065462865,
+        "pos": 23,
+        "n": 32,
+        "z": 2.4748737341529163,
+        "same_lower": 10459.477754168596,
+        "diff_lower": 17838.220025022838
+      }
+    },
+    "half_depth_mean": {
+      "handwritten_64": {
+        "d_fr": 4.53125,
+        "d_euc": 26.5625,
+        "d_uu": 26.28125
+      },
+      "gap_vs_uu": {
+        "mean": 21.75,
+        "ci": [
+          20.453125,
+          22.9375
+        ],
+        "fr_earlier": 64,
+        "n": 64
+      },
+      "wic_different_sense": {
+        "d_fr": 6.748466257668712,
+        "d_euc": 26.607361963190183,
+        "d_uu": 26.570552147239265
+      }
+    }
+  },
+  "checks": [
+    {
+      "label": "E2 pooled intrinsic_K|pca",
+      "recomputed": -0.14415709877799993,
+      "stored": -0.14428249189165554,
+      "ok": true
+    },
+    {
+      "label": "E2 within-layer intrinsic_K|pca",
+      "recomputed": -0.0006253853331635554,
+      "stored": 0.0003960808838857663,
+      "ok": true
+    },
+    {
+      "label": "E2 pooled intrinsic_K|manson",
+      "recomputed": 0.13338844866812238,
+      "stored": 0.1333885096534146,
+      "ok": true
+    },
+    {
+      "label": "E2 within-layer intrinsic_K|manson",
+      "recomputed": -0.0027246033996062347,
+      "stored": -0.002767354596622886,
+      "ok": true
+    },
+    {
+      "label": "E2 pooled intrinsic_K|king",
+      "recomputed": 0.1365353422143301,
+      "stored": 0.13653534221433014,
+      "ok": true
+    },
+    {
+      "label": "E2 within-layer intrinsic_K|king",
+      "recomputed": 0.11209927119369843,
+      "stored": 0.11209927119369843,
+      "ok": true
+    },
+    {
+      "label": "E2 pooled pca|manson",
+      "recomputed": 0.07064985322093616,
+      "stored": 0.07086507192453051,
+      "ok": true
+    },
+    {
+      "label": "E2 pooled pca|king",
+      "recomputed": 0.17785058371893672,
+      "stored": 0.1778428075067021,
+      "ok": true
+    },
+    {
+      "label": "E2 pooled manson|king",
+      "recomputed": 0.24799615558132346,
+      "stored": 0.2479961555813235,
+      "ok": true
+    },
+    {
+      "label": "E2 within-layer manson|king",
+      "recomputed": 0.06265697871251277,
+      "stored": 0.06265697871251277,
+      "ok": true
+    },
+    {
+      "label": "E2 positive control K|R",
+      "recomputed": 0.7204716500937379,
+      "stored": 0.7204705797627039,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(K, H) handwritten",
+      "recomputed": -0.44706084126446094,
+      "stored": -0.44706033332029343,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(K, H) wikitext",
+      "recomputed": -0.47545377150543855,
+      "stored": -0.4754537715054385,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(R, H) handwritten",
+      "recomputed": -0.5786855561839658,
+      "stored": -0.578684351387944,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(R, H) wikitext",
+      "recomputed": -0.5444648492658123,
+      "stored": -0.5444648492658122,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(pca, H) handwritten",
+      "recomputed": 0.1754483555495987,
+      "stored": 0.17536097612638962,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(pca, H) wikitext",
+      "recomputed": 0.049660751604356075,
+      "stored": 0.049663191845616086,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(manson, H) handwritten",
+      "recomputed": -0.11320073565023676,
+      "stored": -0.11320079178790467,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(manson, H) wikitext",
+      "recomputed": -0.21689567280930477,
+      "stored": -0.2168956728093048,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(king, H) handwritten",
+      "recomputed": 0.04276266554487106,
+      "stored": 0.04276266554487105,
+      "ok": true
+    },
+    {
+      "label": "corpus rho(king, H) wikitext",
+      "recomputed": -0.15091693762583758,
+      "stored": -0.15091693762583755,
+      "ok": true
+    },
+    {
+      "label": "samesense d_fr same (stored = lower median)",
+      "recomputed": 0.7540767363138084,
+      "stored": 0.7540767363138084,
+      "ok": true
+    },
+    {
+      "label": "samesense d_fr diff (stored = lower median)",
+      "recomputed": 1.5316303278509098,
+      "stored": 1.5316303278509098,
+      "ok": true
+    },
+    {
+      "label": "samesense d_fr sign",
+      "recomputed": 30,
+      "stored": 30,
+      "ok": true
+    },
+    {
+      "label": "samesense d_euc same (stored = lower median)",
+      "recomputed": 259.97429908680687,
+      "stored": 259.97429908680687,
+      "ok": true
+    },
+    {
+      "label": "samesense d_euc diff (stored = lower median)",
+      "recomputed": 552.5213801061566,
+      "stored": 552.5213801061566,
+      "ok": true
+    },
+    {
+      "label": "samesense d_euc sign",
+      "recomputed": 32,
+      "stored": 32,
+      "ok": true
+    },
+    {
+      "label": "samesense d_uu same (stored = lower median)",
+      "recomputed": 10459.477754168596,
+      "stored": 10459.477754168596,
+      "ok": true
+    },
+    {
+      "label": "samesense d_uu diff (stored = lower median)",
+      "recomputed": 17838.220025022838,
+      "stored": 17838.220025022838,
+      "ok": true
+    },
+    {
+      "label": "samesense d_uu sign",
+      "recomputed": 23,
+      "stored": 23,
+      "ok": true
+    }
+  ]
+}
