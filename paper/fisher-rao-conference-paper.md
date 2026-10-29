@@ -234,13 +234,11 @@ Magnitude is not the only axis. Half-separation depth is the first layer at whic
 The published value of order 10⁻⁵ reproduces exactly, and Fig. 3(a) shows it: with a tight retained-variance threshold the local-PCA residual on GPT-2 falls below 10⁻⁵ and continues falling until it underflows. What that number licenses is a separate question.
 
 **[FIGURE 3: fig3_threshold.png]**
-*Fig. 3. (a) The local-PCA residual proxy on GPT-2 layer 12 as a function of its retained-variance threshold, for several neighbourhood sizes. (b) The same estimator applied to manifolds of known curvature. Bars at the axis floor are numerically zero.*
+*Fig. 3. (a) The local-PCA residual on GPT-2 layer 12 against its retained-variance threshold, several neighbourhood sizes. (b) The same estimator on manifolds of known curvature; bars at the axis floor are numerically zero.*
 
 Fig. 3(b) applies the same estimator, at the same thresholds, to a unit 3-sphere embedded in 12 dimensions — a manifold whose sectional curvature is exactly +1 everywhere — and to a flat 3-plane, whose curvature is exactly 0. At loose thresholds the estimator separates them cleanly. At the threshold that produces the published value it does not: the sphere's residual falls to order 10⁻³¹, numerically indistinguishable from the plane's exact zero.
 
 An estimator that reports a unit sphere as flat to 10⁻³¹ cannot support the inference from "the residual is 10⁻⁵" to "the manifold is flat"; the residual is a function of the threshold at least as much as of the geometry. Measured intrinsically, the same states give `K ≈ +1/4`. The original observation replicates exactly; the reading that follows from it is that the representation manifold is strongly curved, and that the apparent flatness is a property of the estimator's operating point.
-
----
 
 ## VI. Discussion
 
