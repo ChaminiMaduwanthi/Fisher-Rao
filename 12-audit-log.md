@@ -251,3 +251,24 @@ selected** `k`; the curvature results hold `k` fixed at 5. Different quantity.
 > Transcription between documents is a step at which provenance is silently
 > lost, and the only defence is to re-measure into the table rather than copy
 > into it.
+
+---
+
+## 8. Third audit — the paired scramble control, 29 October 2026
+
+Prompted by a conference reviewer, who asked whether the scrambled metric is "a valid and appropriately controlled geometric object" and whether its "local probability map" and "derivative construction" were established.
+
+### 8.1 🔴 The `within` control is not a Fisher pullback
+
+`fisher_metric_projected(rows=...)` takes `p(h)` from the real logits and the Jacobian from permuted rows. Curvature is built from derivatives of the metric, and away from the base point the two no longer correspond: `p` moves along the real directions while the metric measures along the permuted ones. The object is a valid Riemannian metric, but not `JᵀΣ_pJ` for any map `h → p`.
+
+A consistent version of the same scramble ([run_scramble_consistent.py](run_scramble_consistent.py)), identical at the base point, leaves `K` at the real value: **0.2532 against 0.2554, 15/30 paired, z = 0.00**, where the `within` control gives −0.0004 (n = 30, SmolLM2-135M, `k` = 5). Details and the entropy breakdown: [08-rq3a-log.md](08-rq3a-log.md) §5.7.
+
+### 8.2 What this withdraws, and what it does not
+
+- **Withdrawn pending scale-up:** "the learned assignment puts `K` at the simplex value" (08 §5.4), "the assignment stabilises `K`" (08 §5.3), and the curvature half of the separation in the conference paper and README item 7.
+- **Not affected:** the spectral reproduction (log-volume ρ = +0.957, `k_eff` ρ = +0.991), because both are functions of `G(h0)`, where the two controls coincide exactly; the validation ladder; the null-direction test; the Mabrok calibration; RQ3b.
+
+### 8.3 The rule this adds
+
+> **A control must belong to the class of objects it controls for.** A scrambled metric that is not the pullback of any model does not answer "what does learning contribute to the pullback geometry"; it answers "what happens when the metric stops being a pullback". The Gaussian-`U` control (08 §5.1) was a genuine pullback and agreed with the real model. It was set aside as blunt, and the one control that disagreed was the one that broke the construction. Before reading anything into a control, check that it preserves the defining structure — here, that `p` and its Jacobian come from the same map.
