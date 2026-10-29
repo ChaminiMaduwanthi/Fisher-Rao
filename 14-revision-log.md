@@ -303,3 +303,34 @@ Fig. 3(b)'s sphere calibration is now a function (`make_figures.sphere_calibrati
 5. **One more number in the paper.** Section VI.B says the scrambled effective-dimension profile retains "99.5 %" of the real range. With true medians it is 99.3 % ([12-audit-log.md](12-audit-log.md) §8.6).
 
 **Excluded LLaMA-160M states, and a correction to §5.** 25 of LLaMA-160M's 360 states fail here, as do 2 of its 120 in §5. All 27 are at the `<s>` position. LLaMA-160M's `<s>` embedding is zero, and its attention and MLP blocks have no bias terms, so the residual stream stays exactly zero there: ‖h‖ = 0.0 at every depth from the embedding to the last layer, checked on three sentences. The final RMSNorm maps zero to zero, so the prediction is uniform, and every excluded state has entropy ln 32 000 = 10.3735 nats. The normalisation's null direction `h/‖h‖` is undefined there, so the quotient metric cannot be formed and `eigh` fails. §5 blamed the pseudo-inverse in `christoffel()`; §5 and [15-reproducibility.md](15-reproducibility.md) §6 are corrected. No other saved LLaMA-160M value comes from such a state: the profile and Gaussian-control states reach at most 7.5 nats, and the six E5 states that failed with the same `eigh` error are already excluded there. SmolLM2, GPT-2 and Pythia-160M have no failures.
+
+---
+
+## 13. The consistent and Gaussian controls on the LayerNorm models
+
+GPT-2 and Pythia-160M, with the exact LayerNorm Jacobian of §10. The design is LLaMA-160M's: an entropy-stratified draw of 24 states per band at nine relative depths, `k` = 5, and `k` = 4 and 6 on 30 of the states ([run_scramble_consistent.py](run_scramble_consistent.py) `--model <id> --per-bin 24 --ksweep`, then [run_gaussian_matched.py](run_gaussian_matched.py) `--model <id> --points draw`). No state fails. At the first state the identity permutation reproduces the real metric (2.4e−14 on GPT-2, 1.2e−13 on Pythia-160M), and the two scrambles coincide at the base point (0.0). Entropy is matched to 1.2e−14 and 3.6e−14.
+
+| model | n | real | paper's scramble | consistent scramble | Gaussian `U` |
+|---|---|---|---|---|---|
+| GPT-2 | 120 | 0.2580 | 0.0095 (real higher 112/120, z = +9.49) | 0.2823 (31/120, z = −5.29) | 0.2303 (100/120, z = +7.30) |
+| Pythia-160M | 120 | 0.2696 | 0.0218 (117/120, z = +10.41) | 0.2827 (38/120, z = −4.02) | 0.2816 (39/120, z = −3.83) |
+
+At `k` = 4 and 6 the trained `K` is again below the consistent one. GPT-2: 0.3415 against 0.3517 (11/30, z = −1.46) and 0.2596 against 0.3374 (3/30, z = −4.38). Pythia-160M: 0.3133 against 0.3898 and 0.3189 against 0.3506 (9/30, z = −2.19, both).
+
+By entropy (real / consistent / Gaussian `U`):
+
+| entropy (nats) | GPT-2 | Pythia-160M |
+|---|---|---|
+| [0, 0.5) | 0.3907 / 0.4645 / 0.2499 | 0.4689 / 0.4871 / 0.2857 |
+| [0.5, 1) | 0.2685 / 0.3076 / 0.2501 | 0.2690 / 0.2796 / 0.2833 |
+| [1, 2) | 0.2584 / 0.2665 / 0.2396 | 0.2658 / 0.2654 / 0.2830 |
+| [2, 4) | 0.2568 / 0.2809 / 0.2177 | 0.2675 / 0.2849 / 0.2890 |
+| [4, ∞) | 0.2087 / 0.2697 / 0.1169 | 0.2645 / 0.2712 / 0.2680 |
+
+**Reading.**
+
+1. **The collapse is reproduced, and removed, on both LayerNorm models.** With §4–§5 that makes four models from two normalisation families. The paper's scramble takes `K` to between −0.006 and 0.022; the consistent one leaves it at 0.257–0.283.
+2. **Against the consistent scramble, the LayerNorm models behave like the RMSNorm ones.** The trained `K` is lower, by 0.024 on GPT-2 and 0.013 on Pythia-160M, and in every band fewer than half the states have it higher.
+3. **Against the Gaussian readout, GPT-2 is the exception.** Its Gaussian `K` is below the trained one in every band (z = +2.04 to +4.90). Above 4 nats it is far below +1/4: 0.117, against 0.209 for the trained model, and lower at all 24 states. Pythia-160M follows SmolLM2 and LLaMA-160M, with the Gaussian `K` above the trained one from 0.5 nats up.
+4. **The final LayerNorm's bias does not cause it.** The Gaussian control replaces only `U`, so on a LayerNorm model it keeps the norm's learned bias `b`, and every state's logits carry the same random offset `s U_g b`. RMSNorm has no such term. [check_gaussian_bias.py](check_gaussian_bias.py) recomputes the lowest and highest bands with `b` removed ([results/scramble/](results/scramble/) `gaussian_nobias_*`); with `b` kept, the first four states reproduce the saved values exactly. On GPT-2, removing `b` moves the Gaussian median from 0.2499 to 0.2541 below 0.5 nats and from 0.1169 to 0.1137 above 4 nats, and the trained `K` stays higher at 18 and 24 of 24 states. On Pythia-160M, where `b` is a larger part of the norm's output (median ‖b‖/‖n(h)‖ 0.44 and 0.49 in the two bands, against 0.25 and 0.15 on GPT-2), removing it moves the Gaussian median from 0.2857 to 0.3478 below 0.5 nats and from 0.2680 to 0.2628 above 4 nats, but the comparison with the trained model barely changes: the trained `K` is higher at 16 and 8 of 24 states, against 16 and 7 with `b` kept. What does drive GPT-2's result is not established.
+5. **Neither control moves the median far from +1/4.** On these two models the structure-free pullbacks give 0.230–0.283.
