@@ -177,3 +177,16 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 3. Authorship and affiliation for the camera-ready version.
 4. Wording of the AI-use disclosure.
 5. Whether to post a preprint, given double-blind review.
+
+## 12. Progress
+
+**29 October 2026 — step 1 (science) complete** ([14-revision-log.md](14-revision-log.md) §9).
+
+| step | content | status |
+|---|---|---|
+| 1. Science | consistent control on SmolLM2 and LLaMA-160M; entropy-matched Gaussian control; slice against manifold (Gauss); control validity; duplicate audit; tables rebuilt and checked; reproducibility record | ✅ |
+| 2. Writing | title, abstract, introduction with RQ1–RQ3, related work, method, validation, results, threats to validity, discussion, figures, six pages | to do, after the supervisor meeting |
+| 3. Compliance | anonymisation (author line, Word metadata), IEEE references, number check, similarity check, AI disclosure, anonymous code link | to do |
+| 4. Submission | supervisor decisions (§11), final read, CMT Track 01 by 24 November | to do |
+
+The rewrite must also correct the seven errors listed in [12-audit-log.md](12-audit-log.md) §8.6.
