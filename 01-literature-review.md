@@ -335,3 +335,9 @@ A search on 29 October 2026 found five relevant papers from June–September 202
 - **Scale:** ten checkpoints from 1B to 9B parameters (SmolLM2-1.7B, LLaMA-3.2-1B, Qwen2.5-3B, Phi-3 Mini, Mistral-7B, LLaMA-2-7B, Gemma-2B and 7B, OLMo-3-7B, Gemma-2-9B), applied to rank allocation, token pruning and distillation.
 - **Curvature:** its "tokenwise curvature score" is a trace of the operator, a sensitivity measure, not Riemannian curvature. LayerNorm is handled by assumption rather than by quotienting null directions.
 - **Relevance:** the same object at much larger scale. Its terminology has to be distinguished from intrinsic curvature in related work, and it makes model scale the most visible weakness of this project.
+
+### B5. 🟡 Pandey, Singh & Mahdid (2026), *Trajectory Geometry of Transformer Representations Across Layers* — `arXiv:2606.09287`
+
+- **What it does:** measures trajectory length, curvature (in radians), a semantic convergence index, layer-wise cosine similarity and representational stability directly in the ambient activation space of GPT-2, TinyLlama and Qwen2.5.
+- **Main results:** reasoning prompts bend more (0.71–0.83 rad) than lexical variations (0.27–0.31 rad); ambiguous tokens split into separate trajectories; the effects vanish under shuffled-layer and random-embedding controls.
+- **Relevance:** another flat-metric curvature, in the same group as Manson (B1) and King et al. (B2).
