@@ -180,3 +180,20 @@ The summary `.json` files written by `run_profiles.py`, `run_corpus_compare.py`,
 | negative planes, Section VII | 49/456; `k_eff` 248 vs 122; AUC 0.618, z = +2.69 | 48/425; 250 vs 123; AUC 0.624, z = +2.79 |
 
 No conclusion changes, but every count and z-statistic must be quoted on distinct states. `make_figures.py` Fig. 1 read the raw checkpoint; it now counts each state once.
+
+---
+
+## 8. Tables for the revision, and what rebuilding them exposed
+
+[make_tables.py](make_tables.py) rebuilds every table the revised paper needs from per-state rows, on distinct states, with true medians and midrank Spearman: controls, architectures, instrument agreement, two corpora and behaviour ([results/tables/tables.md](results/tables/tables.md)). Its 30 checks against the stored summaries all agree once two causes are allowed for, and each cause is itself a correction to the submitted paper:
+
+1. **Table VII's medians are lower medians.** The 32-pair medians were taken with `torch.median`, which returns the lower of the two middle values. True medians: Fisher–Rao 0.774 → 1.537 (1.98×, not 2.03×); Euclidean 262.4 → 559.1 (2.13×); `UᵀU` 10 630 → 17 953 (1.69×, not 1.71×). Sign counts and z are unchanged.
+2. **The stored correlations predate the midrank Spearman** of [12-audit-log.md](12-audit-log.md) §1. The local-PCA proxy has exact ties, so they move by up to 1e−3; at three decimals only the within-layer `K`–PCA value changes (+0.000 → −0.001).
+
+Three more errors surfaced while tracing the numbers to their sources:
+
+3. **"Pairs involving intrinsic curvature fall at or below 0.144" holds for `K` only.** Scalar curvature `R` reaches −0.273 against the local-PCA proxy and +0.203 against Manson's, pooled, so the largest cross-family |ρ| is 0.273, not 0.248. Within layers every cross-family pair stays at or below 0.112.
+4. **The corpus is WikiText-103, not WikiText-2.** `fisherrao/corpus.py` reads `Salesforce/wikitext`, `wikitext-103-raw-v1`, validation split.
+5. **The half-separation depths are means** — 4.53, 26.56 and 26.28 layers over 64 pairs. The paper should say "mean".
+
+**And one of mine.** The scripts added for this revision first summarised across states with `torch.median`, the convention the audit had already retired ([12-audit-log.md](12-audit-log.md) §4). They now use `fisherrao.stats.median`, and §2–§4 above and [08-rq3a-log.md](08-rq3a-log.md) §5.7 have been corrected. The changes are in the third or fourth decimal, except in the pilot's six-state bands. Per-state `K` keeps `torch.median` over its 16 planes, the definition behind every saved `K`. `make_figures.py` also prints lower medians to the console; the plotted boxes use matplotlib's true median.
