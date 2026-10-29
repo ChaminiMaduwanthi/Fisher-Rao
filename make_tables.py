@@ -377,6 +377,14 @@ def markdown(T):
         gg = (f"{qd['gauss']:.4f} | {qd['real_closer_than_gauss']['pos']}/{qd['real_closer_than_gauss']['n']}, "
               f"z = {qd['real_closer_than_gauss']['z']:+.2f}") if "gauss" in qd else "— | —"
         L.append(f"| {m} | {qd['real']:.4f} | {qd['consistent']:.4f} | {rc['pos']}/{rc['n']}, z = {rc['z']:+.2f} | {gg} |")
+    # 13-revision-plan.md S5, E1: real and consistent "agree" when |z| < 2 and the medians differ by < 0.01.
+    agree = lambda d, z: abs(z) < 2 and abs(d) < 0.01
+    for c, label in (("consistent", "consistent scramble"), ("gauss", "Gaussian `U`")):
+        cs = [(m, t["real"] - t[c], t[f"real_gt_{c}"]["z"]) for m, t in T["controls"].items() if c in t]
+        L += ["", f"Decision rule E1 (13-revision-plan.md §5: agreement means \\|z\\| < 2 "
+              f"and a median difference below 0.01), real against {label}: agreement on "
+              f"{sum(agree(d, z) for _, d, z in cs)} of {len(cs)} models (" +
+              "; ".join(f"{m} {d:+.4f}, z = {z:+.2f}" for m, d, z in cs) + ")."]
     L += ["", "## 2. Slice sectional curvature across architectures (distinct states)", "",
           "| model | n | median `K` | quartiles |", "|---|---|---|---|"]
     for m, t in T["architectures"].items():
