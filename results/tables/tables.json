@@ -2,6 +2,7 @@
   "controls": {
     "SmolLM2-135M": {
       "n": 186,
+      "excluded": 0,
       "real": 0.25472813844680786,
       "within": 0.009551174007356167,
       "real_gt_within": {
@@ -22,6 +23,103 @@
         "pos": 40,
         "n": 186,
         "z": -7.772297096131725
+      },
+      "by_entropy": {
+        "[0, 0.5)": {
+          "n": 33,
+          "real": 0.2788819968700409,
+          "consistent": 0.3426640033721924,
+          "real_gt_consistent": {
+            "pos": 10,
+            "n": 33,
+            "z": -2.263009527424072
+          },
+          "gauss": 0.25559377670288086,
+          "real_gt_gauss": {
+            "pos": 17,
+            "n": 33,
+            "z": 0.17407765595569785
+          }
+        },
+        "[0.5, 1)": {
+          "n": 31,
+          "real": 0.257012277841568,
+          "consistent": 0.2586885094642639,
+          "real_gt_consistent": {
+            "pos": 12,
+            "n": 31,
+            "z": -1.2572371141874243
+          },
+          "gauss": 0.27549266815185547,
+          "real_gt_gauss": {
+            "pos": 8,
+            "n": 31,
+            "z": -2.694079530401624
+          }
+        },
+        "[1, 2)": {
+          "n": 60,
+          "real": 0.2551558166742325,
+          "consistent": 0.2570279985666275,
+          "real_gt_consistent": {
+            "pos": 27,
+            "n": 60,
+            "z": -0.7745966692414834
+          },
+          "gauss": 0.2725794017314911,
+          "real_gt_gauss": {
+            "pos": 12,
+            "n": 60,
+            "z": -4.6475800154489
+          }
+        },
+        "[2, 4)": {
+          "n": 30,
+          "real": 0.25287699699401855,
+          "consistent": 0.24824567884206772,
+          "real_gt_consistent": {
+            "pos": 14,
+            "n": 30,
+            "z": -0.3651483716701107
+          },
+          "gauss": 0.2784964442253113,
+          "real_gt_gauss": {
+            "pos": 1,
+            "n": 30,
+            "z": -5.11207720338155
+          }
+        },
+        "[4, ∞)": {
+          "n": 32,
+          "real": 0.2107377126812935,
+          "consistent": 0.23792599141597748,
+          "real_gt_consistent": {
+            "pos": 9,
+            "n": 32,
+            "z": -2.4748737341529163
+          },
+          "gauss": 0.2738894671201706,
+          "real_gt_gauss": {
+            "pos": 2,
+            "n": 32,
+            "z": -4.949747468305833
+          }
+        }
+      },
+      "quarter": {
+        "real": 0.011698558926582336,
+        "consistent": 0.011816397309303284,
+        "real_closer_than_consistent": {
+          "pos": 95,
+          "n": 186,
+          "z": 0.2932942300427066
+        },
+        "gauss": 0.024326011538505554,
+        "real_closer_than_gauss": {
+          "pos": 122,
+          "n": 186,
+          "z": 4.2527663356192456
+        }
       },
       "k4": {
         "n": 60,
@@ -48,6 +146,7 @@
     },
     "LLaMA-160M": {
       "n": 118,
+      "excluded": 2,
       "real": 0.25650475919246674,
       "within": -0.00562843115767464,
       "real_gt_within": {
@@ -69,6 +168,103 @@
         "n": 118,
         "z": -4.418758165911952
       },
+      "by_entropy": {
+        "[0, 0.5)": {
+          "n": 24,
+          "real": 0.37395887076854706,
+          "consistent": 0.42380648851394653,
+          "real_gt_consistent": {
+            "pos": 8,
+            "n": 24,
+            "z": -1.6329931618554523
+          },
+          "gauss": 0.3624531179666519,
+          "real_gt_gauss": {
+            "pos": 9,
+            "n": 24,
+            "z": -1.2247448713915892
+          }
+        },
+        "[0.5, 1)": {
+          "n": 24,
+          "real": 0.2563911974430084,
+          "consistent": 0.2818485349416733,
+          "real_gt_consistent": {
+            "pos": 5,
+            "n": 24,
+            "z": -2.8577380332470415
+          },
+          "gauss": 0.2726282626390457,
+          "real_gt_gauss": {
+            "pos": 7,
+            "n": 24,
+            "z": -2.041241452319315
+          }
+        },
+        "[1, 2)": {
+          "n": 24,
+          "real": 0.25741198658943176,
+          "consistent": 0.2686889320611954,
+          "real_gt_consistent": {
+            "pos": 7,
+            "n": 24,
+            "z": -2.041241452319315
+          },
+          "gauss": 0.2782422751188278,
+          "real_gt_gauss": {
+            "pos": 6,
+            "n": 24,
+            "z": -2.4494897427831783
+          }
+        },
+        "[2, 4)": {
+          "n": 24,
+          "real": 0.2517673522233963,
+          "consistent": 0.26994606852531433,
+          "real_gt_consistent": {
+            "pos": 7,
+            "n": 24,
+            "z": -2.041241452319315
+          },
+          "gauss": 0.28211694955825806,
+          "real_gt_gauss": {
+            "pos": 8,
+            "n": 24,
+            "z": -1.6329931618554523
+          }
+        },
+        "[4, ∞)": {
+          "n": 22,
+          "real": 0.2438465878367424,
+          "consistent": 0.269386351108551,
+          "real_gt_consistent": {
+            "pos": 6,
+            "n": 22,
+            "z": -2.1320071635561044
+          },
+          "gauss": 0.2780058681964874,
+          "real_gt_gauss": {
+            "pos": 5,
+            "n": 22,
+            "z": -2.5584085962673253
+          }
+        }
+      },
+      "quarter": {
+        "real": 0.016244329512119293,
+        "consistent": 0.03061072528362274,
+        "real_closer_than_consistent": {
+          "pos": 77,
+          "n": 118,
+          "z": 3.3140686244339643
+        },
+        "gauss": 0.03702174127101898,
+        "real_closer_than_gauss": {
+          "pos": 68,
+          "n": 118,
+          "z": 1.6570343122169822
+        }
+      },
       "k4": {
         "n": 30,
         "real": 0.2591716945171356,
@@ -89,6 +285,294 @@
           "pos": 5,
           "n": 30,
           "z": -3.6514837167011076
+        }
+      }
+    },
+    "GPT-2": {
+      "n": 120,
+      "excluded": 0,
+      "real": 0.2580113857984543,
+      "within": 0.009537671692669392,
+      "real_gt_within": {
+        "pos": 112,
+        "n": 120,
+        "z": 9.49385766342288
+      },
+      "consistent": 0.28227217495441437,
+      "real_gt_consistent": {
+        "pos": 31,
+        "n": 120,
+        "z": -5.294651389216606
+      },
+      "gauss_n": 120,
+      "gauss": 0.23032930493354797,
+      "real_on_gauss_states": 0.2580113857984543,
+      "real_gt_gauss": {
+        "pos": 100,
+        "n": 120,
+        "z": 7.302967433402215
+      },
+      "by_entropy": {
+        "[0, 0.5)": {
+          "n": 24,
+          "real": 0.39068758487701416,
+          "consistent": 0.46450433135032654,
+          "real_gt_consistent": {
+            "pos": 10,
+            "n": 24,
+            "z": -0.8164965809277261
+          },
+          "gauss": 0.24989015609025955,
+          "real_gt_gauss": {
+            "pos": 20,
+            "n": 24,
+            "z": 3.2659863237109046
+          }
+        },
+        "[0.5, 1)": {
+          "n": 24,
+          "real": 0.26852354407310486,
+          "consistent": 0.3076414316892624,
+          "real_gt_consistent": {
+            "pos": 8,
+            "n": 24,
+            "z": -1.6329931618554523
+          },
+          "gauss": 0.2500965744256973,
+          "real_gt_gauss": {
+            "pos": 17,
+            "n": 24,
+            "z": 2.041241452319315
+          }
+        },
+        "[1, 2)": {
+          "n": 24,
+          "real": 0.25839896500110626,
+          "consistent": 0.2664646655321121,
+          "real_gt_consistent": {
+            "pos": 8,
+            "n": 24,
+            "z": -1.6329931618554523
+          },
+          "gauss": 0.23964986205101013,
+          "real_gt_gauss": {
+            "pos": 19,
+            "n": 24,
+            "z": 2.8577380332470415
+          }
+        },
+        "[2, 4)": {
+          "n": 24,
+          "real": 0.25683125853538513,
+          "consistent": 0.28088289499282837,
+          "real_gt_consistent": {
+            "pos": 3,
+            "n": 24,
+            "z": -3.6742346141747673
+          },
+          "gauss": 0.21766405552625656,
+          "real_gt_gauss": {
+            "pos": 20,
+            "n": 24,
+            "z": 3.2659863237109046
+          }
+        },
+        "[4, ∞)": {
+          "n": 24,
+          "real": 0.20872694998979568,
+          "consistent": 0.2696838676929474,
+          "real_gt_consistent": {
+            "pos": 2,
+            "n": 24,
+            "z": -4.08248290463863
+          },
+          "gauss": 0.11691539362072945,
+          "real_gt_gauss": {
+            "pos": 24,
+            "n": 24,
+            "z": 4.898979485566357
+          }
+        }
+      },
+      "quarter": {
+        "real": 0.02382124960422516,
+        "consistent": 0.0352206826210022,
+        "real_closer_than_consistent": {
+          "pos": 64,
+          "n": 120,
+          "z": 0.7302967433402214
+        },
+        "gauss": 0.02916771173477173,
+        "real_closer_than_gauss": {
+          "pos": 64,
+          "n": 120,
+          "z": 0.7302967433402214
+        }
+      },
+      "k4": {
+        "n": 30,
+        "real": 0.3415282666683197,
+        "within": -1.514765739440918,
+        "consistent": 0.35169027745723724,
+        "real_gt_consistent": {
+          "pos": 11,
+          "n": 30,
+          "z": -1.4605934866804429
+        }
+      },
+      "k6": {
+        "n": 30,
+        "real": 0.25959479808807373,
+        "within": -3.1550540924072266,
+        "consistent": 0.3374064117670059,
+        "real_gt_consistent": {
+          "pos": 3,
+          "n": 30,
+          "z": -4.381780460041329
+        }
+      }
+    },
+    "Pythia-160M": {
+      "n": 120,
+      "excluded": 0,
+      "real": 0.26959170401096344,
+      "within": 0.02184739988297224,
+      "real_gt_within": {
+        "pos": 117,
+        "n": 120,
+        "z": 10.406728592598157
+      },
+      "consistent": 0.282742515206337,
+      "real_gt_consistent": {
+        "pos": 38,
+        "n": 120,
+        "z": -4.016632088371218
+      },
+      "gauss_n": 120,
+      "gauss": 0.2815500646829605,
+      "real_on_gauss_states": 0.26959170401096344,
+      "real_gt_gauss": {
+        "pos": 39,
+        "n": 120,
+        "z": -3.8340579025361627
+      },
+      "by_entropy": {
+        "[0, 0.5)": {
+          "n": 24,
+          "real": 0.4689223915338516,
+          "consistent": 0.4871394485235214,
+          "real_gt_consistent": {
+            "pos": 8,
+            "n": 24,
+            "z": -1.6329931618554523
+          },
+          "gauss": 0.28568513691425323,
+          "real_gt_gauss": {
+            "pos": 16,
+            "n": 24,
+            "z": 1.6329931618554523
+          }
+        },
+        "[0.5, 1)": {
+          "n": 24,
+          "real": 0.2690477669239044,
+          "consistent": 0.27957984805107117,
+          "real_gt_consistent": {
+            "pos": 6,
+            "n": 24,
+            "z": -2.4494897427831783
+          },
+          "gauss": 0.28332550823688507,
+          "real_gt_gauss": {
+            "pos": 8,
+            "n": 24,
+            "z": -1.6329931618554523
+          }
+        },
+        "[1, 2)": {
+          "n": 24,
+          "real": 0.26577138900756836,
+          "consistent": 0.26544904708862305,
+          "real_gt_consistent": {
+            "pos": 10,
+            "n": 24,
+            "z": -0.8164965809277261
+          },
+          "gauss": 0.2830367535352707,
+          "real_gt_gauss": {
+            "pos": 5,
+            "n": 24,
+            "z": -2.8577380332470415
+          }
+        },
+        "[2, 4)": {
+          "n": 24,
+          "real": 0.2675268054008484,
+          "consistent": 0.2849449962377548,
+          "real_gt_consistent": {
+            "pos": 7,
+            "n": 24,
+            "z": -2.041241452319315
+          },
+          "gauss": 0.2889741510152817,
+          "real_gt_gauss": {
+            "pos": 3,
+            "n": 24,
+            "z": -3.6742346141747673
+          }
+        },
+        "[4, ∞)": {
+          "n": 24,
+          "real": 0.26452498137950897,
+          "consistent": 0.27116748690605164,
+          "real_gt_consistent": {
+            "pos": 7,
+            "n": 24,
+            "z": -2.041241452319315
+          },
+          "gauss": 0.2679527550935745,
+          "real_gt_gauss": {
+            "pos": 7,
+            "n": 24,
+            "z": -2.041241452319315
+          }
+        }
+      },
+      "quarter": {
+        "real": 0.0205441415309906,
+        "consistent": 0.032945409417152405,
+        "real_closer_than_consistent": {
+          "pos": 78,
+          "n": 120,
+          "z": 3.2863353450309964
+        },
+        "gauss": 0.03155006468296051,
+        "real_closer_than_gauss": {
+          "pos": 75,
+          "n": 120,
+          "z": 2.7386127875258306
+        }
+      },
+      "k4": {
+        "n": 30,
+        "real": 0.3133402019739151,
+        "within": -1.041960746049881,
+        "consistent": 0.3897627145051956,
+        "real_gt_consistent": {
+          "pos": 9,
+          "n": 30,
+          "z": -2.1908902300206643
+        }
+      },
+      "k6": {
+        "n": 30,
+        "real": 0.3189298212528229,
+        "within": -3.705658197402954,
+        "consistent": 0.35059963166713715,
+        "real_gt_consistent": {
+          "pos": 9,
+          "n": 30,
+          "z": -2.1908902300206643
         }
       }
     }
@@ -270,7 +754,715 @@
       }
     }
   },
+  "spectral": {
+    "SmolLM2-135M": {
+      "n": 360,
+      "excluded": 0,
+      "layers": [
+        1,
+        5,
+        10,
+        15,
+        20,
+        25,
+        28,
+        29,
+        30
+      ],
+      "log_volume_rho": 0.9567364039191134,
+      "log_volume_profile": {
+        "real": [
+          -0.18894291458646437,
+          0.011153221596797902,
+          -0.1808420644554058,
+          -0.2561204501707259,
+          -0.714244651928565,
+          -0.4486332683927953,
+          -0.017750325491097386,
+          0.03362730307495063,
+          0.07347058979221083
+        ],
+        "within": [
+          -0.04027578759780024,
+          0.15004358424249356,
+          -0.08260934823149313,
+          -0.07052660980327197,
+          -0.6082987240721969,
+          -0.22093153836075796,
+          0.03817823681315726,
+          0.029245271646519376,
+          0.12661281154733003
+        ]
+      },
+      "log_volume_min_layer": {
+        "real": 20,
+        "within": 20
+      },
+      "log_volume_range_retained": 0.9627112288167489,
+      "log_volume_shape_rho": 0.8666666666666667,
+      "log_volume_rho_entropy_real": 0.8620730098376898,
+      "k_eff_rho": 0.9912280305461206,
+      "k_eff_profile": {
+        "real": [
+          14.5,
+          8.5,
+          6.0,
+          7.0,
+          6.0,
+          23.5,
+          80.0,
+          167.5,
+          218.5
+        ],
+        "within": [
+          13.5,
+          8.0,
+          5.0,
+          6.0,
+          6.0,
+          25.0,
+          67.0,
+          151.0,
+          216.0
+        ]
+      },
+      "k_eff_min_layer": {
+        "real": 10,
+        "within": 10
+      },
+      "k_eff_range_retained": 0.9929411764705882,
+      "k_eff_shape_rho": 0.9873949579831933,
+      "k_eff_rho_entropy_real": 0.7146043054110494
+    },
+    "LLaMA-160M": {
+      "n": 335,
+      "excluded": 25,
+      "layers": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        8,
+        9,
+        11,
+        12
+      ],
+      "log_volume_rho": 0.8471621156530211,
+      "log_volume_profile": {
+        "real": [
+          -0.07499723087375582,
+          -0.022150612894397348,
+          -0.009223035001776203,
+          -0.0719189407341144,
+          -0.04383199218825044,
+          -0.06783104331728254,
+          -0.13548306497208476,
+          -0.2141902357204309,
+          -0.10435842382674085
+        ],
+        "within": [
+          -0.14148710550647275,
+          -0.0760123017153907,
+          -0.0820126880308957,
+          -0.11617960907979956,
+          -0.07698631761799418,
+          -0.04103689683928628,
+          -0.1270977645329145,
+          -0.2053356996425464,
+          -0.09236453690829638
+        ]
+      },
+      "log_volume_min_layer": {
+        "real": 11,
+        "within": 11
+      },
+      "log_volume_range_retained": 0.8015858255720754,
+      "log_volume_shape_rho": 0.7666666666666667,
+      "log_volume_rho_entropy_real": 0.37805691402441527,
+      "k_eff_rho": 0.9884203848193405,
+      "k_eff_profile": {
+        "real": [
+          360.5,
+          352.0,
+          324.5,
+          328.5,
+          315.5,
+          219.5,
+          151.5,
+          67.0,
+          263.5
+        ],
+        "within": [
+          362.0,
+          355.5,
+          323.5,
+          333.0,
+          313.5,
+          214.0,
+          154.5,
+          83.0,
+          252.5
+        ]
+      },
+      "k_eff_min_layer": {
+        "real": 11,
+        "within": 11
+      },
+      "k_eff_range_retained": 0.9505962521294719,
+      "k_eff_shape_rho": 1.0,
+      "k_eff_rho_entropy_real": 0.9030769302041121
+    },
+    "GPT-2": {
+      "n": 360,
+      "excluded": 0,
+      "layers": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        8,
+        9,
+        11,
+        12
+      ],
+      "log_volume_rho": 0.878860850873423,
+      "log_volume_profile": {
+        "real": [
+          -0.4693045117770072,
+          -0.3579071164752567,
+          -0.13921500138115742,
+          -0.22665544888437356,
+          -0.38671023408520455,
+          -0.1867784507622126,
+          -0.1554248428327992,
+          -0.2467693397364046,
+          -0.3506213480226423
+        ],
+        "within": [
+          -0.39586665899516266,
+          -0.16710571230113716,
+          -0.01344722706959578,
+          -0.1325512575932586,
+          -0.1833657885414432,
+          -0.013679099097563175,
+          0.05956029292557892,
+          -0.03201813689284041,
+          -0.08107692639658506
+        ]
+      },
+      "log_volume_min_layer": {
+        "real": 1,
+        "within": 1
+      },
+      "log_volume_range_retained": 1.3797074356424859,
+      "log_volume_shape_rho": 0.9333333333333333,
+      "log_volume_rho_entropy_real": 0.45038206617953624,
+      "k_eff_rho": 0.9715709910555674,
+      "k_eff_profile": {
+        "real": [
+          259.0,
+          213.0,
+          207.5,
+          194.5,
+          215.0,
+          143.5,
+          132.0,
+          218.5,
+          326.5
+        ],
+        "within": [
+          225.5,
+          187.0,
+          170.5,
+          182.0,
+          193.0,
+          128.0,
+          106.5,
+          166.5,
+          288.5
+        ]
+      },
+      "k_eff_min_layer": {
+        "real": 9,
+        "within": 9
+      },
+      "k_eff_range_retained": 0.9357326478149101,
+      "k_eff_shape_rho": 0.8166666666666667,
+      "k_eff_rho_entropy_real": 0.7860343705329409
+    },
+    "Pythia-160M": {
+      "n": 360,
+      "excluded": 0,
+      "layers": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        8,
+        9,
+        11,
+        12
+      ],
+      "log_volume_rho": 0.9579819018550875,
+      "log_volume_profile": {
+        "real": [
+          0.35842398562057276,
+          0.5666198195757356,
+          0.17280421966051818,
+          0.38394440797238205,
+          0.38437113588899474,
+          0.4885538997101562,
+          0.380684154334423,
+          0.3886638904055143,
+          0.2905101196986095
+        ],
+        "within": [
+          0.36531768923380503,
+          0.4965397861907549,
+          0.18434115871411927,
+          0.39065375664947344,
+          0.40324238287036085,
+          0.5059824105488113,
+          0.3781070587444616,
+          0.3834108521858756,
+          0.34106918340159326
+        ]
+      },
+      "log_volume_min_layer": {
+        "real": 4,
+        "within": 4
+      },
+      "log_volume_range_retained": 0.8167306015910405,
+      "log_volume_shape_rho": 0.9333333333333333,
+      "log_volume_rho_entropy_real": 0.6934864382781224,
+      "k_eff_rho": 0.9939238186990108,
+      "k_eff_profile": {
+        "real": [
+          52.5,
+          78.0,
+          31.0,
+          31.5,
+          35.5,
+          77.0,
+          31.0,
+          22.0,
+          336.0
+        ],
+        "within": [
+          55.0,
+          89.5,
+          34.0,
+          34.0,
+          38.0,
+          78.0,
+          33.0,
+          23.5,
+          323.5
+        ]
+      },
+      "k_eff_min_layer": {
+        "real": 11,
+        "within": 11
+      },
+      "k_eff_range_retained": 0.9554140127388535,
+      "k_eff_shape_rho": 0.9873949579831933,
+      "k_eff_rho_entropy_real": 0.7847900436894245
+    }
+  },
+  "validation": {
+    "ladder_autodiff": [
+      {
+        "rung": 1,
+        "manifold": "Sphere, radius 2",
+        "expect": 0.25,
+        "n": 12,
+        "worst": 1.8041124150158794e-15
+      },
+      {
+        "rung": 2,
+        "manifold": "Poincare half-plane",
+        "expect": -1.0,
+        "n": 12,
+        "worst": 1.0325074129013956e-13
+      },
+      {
+        "rung": 3,
+        "manifold": "Categorical simplex",
+        "expect": 0.25,
+        "n": 12,
+        "worst": 6.584193468217592e-10
+      },
+      {
+        "rung": 6,
+        "manifold": "Univariate Gaussian",
+        "expect": -0.5,
+        "n": 12,
+        "worst": 2.55351295663786e-15
+      }
+    ],
+    "gate_a_real": {
+      "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "eps": 0.001,
+      "rel_err": 4.30806513777556e-05
+    },
+    "gate_a_synthetic": {
+      "eps": 0.0001,
+      "rel_err": 8.73e-06
+    },
+    "rung7": {
+      "sectional_worst": 9.73e-12,
+      "reparam_worst": 1.94e-11,
+      "scalar_worst": 4.94e-12,
+      "broken_assembly": 0.2634
+    },
+    "geomstats": {
+      "Poincare": {
+        "rung": 2,
+        "n": 2,
+        "agree": 0,
+        "max_diff": 1.43,
+        "metrics_identical": true
+      },
+      "categorical": {
+        "rung": 3,
+        "n": 2,
+        "agree": 0,
+        "max_diff": 1.75,
+        "metrics_identical": true
+      },
+      "normal": {
+        "rung": 6,
+        "n": 2,
+        "agree": 2,
+        "max_diff": 2.22e-16
+      },
+      "gamma": {
+        "rung": 4,
+        "n": 3,
+        "agree": 3,
+        "max_diff": 2.3e-13
+      },
+      "beta": {
+        "rung": 5,
+        "n": 3,
+        "agree": 3,
+        "max_diff": 4.87e-14
+      }
+    },
+    "null": [
+      {
+        "model": "SmolLM2-135M",
+        "norm": "LlamaRMSNorm",
+        "expect": 1,
+        "found": 1,
+        "kl_null": 2.777622971995432e-15,
+        "kl_rand": 3.7578220751505578,
+        "ok": true
+      },
+      {
+        "model": "LLaMA-160M",
+        "norm": "LlamaRMSNorm",
+        "expect": 1,
+        "found": 1,
+        "kl_null": 3.8155490354820954e-16,
+        "kl_rand": 2.9581828334102056,
+        "ok": true
+      },
+      {
+        "model": "Pythia-70M",
+        "norm": "LayerNorm",
+        "expect": 2,
+        "found": 2,
+        "kl_null": 1.6494128119090347e-13,
+        "kl_rand": 13.40691829506639,
+        "ok": true
+      },
+      {
+        "model": "Pythia-160M",
+        "norm": "LayerNorm",
+        "expect": 2,
+        "found": 2,
+        "kl_null": 2.017222439121516e-13,
+        "kl_rand": 7.790524384997391,
+        "ok": true
+      },
+      {
+        "model": "GPT-2",
+        "norm": "LayerNorm",
+        "expect": 2,
+        "found": 2,
+        "kl_null": 1.1595015479914542e-15,
+        "kl_rand": 3.6988017282798715,
+        "ok": true
+      },
+      {
+        "model": "GPT-Neo-125M",
+        "norm": "LayerNorm",
+        "expect": 2,
+        "found": 2,
+        "kl_null": 9.661226165512914e-16,
+        "kl_rand": 32.30583997699512,
+        "ok": true
+      }
+    ],
+    "trace_fraction": {
+      "4": {
+        "median": 0.9211236834526062,
+        "mean": 0.8874334096908569,
+        "min": 0.40660104155540466,
+        "max": 0.9956070184707642,
+        "n": 60
+      },
+      "5": {
+        "median": 0.9563047885894775,
+        "mean": 0.9124984741210938,
+        "min": 0.43198731541633606,
+        "max": 0.9979173541069031,
+        "n": 60
+      },
+      "6": {
+        "median": 0.9675347805023193,
+        "mean": 0.9292883276939392,
+        "min": 0.4545226991176605,
+        "max": 0.9995262622833252,
+        "n": 60
+      }
+    }
+  },
+  "calibration": {
+    "model": "gpt2",
+    "thresholds": [
+      0.9,
+      0.95,
+      0.99,
+      0.999,
+      0.9999
+    ],
+    "layer12": {
+      "5": [
+        0.061992151261423434,
+        5.316577942661571e-32,
+        4.4239054851285846e-32,
+        4.4239054851285846e-32,
+        4.4239054851285846e-32
+      ],
+      "10": [
+        0.07116226173866269,
+        0.030434644805983135,
+        3.996276496062595e-32,
+        3.6392182996179834e-32,
+        3.6392182996179834e-32
+      ],
+      "20": [
+        0.0884787457179253,
+        0.04255624412679109,
+        0.006543457278690427,
+        3.0306389963402946e-32,
+        3.0306389963402946e-32
+      ],
+      "50": [
+        0.09559494774022752,
+        0.046905118397142204,
+        0.008764136526502705,
+        0.0005200047765386017,
+        2.041388584965037e-32
+      ],
+      "100": [
+        0.09762584324171329,
+        0.048812513951803076,
+        0.00947085953810555,
+        0.0008423455016878936,
+        1.4578504738518624e-32
+      ],
+      "200": [
+        0.09888784218411208,
+        0.0494254804696886,
+        0.009769724775325239,
+        0.0009313230834201549,
+        6.204074058877831e-05
+      ]
+    },
+    "sphere": [
+      0.008358562113805678,
+      0.008317782684234828,
+      0.007814820199707802,
+      1.4757534244406724e-31,
+      1.56994486676354e-31
+    ],
+    "plane": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "layernorm": {
+    "gpt2": {
+      "n": 12,
+      "r_over_s": 1.0001453313329898,
+      "metric_err": 0.00028943828659423905,
+      "median_abs_dK": 6.341934204101562e-05,
+      "max_abs_dK": 0.00023846328258514404,
+      "package_vs_full": 1.774874948137932e-14
+    },
+    "EleutherAI/pythia-160m": {
+      "n": 12,
+      "r_over_s": 1.0001520987320265,
+      "metric_err": 0.00031520650447306136,
+      "median_abs_dK": 5.799531936645508e-05,
+      "max_abs_dK": 0.0010593831539154053,
+      "package_vs_full": 1.1471170655751992e-12
+    }
+  },
   "checks": [
+    {
+      "label": "controls, SmolLM2-135M: median K, real",
+      "recomputed": 0.25472813844680786,
+      "stored": 0.25472813844680786,
+      "ok": true
+    },
+    {
+      "label": "controls, SmolLM2-135M: median K, within",
+      "recomputed": 0.009551174007356167,
+      "stored": 0.009551174007356167,
+      "ok": true
+    },
+    {
+      "label": "controls, SmolLM2-135M: median K, consistent",
+      "recomputed": 0.25646181404590607,
+      "stored": 0.25646181404590607,
+      "ok": true
+    },
+    {
+      "label": "controls, SmolLM2-135M: real > consistent",
+      "recomputed": 72,
+      "stored": 72,
+      "ok": true
+    },
+    {
+      "label": "controls, SmolLM2-135M: median K, Gaussian U",
+      "recomputed": 0.2729555666446686,
+      "stored": 0.2729555666446686,
+      "ok": true
+    },
+    {
+      "label": "controls, SmolLM2-135M: real > Gaussian U",
+      "recomputed": 40,
+      "stored": 40,
+      "ok": true
+    },
+    {
+      "label": "controls, LLaMA-160M: median K, real",
+      "recomputed": 0.25650475919246674,
+      "stored": 0.25650475919246674,
+      "ok": true
+    },
+    {
+      "label": "controls, LLaMA-160M: median K, within",
+      "recomputed": -0.00562843115767464,
+      "stored": -0.00562843115767464,
+      "ok": true
+    },
+    {
+      "label": "controls, LLaMA-160M: median K, consistent",
+      "recomputed": 0.2794288247823715,
+      "stored": 0.2794288247823715,
+      "ok": true
+    },
+    {
+      "label": "controls, LLaMA-160M: real > consistent",
+      "recomputed": 33,
+      "stored": 33,
+      "ok": true
+    },
+    {
+      "label": "controls, LLaMA-160M: median K, Gaussian U",
+      "recomputed": 0.284574419260025,
+      "stored": 0.284574419260025,
+      "ok": true
+    },
+    {
+      "label": "controls, LLaMA-160M: real > Gaussian U",
+      "recomputed": 35,
+      "stored": 35,
+      "ok": true
+    },
+    {
+      "label": "controls, GPT-2: median K, real",
+      "recomputed": 0.2580113857984543,
+      "stored": 0.2580113857984543,
+      "ok": true
+    },
+    {
+      "label": "controls, GPT-2: median K, within",
+      "recomputed": 0.009537671692669392,
+      "stored": 0.009537671692669392,
+      "ok": true
+    },
+    {
+      "label": "controls, GPT-2: median K, consistent",
+      "recomputed": 0.28227217495441437,
+      "stored": 0.28227217495441437,
+      "ok": true
+    },
+    {
+      "label": "controls, GPT-2: real > consistent",
+      "recomputed": 31,
+      "stored": 31,
+      "ok": true
+    },
+    {
+      "label": "controls, GPT-2: median K, Gaussian U",
+      "recomputed": 0.23032930493354797,
+      "stored": 0.23032930493354797,
+      "ok": true
+    },
+    {
+      "label": "controls, GPT-2: real > Gaussian U",
+      "recomputed": 100,
+      "stored": 100,
+      "ok": true
+    },
+    {
+      "label": "controls, Pythia-160M: median K, real",
+      "recomputed": 0.26959170401096344,
+      "stored": 0.26959170401096344,
+      "ok": true
+    },
+    {
+      "label": "controls, Pythia-160M: median K, within",
+      "recomputed": 0.02184739988297224,
+      "stored": 0.02184739988297224,
+      "ok": true
+    },
+    {
+      "label": "controls, Pythia-160M: median K, consistent",
+      "recomputed": 0.282742515206337,
+      "stored": 0.282742515206337,
+      "ok": true
+    },
+    {
+      "label": "controls, Pythia-160M: real > consistent",
+      "recomputed": 38,
+      "stored": 38,
+      "ok": true
+    },
+    {
+      "label": "controls, Pythia-160M: median K, Gaussian U",
+      "recomputed": 0.2815500646829605,
+      "stored": 0.2815500646829605,
+      "ok": true
+    },
+    {
+      "label": "controls, Pythia-160M: real > Gaussian U",
+      "recomputed": 39,
+      "stored": 39,
+      "ok": true
+    },
     {
       "label": "E2 pooled intrinsic_K|pca",
       "recomputed": -0.14415709877799993,
@@ -450,6 +1642,158 @@
       "recomputed": 23,
       "stored": 23,
       "ok": true
+    },
+    {
+      "label": "spectral, LLaMA-160M: log-volume per-state rho",
+      "recomputed": 0.8471621156530211,
+      "stored": 0.8471621156530211,
+      "ok": true
+    },
+    {
+      "label": "spectral, LLaMA-160M: k_eff per-state rho",
+      "recomputed": 0.9884203848193405,
+      "stored": 0.9884203848193405,
+      "ok": true
+    },
+    {
+      "label": "spectral, LLaMA-160M: log-volume profile shape",
+      "recomputed": 0.7666666666666667,
+      "stored": 0.7666666666666667,
+      "ok": true
+    },
+    {
+      "label": "spectral, LLaMA-160M: k_eff profile shape",
+      "recomputed": 1.0,
+      "stored": 1.0,
+      "ok": true
+    },
+    {
+      "label": "spectral, LLaMA-160M: rho(log-volume, entropy)",
+      "recomputed": 0.37805691402441527,
+      "stored": 0.37805691402441527,
+      "ok": true
+    },
+    {
+      "label": "spectral, GPT-2: log-volume per-state rho",
+      "recomputed": 0.878860850873423,
+      "stored": 0.878860850873423,
+      "ok": true
+    },
+    {
+      "label": "spectral, GPT-2: k_eff per-state rho",
+      "recomputed": 0.9715709910555674,
+      "stored": 0.9715709910555674,
+      "ok": true
+    },
+    {
+      "label": "spectral, GPT-2: log-volume profile shape",
+      "recomputed": 0.9333333333333333,
+      "stored": 0.9333333333333333,
+      "ok": true
+    },
+    {
+      "label": "spectral, GPT-2: k_eff profile shape",
+      "recomputed": 0.8166666666666667,
+      "stored": 0.8166666666666667,
+      "ok": true
+    },
+    {
+      "label": "spectral, GPT-2: rho(log-volume, entropy)",
+      "recomputed": 0.45038206617953624,
+      "stored": 0.45038206617953624,
+      "ok": true
+    },
+    {
+      "label": "spectral, Pythia-160M: log-volume per-state rho",
+      "recomputed": 0.9579819018550875,
+      "stored": 0.9579819018550875,
+      "ok": true
+    },
+    {
+      "label": "spectral, Pythia-160M: k_eff per-state rho",
+      "recomputed": 0.9939238186990108,
+      "stored": 0.9939238186990108,
+      "ok": true
+    },
+    {
+      "label": "spectral, Pythia-160M: log-volume profile shape",
+      "recomputed": 0.9333333333333333,
+      "stored": 0.9333333333333333,
+      "ok": true
+    },
+    {
+      "label": "spectral, Pythia-160M: k_eff profile shape",
+      "recomputed": 0.9873949579831933,
+      "stored": 0.9873949579831933,
+      "ok": true
+    },
+    {
+      "label": "spectral, Pythia-160M: rho(log-volume, entropy)",
+      "recomputed": 0.6934864382781224,
+      "stored": 0.6934864382781224,
+      "ok": true
+    }
+  ],
+  "paper": [
+    {
+      "what": "spectral: log-volume, per-state rho (SmolLM2)",
+      "recomputed": 0.9567364039191134,
+      "submitted": 0.957
+    },
+    {
+      "what": "spectral: k_eff, per-state rho (SmolLM2)",
+      "recomputed": 0.9912280305461206,
+      "submitted": 0.991
+    },
+    {
+      "what": "spectral: k_eff range retained (SmolLM2), Section VI.B text",
+      "recomputed": 0.9929411764705882,
+      "submitted": 0.995
+    },
+    {
+      "what": "Gate A on a real model (KL-Hessian relative error)",
+      "recomputed": 4.30806513777556e-05,
+      "submitted": 8.7e-06
+    },
+    {
+      "what": "states in the cross-architecture sweep",
+      "recomputed": 425,
+      "submitted": 456
+    },
+    {
+      "what": "Pythia-160M median K",
+      "recomputed": 0.2720853336971807,
+      "submitted": 0.2738
+    },
+    {
+      "what": "GPT-2 median K",
+      "recomputed": 0.26010120878432985,
+      "submitted": 0.2599
+    },
+    {
+      "what": "spread of median K across the four models",
+      "recomputed": 0.017303269162666446,
+      "submitted": 0.019
+    },
+    {
+      "what": "paper's scramble, SmolLM2, median K",
+      "recomputed": 0.009551174007356167,
+      "submitted": 0.0109
+    },
+    {
+      "what": "paper's scramble, SmolLM2, states",
+      "recomputed": 186,
+      "submitted": 221
+    },
+    {
+      "what": "sense change / same sense, Fisher-Rao ratio",
+      "recomputed": 1.9843761997406946,
+      "submitted": 2.03
+    },
+    {
+      "what": "largest cross-family |rho| between instruments",
+      "recomputed": 0.2730826295479166,
+      "submitted": 0.248
     }
   ]
 }
