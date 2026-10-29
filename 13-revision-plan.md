@@ -166,3 +166,11 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 | A null-type result is judged insignificant | Rejection | State the practical consequence — which geometric probes can be trusted for interpretability — and position against the 2026 papers that rely on them |
 | If this repository is public, it shows the paper and the author's name | Reviewers could identify the author | Consider making it private until the decision on 6 January 2027 |
 | The deadline slips | No submission | The fallback in §9 |
+
+## 11. Decisions needed from the supervisor
+
+1. Adopt the framing in §4, conditional on E1–E2?
+2. Submit to ICARC by 25 November, or take more time for a later venue?
+3. Authorship and affiliation for the camera-ready version.
+4. Wording of the AI-use disclosure.
+5. Whether to post a preprint, given double-blind review.
