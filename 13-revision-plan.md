@@ -58,3 +58,27 @@ The Gaussian-unembedding control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, whic
 **What it does not affect.** The spectral results (log-volume ρ = +0.957, effective dimension ρ = +0.991) are functions of `G(h0)` alone, and at `h0` the two controls are identical. The validation ladder, the null-direction test, `K ≈ +1/4` as a measurement, the calibration of the 10⁻⁵ reading and the behavioural probe also stand.
 
 **Caveat.** One model, 30 states and `k` = 5. E1 and E2 (§5) decide the claim. Full record: [08-rq3a-log.md](08-rq3a-log.md) §5.7 and [12-audit-log.md](12-audit-log.md) §8.
+
+## 4. Proposed framing (to be agreed with the supervisor)
+
+**Working title:** *What Does Fisher–Rao Geometry Measure in Transformer Representations? A Controlled Study of Curvature and Spectrum*
+
+**Problem statement (draft).** Geometric summaries of the Fisher–Rao metric on transformer hidden states — its spectrum, effective dimension, volume and curvature — are increasingly used to describe what language models represent. Whether these quantities reflect learned structure, or are fixed by the predictive distribution and the geometry of the probability simplex, has not been tested with controls that hold the predictive distribution fixed and remain genuine pullbacks.
+
+**Research questions.**
+
+- **RQ1.** Can the intrinsic Riemannian curvature of the Fisher–Rao pullback metric on transformer hidden states be computed reliably? *(method, validation ladder, null-direction test)*
+- **RQ2.** What value does that curvature take across architectures, and is the value produced by learning? *(`K ≈ +1/4`; Gaussian, untrained and consistent controls)*
+- **RQ3.** What do the spectral summaries — log-volume and effective dimension — read? *(matched-entropy controls; the depth profile)*
+
+**Contributions, if E1–E2 confirm the pilot.**
+
+1. A validated pipeline for the intrinsic curvature of the Fisher–Rao pullback on transformer hidden states.
+2. `K ≈ +1/4` across four architectures, shown by genuine-pullback controls to be inherited from the simplex rather than learned.
+3. The spectral profiles, including the depth "hourglass", reproduced by structure-free controls at matched entropy.
+4. A methodological result: a control that is not itself a pullback manufactures a spurious collapse (0.255 → 0.000), and a consistency criterion that prevents it.
+5. A calibration of the published near-flat reading (10⁻⁵): the same estimator reports a unit 3-sphere as flat.
+
+**Dropped:** "curvature carries learned structure". **Moved to future work:** the causal probe (current §VI.H). **Kept briefly if space allows:** the behavioural probe.
+
+**If E1 differs from the pilot** on other architectures, the framing changes to report where real and consistent curvature diverge. The claim follows the data either way.
