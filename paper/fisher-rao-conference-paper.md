@@ -148,10 +148,10 @@ The deviation from exactly +1/4 is not advanced as a model-specific signal. It v
 
 ### B. The separation
 
-Fig. 2 presents the central result: one control, three quantities, two outcomes.
+Fig. 2 presents the central result: one control, three quantities, two outcomes. Table III gives the numbers. Sectional curvature falls from a median of 0.2546 to 0.0109 and retains 4 % of its value, while the log volume element is reproduced at rho = +0.957 and the effective dimension at rho = +0.991, retaining 96 % and 99 % respectively. Throughout, rho is a Spearman rank correlation across states, and z is a normal-approximation test statistic, from a paired sign test except where another test is named.
 
 **[FIGURE 2: fig2_split.png]**
-*Fig. 2. One paired control applied to three quantities. Sectional curvature collapses; the log volume element and the effective dimension are reproduced almost exactly.*
+*Fig. 2. (a) sectional curvature, (b) log volume element, (c) effective dimension, across depth. Solid, real; dashed, scrambled.*
 
 **TABLE III. ONE CONTROL, THREE QUANTITIES**
 
