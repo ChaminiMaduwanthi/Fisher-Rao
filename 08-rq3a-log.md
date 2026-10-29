@@ -421,7 +421,7 @@ At `h0` it agrees with `within` exactly — same `p`, metric, frame, conditionin
 
 ## 7. Next
 
-0. **Scale the consistent control (§5.7)** to the four architectures and the 186 distinct states (221 rows) of §5.4, at `k` = 4–6, with an untrained-model control alongside. It decides whether any claim that curvature reads learned structure survives ([13-revision-plan.md](13-revision-plan.md) E1–E2).
+0. ✅ **Scaled** ([14-revision-log.md](14-revision-log.md) §4–§6): SmolLM2 on the 186 distinct states of §5.4 at `k` = 4–6, LLaMA-160M on 118 states, and an entropy-matched Gaussian control on both. No genuine pullback collapses. Still open, and optional for the resubmission: the LayerNorm models and an untrained-model control.
 1. **Raise `n` on the §5.4 paired control and break it down by layer.** It is the load-bearing result of this document and it rests on 17–19 points. The measurement is ~44 s/point at `k`=5; `run_frame_resolution.py main` checkpoints, so this is just wall time.
 2. Re-run on GPT-2 / Pythia — **no longer blocked**, the TLS problem is fixed and all three architectures pass their checks ([10-architecture-log.md](10-architecture-log.md)).
 3. Replicate Mabrok's proxy faithfully so the magnitude comparison can be made or dropped ([07-stage4-log.md](07-stage4-log.md) §1.2).
