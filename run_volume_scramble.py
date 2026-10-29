@@ -50,7 +50,7 @@ if hasattr(sys.stdout, "reconfigure"):
 from fisherrao import LM, corpus
 from fisherrao.metrics import fisher_metric, fisher_metric_scrambled, topk_indices
 from fisherrao.curvature import null_projector
-from fisherrao.stats import spearman as _spearman
+from fisherrao.stats import median as _true_median, spearman as _spearman
 
 OUT = pathlib.Path("results/volume_scramble")
 K_DIM, TOP_K = 5, 512
@@ -84,21 +84,38 @@ def log_vol_per_dim(lm, h, G, k):
     if len(ev) == 0:
         return float("nan")
     lv = float(0.5 * torch.log(ev).sum())
-    lv += len(ev) * float(torch.log(torch.sqrt(h.pow(2).mean() + lm.eps)))
+    # the metric scales as 1/r^2 with the hidden-state norm; r is the RMS for
+    # RMSNorm and the standard deviation for LayerNorm
+    scale = (h.pow(2).mean() if "RMS" in lm.norm_kind else h.var(unbiased=False)) + lm.eps
+    lv += len(ev) * float(torch.log(torch.sqrt(scale)))
     return lv / len(ev)
 
 
 def median(xs):
-    t = torch.tensor([x for x in xs if x == x], dtype=torch.float64)
-    return float(t.median()) if len(t) else float("nan")
+    """True median (fisherrao.stats); the first version took torch's lower middle value."""
+    return _true_median(xs)
+
+
+def depths_for(n_layers: int, n_depths: int = 9) -> list[int]:
+    """Same rule as run_profiles.depths_for."""
+    if n_layers <= n_depths:
+        return list(range(1, n_layers + 1))
+    step = (n_layers - 1) / (n_depths - 1)
+    return sorted({max(1, round(1 + i * step)) for i in range(n_depths)})
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     per_layer = int(sys.argv[1]) if len(sys.argv) > 1 else 40
     gen = torch.Generator().manual_seed(0)
-    lm = LM()
+    model = sys.argv[2] if len(sys.argv) > 2 else None
+    lm = LM(model) if model else LM()
     print(lm.summary())
+    global LAYERS
+    if model and "SmolLM2" not in model:
+        LAYERS = depths_for(lm.n_layers)
+    out_name = ("volume_scramble.json" if not model or "SmolLM2" in model
+                else f"volume_scramble_{model.split('/')[-1]}.json")
 
     by_layer: dict[int, list] = {l: [] for l in LAYERS}
     for s in corpus.sentences():
@@ -220,11 +237,17 @@ def main():
     print("   scrambled correlation as strong as the real one means the")
     print("   quantity is reading concentration rather than learned structure.")
 
-    (OUT / "volume_scramble.json").write_text(json.dumps(dict(
-        n_per_layer=per_layer, k=K_DIM, profile=prof, shape_rho=shape,
+    # per-state rank correlation with the real value: convention-free, and the
+    # number to quote (12-audit-log.md S4)
+    point_rho = {f"{q}_{c}": spearman([r[f"{q}_real"] for r in rows], [r[f"{q}_{c}"] for r in rows])
+                 for q in ("lv", "ke") for c in ("within", "scr")}
+    print(f"\n   per-state rho with the real value: {point_rho}")
+    (OUT / out_name).write_text(json.dumps(dict(
+        model=lm.model_id, layers=LAYERS, n_per_layer=per_layer, k=K_DIM, profile=prof,
+        k_eff_profile=kprof, shape_rho=shape, k_eff_shape_rho=kshape, point_rho=point_rho,
         stats=stats, rho_real_entropy=rho_re, rows=rows), indent=2),
         encoding="utf-8")
-    print(f"\nwrote {OUT / 'volume_scramble.json'}")
+    print(f"\nwrote {OUT / out_name}")
 
 
 if __name__ == "__main__":
