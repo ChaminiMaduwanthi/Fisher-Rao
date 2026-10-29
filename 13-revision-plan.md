@@ -58,7 +58,7 @@ The earlier Gaussian control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, matched 
 
 **What it does not affect.** The spectral results (log-volume ρ = +0.957, effective dimension ρ = +0.991 on SmolLM2) are functions of `G(h0)` alone, and at `h0` the two controls are identical. They replicate on all four models: ρ across states 0.85–0.96 and 0.97–0.99, with the same lowest layer in every case ([14-revision-log.md](14-revision-log.md) §12). The validation ladder, the null-direction test, `K ≈ +1/4` as a measurement, the calibration of the 10⁻⁵ reading and the behavioural probe also stand.
 
-**Status.** Done on both RMSNorm models at `k` = 4–6, with a learning-free Gaussian control in place of E2 ([14-revision-log.md](14-revision-log.md) §4–§6). The LayerNorm models and an untrained-model control remain optional. Full record: [08-rq3a-log.md](08-rq3a-log.md) §5.7, [12-audit-log.md](12-audit-log.md) §8, [14-revision-log.md](14-revision-log.md).
+**Status.** Done on all four models at `k` = 4–6, with a learning-free Gaussian control in place of E2, and the spectral control on all four ([14-revision-log.md](14-revision-log.md) §4–§6, §12–§14). An untrained-model control remains optional. Full record: [08-rq3a-log.md](08-rq3a-log.md) §5.7, [12-audit-log.md](12-audit-log.md) §8, [14-revision-log.md](14-revision-log.md).
 
 ## 4. Proposed framing (to be agreed with the supervisor)
 
