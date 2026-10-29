@@ -348,3 +348,10 @@ A search on 29 October 2026 found five relevant papers from June–September 202
 - **Main results:** beats Euclidean mean pooling on CoLA, CREAK and RTE and is at chance on FEVER-Symmetric. A randomly initialised encoder with the same aggregation already beats Euclidean pooling on two of the three datasets.
 - **Curvature:** none.
 - **Relevance:** a precedent for random-network controls of pullback geometry; it motivates the untrained-model control (E2) in [13-revision-plan.md](13-revision-plan.md).
+
+### D6. 🟡 Xu, Xu & Wu (2026), *PersonaManifold: Revealing and Exploiting Curved Geometry in LLM Persona Representations* — `arXiv:2609.34571`, listed as accepted to NeurIPS 2026
+
+- **What it does:** models persona activations as a curved low-dimensional submanifold of activation space, with local metric tensors, geodesic distances and Ollivier-Ricci curvature, and steers along geodesics instead of straight lines.
+- **Main results:** curvature is heterogeneous; geodesic distance predicts behavioural similarity better than Euclidean distance; geodesic steering gives more coherent intermediate personas, with the advantage concentrated where the manifold departs most from flatness.
+- **Curvature:** Ollivier-Ricci, a discrete graph-based notion, not the Riemann tensor of the Fisher metric.
+- **Relevance:** evidence at a major venue that representation curvature has behavioural consequences.
