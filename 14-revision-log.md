@@ -276,3 +276,30 @@ Fig. 3(b)'s sphere calibration is now a function (`make_figures.sphere_calibrati
 **Error 8 in the submitted paper.** Section IV.B says the KL–Hessian identity "was verified on a real model … at relative error 8.7 × 10⁻⁶". 8.7e−6 is the synthetic softmax model of `gate_a_kl_test.py`. On a real model (SmolLM2-135M, Stage 0) the plateau is at **4.3e−5**, at ε = 10⁻³. Both pass, but the paper must attribute each correctly.
 
 **Error 9.** Table IV, effective dimension by layer, also used lower medians. With true medians the real profile is 14.5, 8.5, 6, 7, 6, 23.5, 80, 167.5, 218.5. The scrambled one is 13.5, 8, 5, 6, 6, 25, 67, 151, 216: at layer 28 the scrambled value is 67, not 54. The conclusion stands, because the minimum layer and 99 % of the range are retained and the per-state ρ is +0.991.
+
+---
+
+## 12. The spectral control on four models
+
+[run_volume_scramble.py](run_volume_scramble.py) `40 <model>`: 40 states per layer at nine relative depths, real against the paired scramble ([results/volume_scramble/](results/volume_scramble/); Table 6 of [results/tables/tables.md](results/tables/tables.md)). At the base point the paper's scramble and the consistent one coincide (§3), so this control is valid as it stands.
+
+| model | n | quantity | ρ, per state | ρ, layer profile | lowest layer, real / scrambled | range kept | ρ with entropy |
+|---|---|---|---|---|---|---|---|
+| SmolLM2-135M | 360 | log-volume | +0.957 | +0.867 | 20 / 20 | 96 % | +0.862 |
+| | | `k_eff` | +0.991 | +0.987 | 10 / 10 | 99 % | +0.715 |
+| LLaMA-160M | 335 | log-volume | +0.847 | +0.767 | 11 / 11 | 80 % | +0.378 |
+| | | `k_eff` | +0.988 | +1.000 | 11 / 11 | 95 % | +0.903 |
+| GPT-2 | 360 | log-volume | +0.879 | +0.933 | 1 / 1 | 138 % | +0.450 |
+| | | `k_eff` | +0.972 | +0.817 | 9 / 9 | 94 % | +0.786 |
+| Pythia-160M | 360 | log-volume | +0.958 | +0.933 | 4 / 4 | 82 % | +0.693 |
+| | | `k_eff` | +0.994 | +0.987 | 11 / 11 | 96 % | +0.785 |
+
+**Reading.**
+
+1. **The spectral result replicates on all four models.** A scramble that keeps the predictive distribution and the row multiset but destroys their pairing reproduces both summaries: ρ across states 0.85–0.99, and the same lowest layer in all eight cases. Effective dimension is the tighter of the two, with ρ ≥ 0.97 across states and 94–99 % of the range.
+2. **Log-volume is reproduced less tightly outside SmolLM2.** ρ across states is 0.85 on LLaMA-160M and 0.88 on GPT-2, and the scrambled profile spans 80–138 % of the real one's range. On GPT-2 it is wider than the real profile, with the same lowest layer.
+3. **"The spectrum tracks predictive concentration" holds for effective dimension on all four models** (ρ with entropy +0.72 to +0.90). For log-volume it holds clearly on SmolLM2 and Pythia-160M (+0.86, +0.69) and only weakly on LLaMA-160M and GPT-2 (+0.38, +0.45). The paper must state it per quantity.
+4. **The "hourglass" is SmolLM2's.** SmolLM2's effective dimension is lowest at layer 10 of 30, the dip the paper describes. The other three are lowest late: at layer 11 of 12 on LLaMA-160M and Pythia-160M, and 9 of 12 on GPT-2. What generalises is that the control reproduces each model's own profile, not the shape of SmolLM2's.
+5. **One more number in the paper.** Section VI.B says the scrambled effective-dimension profile retains "99.5 %" of the real range. With true medians it is 99.3 % ([12-audit-log.md](12-audit-log.md) §8.6).
+
+**Excluded LLaMA-160M states, and a correction to §5.** 25 of LLaMA-160M's 360 states fail here, as do 2 of its 120 in §5. All 27 are at the `<s>` position. LLaMA-160M's `<s>` embedding is zero, and its attention and MLP blocks have no bias terms, so the residual stream stays exactly zero there: ‖h‖ = 0.0 at every depth from the embedding to the last layer, checked on three sentences. The final RMSNorm maps zero to zero, so the prediction is uniform, and every excluded state has entropy ln 32 000 = 10.3735 nats. The normalisation's null direction `h/‖h‖` is undefined there, so the quotient metric cannot be formed and `eigh` fails. §5 blamed the pseudo-inverse in `christoffel()`; §5 and [15-reproducibility.md](15-reproducibility.md) §6 are corrected. No other saved LLaMA-160M value comes from such a state: the profile and Gaussian-control states reach at most 7.5 nats, and the six E5 states that failed with the same `eigh` error are already excluded there. SmolLM2, GPT-2 and Pythia-160M have no failures.
