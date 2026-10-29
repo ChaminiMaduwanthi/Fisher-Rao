@@ -76,7 +76,7 @@ def controls():
         rows = [r for r in d["rows"] if "error" not in r]
         gpath = R / "scramble" / f"gaussian_{tag}_points.jsonl"
         gauss = {r["_i"]: r["K_gauss"] for r in jl(gpath) if "K_gauss" in r} if gpath.exists() else {}
-        t = dict(n=len(rows), real=median([r["K_real"] for r in rows]))
+        t = dict(n=len(rows), excluded=d["summary"].get("n_errors", 0), real=median([r["K_real"] for r in rows]))
         for c in ("within", "consistent"):
             t[c] = median([r[f"K_{c}"] for r in rows])
             t[f"real_gt_{c}"] = sign([r["K_real"] - r[f"K_{c}"] for r in rows])
@@ -252,9 +252,10 @@ def spectral():
         path = R / "volume_scramble" / fn
         if not path.exists():
             continue
-        rows = json.loads(path.read_text(encoding="utf-8"))["rows"]
+        d = json.loads(path.read_text(encoding="utf-8"))
+        rows = d["rows"]
         layers = sorted({r["layer"] for r in rows})
-        t = dict(n=len(rows), layers=layers)
+        t = dict(n=len(rows), excluded=d.get("n_errors", 0), layers=layers)
         for q, label in (("lv", "log_volume"), ("ke", "k_eff")):
             ok = [r for r in rows if finite(r[f"{q}_real"], r[f"{q}_within"])]
             t[f"{label}_rho"] = spearman([r[f"{q}_real"] for r in ok], [r[f"{q}_within"] for r in ok])
@@ -385,6 +386,10 @@ def markdown(T):
               f"and a median difference below 0.01), real against {label}: agreement on "
               f"{sum(agree(d, z) for _, d, z in cs)} of {len(cs)} models (" +
               "; ".join(f"{m} {d:+.4f}, z = {z:+.2f}" for m, d, z in cs) + ")."]
+    ex = [f"{m}, {t['excluded']}" for m, t in T["controls"].items() if t.get("excluded")]
+    if ex:
+        L += ["", "States excluded because the metric is undefined there (a hidden state that is exactly zero; "
+              "14-revision-log.md §12): " + "; ".join(ex) + "."]
     L += ["", "## 2. Slice sectional curvature across architectures (distinct states)", "",
           "| model | n | median `K` | quartiles |", "|---|---|---|---|"]
     for m, t in T["architectures"].items():
@@ -428,6 +433,10 @@ def markdown(T):
                      f"{t['log_volume_min_layer']['within']} | {t['log_volume_range_retained']*100:.0f} % | "
                      f"{t['k_eff_rho']:+.3f} | {t['k_eff_min_layer']['real']} / {t['k_eff_min_layer']['within']} | "
                      f"{t['k_eff_range_retained']*100:.0f} % | {t['log_volume_rho_entropy_real']:+.3f} |")
+        ex = [f"{m}, {t['excluded']} of {t['n'] + t['excluded']}" for m, t in S.items() if t.get("excluded")]
+        if ex:
+            L += ["", "States excluded because the metric is undefined there (a hidden state that is exactly zero; "
+                  "14-revision-log.md §12): " + "; ".join(ex) + "."]
         for m, t in S.items():
             L += ["", f"Effective dimension by layer, {m} (true medians):", "",
                   "| layer | " + " | ".join(str(l) for l in t["layers"]) + " |",
