@@ -364,3 +364,22 @@ By entropy (real / consistent / Gaussian `U`):
 **What the offset is cannot be settled with these slices.** The trained and control slices are chosen from different metrics, so their extrinsic terms differ (§2). §2 sized that term at 0.005–0.028 between 0.5 and 4 nats, the same order as the offset. The paper should report a difference in slice sectional curvature, not a property of the manifold.
 
 **For the paper** (contribution 2 of plan §4, revised; to be agreed with the supervisor): *`K` ≈ +1/4 on four architectures. Genuine-pullback controls without learned structure give the same value to within 0.035, so the value is inherited from the simplex rather than produced by learning. The trained models nonetheless sit slightly below a structure-free pairing of their own rows, on every model and at every `k` (by 0.002–0.024 at `k` = 5).*
+
+---
+
+## 15. Status after the four-model runs (29 October 2026)
+
+Supersedes §9.
+
+| task | status | where |
+|---|---|---|
+| consistent control, four models, `k` = 4–6 | ✅ | §4, §5, §13 |
+| Gaussian readout, entropy-matched, four models | ✅ | §6, §13 |
+| GPT-2's Gaussian result: the LayerNorm bias ruled out | ✅; the cause is open | §13 |
+| spectral control, four models | ✅ | §12 |
+| LLaMA-160M zero states | ✅ explained and excluded | §12 |
+| E1 decision rule | ✅ applied: not met; contribution 2 revised, for the supervisor | §14 |
+| tables, 69 of 69 checks agree | ✅ | [results/tables/tables.md](results/tables/tables.md) |
+| untrained-model control (E2) | optional, not run | [13-revision-plan.md](13-revision-plan.md) §5 |
+
+**The answers the paper can now give.** RQ1: yes, and validated. RQ2: `K` ≈ +1/4 on all four models and on every genuine pullback (0.230–0.285). The value is inherited from the simplex; learning leaves a small offset (0.002–0.024) against a structure-free pairing of the same rows. RQ3: both spectral summaries are reproduced, on four models, by a control that destroys that pairing. Effective dimension tracks predictive entropy on all four; log-volume does so clearly on two and weakly on two. Ten errors in the submitted paper are listed in [12-audit-log.md](12-audit-log.md) §8.6.
