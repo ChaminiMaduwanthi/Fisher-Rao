@@ -328,3 +328,10 @@ A search on 29 October 2026 found five relevant papers from June–September 202
 - **Main results:** output geometry agrees across models more than activation geometry does (rank agreement 0.88 against 0.61–0.62); the spectrum can be predicted from token probabilities and read-out structure (effective-dimension RMSE 0.027–0.052); Fisher-based edits and fine-tuning disturb off-target behaviour far less than Euclidean ones.
 - **Curvature:** none computed in the part read.
 - **Relevance:** the closest paper to this project. Its spectrum-from-probabilities result is independent support for the finding that spectral quantities track predictive concentration ([08-rq3a-log.md](08-rq3a-log.md) §5.5).
+
+### A5. 🟡 Mudarisov, Burtsev, Petrova & State (2026), *Predictive Geometry of Hidden Trajectories in Transformers* — `arXiv:2609.37717`
+
+- **What it does:** shows that near low-loss trajectories the Hessian of the loss-to-go at an intermediate layer is the pullback Fisher operator `K = J̄ᵀ(diag p − ppᵀ)J̄` plus a residual bounded by the loss. Its spectrum separates output-sensitive from prediction-null directions.
+- **Scale:** ten checkpoints from 1B to 9B parameters (SmolLM2-1.7B, LLaMA-3.2-1B, Qwen2.5-3B, Phi-3 Mini, Mistral-7B, LLaMA-2-7B, Gemma-2B and 7B, OLMo-3-7B, Gemma-2-9B), applied to rank allocation, token pruning and distillation.
+- **Curvature:** its "tokenwise curvature score" is a trace of the operator, a sensitivity measure, not Riemannian curvature. LayerNorm is handled by assumption rather than by quotienting null directions.
+- **Relevance:** the same object at much larger scale. Its terminology has to be distinguished from intrinsic curvature in related work, and it makes model scale the most visible weakness of this project.
