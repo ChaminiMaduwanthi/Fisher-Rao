@@ -297,6 +297,7 @@ The scripts added for the revision (`run_scramble_consistent.py`, `check_slice_g
 | Section IV.B | KL–Hessian identity "on a real model" at 8.7 × 10⁻⁶ | 8.7e−6 is the synthetic model; the real model gives 4.3e−5 |
 | Table IV | effective dimension by layer, lower medians (scrambled layer 28: 54) | true medians (layer 28: 67); minimum layer and 99 % of the range unchanged |
 | Section VI.B | the scrambled effective-dimension profile retains "99.5 %" of the real range | 99.3 % with true medians |
+| References [4], [5], [7] | "Y. Wang and L. Zhao"; "A. Zaher, M. Trzaskowski, D. Nguyen"; "M. King" | S. Wang, J. Zhao, Q. Cao, H. Yao and L. Shu; E. Zaher, M. Trzaskowski, Q. Nguyen; J. King (arXiv pages, 29 October 2026) |
 
 None of these reverses a conclusion. They are listed because the revision must quote the right numbers. `results/tables/tables.md` closes with the same comparison, recomputed.
 
