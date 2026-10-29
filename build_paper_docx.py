@@ -149,11 +149,14 @@ def table(rows: list[list[str]], width_in: float) -> str:
     tw = int(width_in * 1440)                      # twips
     # Columns share the width in proportion to their longest body entry, with the
     # header counting half (headers may wrap, numbers should not), bounded so no
-    # column starves or dominates.
+    # column starves or dominates, and never narrower than the column's longest
+    # unbreakable word; the constant leaves room for Word's cell padding.
     def need_of(j):
-        body = max((len(visible(r[j])) for r in rows[1:] if j < len(r)), default=0)
-        head = len(visible(rows[0][j])) if j < len(rows[0]) else 0
-        return min(max(body, (head + 1) // 2), 30) + 3
+        cells = [visible(r[j]) for r in rows if j < len(r)]
+        body = max((len(c) for c in cells[1:]), default=0)
+        head = len(cells[0]) if cells else 0
+        word = max((len(w) for c in cells for w in c.split()), default=0)
+        return max(min(body, 30), (head + 1) // 2, word) + 5
     need = [need_of(j) for j in range(ncol)]
     widths = [int(tw * n / sum(need)) for n in need]
     grid = "".join(f'<w:gridCol w:w="{w}"/>' for w in widths)
