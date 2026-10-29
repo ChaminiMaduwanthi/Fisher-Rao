@@ -296,3 +296,9 @@ The scripts added for the revision (`run_scramble_consistent.py`, `check_slice_g
 | Section VI.F | "places it at layer 4.5" | a mean half-separation depth (4.53), to be called one |
 
 None of these reverses a conclusion. They are listed because the revision must quote the right numbers.
+
+### 8.7 🟡 The projected metric used the RMSNorm Jacobian on LayerNorm models
+
+`fisher_metric_projected`, behind every Riemann-derived number, applied the RMSNorm Jacobian to every model. On GPT-2 and Pythia-160M the error is 3e−4 in the metric and 6e−5 in `K` (median; 1.1e−3 at most), because a hidden state's mean is negligible against its spread there. It is fixed (`metrics.frame_jacobian`), the RMSNorm path is byte-identical, and the fixed metric matches the full `fisher_metric` to 1e−14. [14-revision-log.md](14-revision-log.md) §10.
+
+**The rule this adds.** A closed form written for one architecture must state the architecture it assumes, and must be checked against the general path on every architecture it is used on. `norm_check()` verified `LM.norm_jacobian` on LayerNorm models, but the projected metric never called it, so the check passed while the code path in use was a different one.
