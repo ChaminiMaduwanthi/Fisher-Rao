@@ -75,8 +75,8 @@ The earlier Gaussian control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, matched 
 **Contributions, if E1–E2 confirm the pilot.**
 
 1. A validated pipeline for the intrinsic curvature of the Fisher–Rao pullback on transformer hidden states.
-2. `K ≈ +1/4` across four architectures, shown by genuine-pullback controls to be inherited from the simplex rather than learned.
-3. The spectral profiles, including the depth "hourglass", reproduced by structure-free controls at matched entropy.
+2. `K ≈ +1/4` across four architectures, shown by genuine-pullback controls to be inherited from the simplex rather than learned. The trained models sit slightly below a structure-free pairing of their own rows on every model (by 0.002–0.024), which the paper reports as a small offset in slice curvature. *(Revised after E1: [14-revision-log.md](14-revision-log.md) §14.)*
+3. The spectral profiles reproduced, on four models, by a control that destroys the learned pairing; effective dimension tracks predictive entropy on all four. The depth "hourglass" is SmolLM2's and is not claimed in general ([14-revision-log.md](14-revision-log.md) §12).
 4. A methodological result: a control that is not itself a pullback manufactures a spurious collapse (0.255 → 0.000), and a consistency criterion that prevents it.
 5. A calibration of the published near-flat reading (10⁻⁵): the same estimator reports a unit 3-sphere as flat.
 
