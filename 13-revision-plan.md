@@ -113,3 +113,21 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 **Related Work structure.** (a) The Fisher pullback metric on hidden states: Mabrok, FishBack, Zaher et al., Picozzi, Mudarisov et al. (b) Curvature under flat metrics: Manson, King et al., Pandey et al. (c) Other curvature notions and other networks: Zavatone-Veth et al., PersonaManifold. (d) Intrinsic dimension and representation manifolds: Valeriani et al., Facco et al., Modell et al. Each group ends with what it leaves open.
 
 **Rules.** 35–40 references in IEEE style, with every preprint's authors and venue re-checked. One known inconsistency to resolve against arXiv: FishBack's authors are "Sihan Wang, Jiayi Zhao" in [references.bib](references.bib) but "Y. Wang and L. Zhao" in the paper's reference [4]. No reused source text — ICARC desk-rejects above 30 % similarity.
+
+## 7. Writing plan (six pages)
+
+| Section | Budget | Content |
+|---|---|---|
+| Abstract | about 200 words | Problem, method, three findings, implication |
+| I. Introduction | 0.6 page | The problem, why it matters for interpretability, RQ1–RQ3, contributions |
+| II. Related Work | 0.6 page | The four groups of §6 |
+| III. Method | 1.0 page | Pullback, null directions, curvature on slices with the Gauss-equation statement, the controls and the consistency criterion, models, data, reproduction details |
+| IV. Validation | 0.5 page | Ladder, KL–Hessian identity, null-direction test (merge Tables I and II if space is short) |
+| V. Results | 2.0 pages | `K` across architectures; the controls table; spectral profiles; the 10⁻⁵ calibration |
+| VI. Threats to Validity | 0.4 page | Scale, slices, sample sizes, corpora, the open library comparison |
+| VII. Discussion and Conclusion | 0.5 page | What the geometry measures, what it does not, future work |
+| References | 0.4 page | 35–40 entries |
+
+**Figures.** (1) A pipeline diagram, new. (2) The controls figure: `K` for the real model, both scrambles, Gaussian `U` and the untrained model. (3) The spectral profiles, real against scrambled. The current threshold figure becomes a small panel or is cut.
+
+**Rules.** Problem before method. One claim per paragraph, each tied to a table or figure. Every number re-measured into its table from a results file ([12-audit-log.md](12-audit-log.md) §7.5). Call what is measured "slice sectional curvature".
