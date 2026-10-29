@@ -24,7 +24,7 @@
 | [11-mabrok-replication-log.md](11-mabrok-replication-log.md) | **Mabrok's 10⁻⁵ reproduced on his corpus — and his proxy shown to read a unit 3-sphere as flat at that setting** | Progress, Ch. 6 |
 | [12-audit-log.md](12-audit-log.md) | 🔴 **Full end-to-end audit — one headline claim withdrawn (ρ = +0.42 was a rank-tie artefact), two restated, everything else reproduced** | Progress, Ch. 5 & 8 |
 | [13-revision-plan.md](13-revision-plan.md) | **ICARC 2027 resubmission plan** — reviewer comments mapped to fixes, the consistent-control finding, experiments, timeline, checklist | Supervisor, writing |
-| [run_scramble_consistent.py](run_scramble_consistent.py) | 🔴 **The consistent scramble** — the §5.4 control realised as a genuine pullback; `K` does not collapse (pilot) | Revision |
+| [run_scramble_consistent.py](run_scramble_consistent.py) | 🔴 **The consistent scramble** — the §5.4 control realised as a genuine pullback; `K` does not collapse (SmolLM2, LLaMA-160M) | Revision |
 | [14-revision-log.md](14-revision-log.md) | **Revision experiments** — the duplicate-state count, slice against manifold curvature, the consistent control at scale | Revision |
 | [check_slice_gauss.py](check_slice_gauss.py) | **Slice vs manifold curvature** on a known answer (rung 7): the Gauss-equation term, measured | Revision |
 | [check_control_validity.py](check_control_validity.py) | **Is each control a pullback?** Gate A off the base point, the RMSNorm Jacobian, conditioning | Revision |
