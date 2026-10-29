@@ -334,3 +334,33 @@ By entropy (real / consistent / Gaussian `U`):
 3. **Against the Gaussian readout, GPT-2 is the exception.** Its Gaussian `K` is below the trained one in every band (z = +2.04 to +4.90). Above 4 nats it is far below +1/4: 0.117, against 0.209 for the trained model, and lower at all 24 states. Pythia-160M follows SmolLM2 and LLaMA-160M, with the Gaussian `K` above the trained one from 0.5 nats up.
 4. **The final LayerNorm's bias does not cause it.** The Gaussian control replaces only `U`, so on a LayerNorm model it keeps the norm's learned bias `b`, and every state's logits carry the same random offset `s U_g b`. RMSNorm has no such term. [check_gaussian_bias.py](check_gaussian_bias.py) recomputes the lowest and highest bands with `b` removed ([results/scramble/](results/scramble/) `gaussian_nobias_*`); with `b` kept, the first four states reproduce the saved values exactly. On GPT-2, removing `b` moves the Gaussian median from 0.2499 to 0.2541 below 0.5 nats and from 0.1169 to 0.1137 above 4 nats, and the trained `K` stays higher at 18 and 24 of 24 states. On Pythia-160M, where `b` is a larger part of the norm's output (median ‖b‖/‖n(h)‖ 0.44 and 0.49 in the two bands, against 0.25 and 0.15 on GPT-2), removing it moves the Gaussian median from 0.2857 to 0.3478 below 0.5 nats and from 0.2680 to 0.2628 above 4 nats, but the comparison with the trained model barely changes: the trained `K` is higher at 16 and 8 of 24 states, against 16 and 7 with `b` kept. What does drive GPT-2's result is not established.
 5. **Neither control moves the median far from +1/4.** On these two models the structure-free pullbacks give 0.230–0.283.
+
+---
+
+## 14. The E1 decision rule, applied to four models
+
+[13-revision-plan.md](13-revision-plan.md) §5 set the rule before the runs. The trained and consistent `K` *agree* on a model when the sign test gives |z| < 2 and the medians differ by less than 0.01. The framing of plan §4 is adopted if they agree on at least three of four models; otherwise the paper reports where they differ. §5 and §6 interpreted two models without applying it. Applied now (Table 1 of [results/tables/tables.md](results/tables/tables.md) prints the same verdict):
+
+| model | real − consistent | z | real − Gaussian `U` | z |
+|---|---|---|---|---|
+| SmolLM2-135M | −0.0017 | −3.08 | −0.0182 | −7.77 |
+| LLaMA-160M | −0.0229 | −4.79 | −0.0281 | −4.42 |
+| GPT-2 | −0.0243 | −5.29 | +0.0277 | +7.30 |
+| Pythia-160M | −0.0132 | −4.02 | −0.0120 | −3.83 |
+
+> 🔴 **Agreement on none of the four models, against either control.** SmolLM2 meets the size criterion (0.0017) but not the significance one. By the plan's own rule the paper reports the difference; it cannot say that the trained and structure-free values are the same.
+
+**What holds on four models.**
+
+1. **The submitted collapse is an artefact.** The paper's scramble is not a pullback (§3). Made into one, it no longer collapses (§4, §5, §13).
+2. **The value is not produced by learning.** The eight structure-free genuine pullbacks give medians from 0.230 to 0.285, the trained models 0.255–0.270. All lie within 0.035 of +1/4.
+3. **The trained models differ consistently from the consistent scramble.** Their `K` is lower on every model at `k` = 5, by 0.002–0.024 (z = −3.08 to −5.29). At `k` = 4 and 6 the direction is the same in all eight cases, with |z| ≥ 2 in six. In all 20 model–band cells fewer than half the states have the trained value higher. The offset is under a tenth of the value. It is the one effect of learning on `K` whose sign is the same on all four models.
+
+**What does not hold.**
+
+4. **"The trained models are the lowest of the genuine pullbacks"** (§6). GPT-2's Gaussian readout gives a lower `K` than the trained model, 0.230 against 0.258.
+5. **"Learning pulls `K` towards +1/4"** (§5, §9; plan §3). At the median the trained `K` is the closest of the three to +1/4 on every model. State by state it is the closer one significantly in only 4 of the 8 model–control comparisons (z from +0.29 to +4.25, none reversed; Table 1). It is not a result.
+
+**What the offset is cannot be settled with these slices.** The trained and control slices are chosen from different metrics, so their extrinsic terms differ (§2). §2 sized that term at 0.005–0.028 between 0.5 and 4 nats, the same order as the offset. The paper should report a difference in slice sectional curvature, not a property of the manifold.
+
+**For the paper** (contribution 2 of plan §4, revised; to be agreed with the supervisor): *`K` ≈ +1/4 on four architectures. Genuine-pullback controls without learned structure give the same value to within 0.035, so the value is inherited from the simplex rather than produced by learning. The trained models nonetheless sit slightly below a structure-free pairing of their own rows, on every model and at every `k` (by 0.002–0.024 at `k` = 5).*
