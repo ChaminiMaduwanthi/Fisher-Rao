@@ -420,18 +420,22 @@ def main() -> int:
     skip = {"word/document.xml", "word/_rels/document.xml.rels", "[Content_Types].xml",
             "docProps/core.xml", "docProps/app.xml"}
     core, app = properties(title)
+    def part(name):
+        """A new package part with a fixed timestamp, so identical sources give identical files."""
+        return zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
         for item in src.infolist():
             if item.filename in skip:
                 continue
             z.writestr(item, src.read(item.filename))
-        z.writestr("[Content_Types].xml", ct)
-        z.writestr("word/document.xml", doc)
-        z.writestr("word/_rels/document.xml.rels", rels)
-        z.writestr("docProps/core.xml", core)
-        z.writestr("docProps/app.xml", app)
+        z.writestr(part("[Content_Types].xml"), ct, zipfile.ZIP_DEFLATED)
+        z.writestr(part("word/document.xml"), doc, zipfile.ZIP_DEFLATED)
+        z.writestr(part("word/_rels/document.xml.rels"), rels, zipfile.ZIP_DEFLATED)
+        z.writestr(part("docProps/core.xml"), core, zipfile.ZIP_DEFLATED)
+        z.writestr(part("docProps/app.xml"), app, zipfile.ZIP_DEFLATED)
         for f in figs.values():
-            z.writestr("word/" + f["media"], open(f["path"], "rb").read())
+            z.writestr(part("word/" + f["media"]), open(f["path"], "rb").read(), zipfile.ZIP_DEFLATED)
     src.close()
 
     print(f"wrote {OUT}  ({os.path.getsize(OUT)/1024:.0f} KB)")
