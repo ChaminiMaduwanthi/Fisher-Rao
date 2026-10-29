@@ -126,7 +126,7 @@ By entropy, `k` = 5:
 
 ## 5. E1 — the consistent control on a second model (LLaMA-160M)
 
-Entropy-stratified draw, 24 states per band, nine relative depths ([results/scramble/consistent_llama-160m_draw.json](results/scramble/consistent_llama-160m_draw.json)). Two of 120 states fail — the pseudo-inverse in `christoffel()` does not converge at entropy 10.4 nats — and are excluded.
+Entropy-stratified draw, 24 states per band, nine relative depths ([results/scramble/consistent_llama-160m_draw.json](results/scramble/consistent_llama-160m_draw.json)). Two of 120 states fail and are excluded. Both are the `<s>` position, whose hidden state is exactly zero, so the metric is undefined there (§12; first attributed here to the pseudo-inverse in `christoffel()`, which was wrong).
 
 | `k` | n | real | `within` | consistent | real > `within` | real > consistent |
 |---|---|---|---|---|---|---|
