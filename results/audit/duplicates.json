@@ -1,0 +1,385 @@
+{
+  "scan": [
+    {
+      "file": "results/corpus_compare/points.jsonl",
+      "rows": 702,
+      "identical_copies": 49
+    },
+    {
+      "file": "results/e5/e5_points_SmolLM2-135M-Instruct_k4.jsonl",
+      "rows": 76,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_SmolLM2-135M-Instruct_k5.jsonl",
+      "rows": 105,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_gpt-neo-125m_k4.jsonl",
+      "rows": 120,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_gpt-neo-125m_k5.jsonl",
+      "rows": 127,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_gpt2_k4.jsonl",
+      "rows": 86,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_gpt2_k5.jsonl",
+      "rows": 100,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_llama-160m_k4.jsonl",
+      "rows": 120,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_llama-160m_k5.jsonl",
+      "rows": 120,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_llama-160m_k6.jsonl",
+      "rows": 129,
+      "identical_copies": 1
+    },
+    {
+      "file": "results/e5/e5_points_pythia-160m_k4.jsonl",
+      "rows": 120,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_pythia-160m_k5.jsonl",
+      "rows": 107,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_pythia-160m_k6.jsonl",
+      "rows": 113,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_pythia-70m_k4.jsonl",
+      "rows": 120,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/e5/e5_points_pythia-70m_k5.jsonl",
+      "rows": 120,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/negplanes/points.jsonl",
+      "rows": 135,
+      "identical_copies": 48
+    },
+    {
+      "file": "results/profiles/profile_points.jsonl",
+      "rows": 463,
+      "identical_copies": 31
+    },
+    {
+      "file": "results/scramble/consistent_SmolLM2-135M-Instruct_paper_points.jsonl",
+      "rows": 186,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/scramble/consistent_llama-160m_draw_points.jsonl",
+      "rows": 96,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/scramble/frame_points.jsonl",
+      "rows": 62,
+      "identical_copies": 0
+    },
+    {
+      "file": "results/scramble/within_points.jsonl",
+      "rows": 221,
+      "identical_copies": 35
+    }
+  ],
+  "scramble": {
+    "rows": {
+      "overall": {
+        "n": 221,
+        "K_real": 0.25460619321673755,
+        "K_within": 0.010902604968736173,
+        "pos": 201,
+        "z": 12.175377571333255
+      },
+      "k4": {
+        "n": 69,
+        "K_real": 0.25429244521271155,
+        "K_within": 0.013656024518269081,
+        "pos": 63,
+        "z": 6.861993625888845
+      },
+      "k6": {
+        "n": 69,
+        "K_real": 0.25322784116519137,
+        "K_within": 0.05117534703974887,
+        "pos": 58,
+        "z": 5.658135095031152
+      },
+      "by_layer": {
+        "1": {
+          "n": 21,
+          "retained": 0.022951252338823867,
+          "pos": 19
+        },
+        "5": {
+          "n": 17,
+          "retained": 0.023178331905902537,
+          "pos": 17
+        },
+        "10": {
+          "n": 25,
+          "retained": 0.014966526725386179,
+          "pos": 22
+        },
+        "15": {
+          "n": 24,
+          "retained": 0.017255863015488582,
+          "pos": 23
+        },
+        "20": {
+          "n": 29,
+          "retained": -0.05290861528686307,
+          "pos": 28
+        },
+        "25": {
+          "n": 20,
+          "retained": -0.9545754056961849,
+          "pos": 20
+        },
+        "28": {
+          "n": 23,
+          "retained": 0.06963759986280844,
+          "pos": 20
+        },
+        "29": {
+          "n": 35,
+          "retained": 0.25757960918955425,
+          "pos": 30
+        },
+        "30": {
+          "n": 27,
+          "retained": 0.6144345679547333,
+          "pos": 22
+        }
+      },
+      "by_entropy": {
+        "[0.0,0.5)": {
+          "n": 38,
+          "K_real": 0.27503780735545746,
+          "K_within": -1.275560955798536,
+          "pos": 35
+        },
+        "[0.5,1.0)": {
+          "n": 37,
+          "K_real": 0.25866795766350625,
+          "K_within": -0.11648787622847556,
+          "pos": 36
+        },
+        "[1.0,2.0)": {
+          "n": 68,
+          "K_real": 0.2554544155757469,
+          "K_within": 0.01104998052342597,
+          "pos": 66
+        },
+        "[2.0,4.0)": {
+          "n": 36,
+          "K_real": 0.2528316841776736,
+          "K_within": 0.13103682462003075,
+          "pos": 31
+        },
+        "[4.0,inf)": {
+          "n": 42,
+          "K_real": 0.20642412592974538,
+          "K_within": 0.12375420298050568,
+          "pos": 33
+        }
+      }
+    },
+    "distinct": {
+      "overall": {
+        "n": 186,
+        "K_real": 0.25472813238598213,
+        "K_within": 0.009551173926797826,
+        "pos": 168,
+        "z": 10.998533626601498
+      },
+      "k4": {
+        "n": 60,
+        "K_real": 0.2553810411688048,
+        "K_within": 0.011002876883899365,
+        "pos": 55,
+        "z": 6.454972243679028
+      },
+      "k6": {
+        "n": 60,
+        "K_real": 0.2543802491388871,
+        "K_within": 0.030398832756132886,
+        "pos": 51,
+        "z": 5.422176684690384
+      },
+      "by_layer": {
+        "1": {
+          "n": 20,
+          "retained": 0.030173098489168902,
+          "pos": 18
+        },
+        "5": {
+          "n": 17,
+          "retained": 0.023178331905902537,
+          "pos": 17
+        },
+        "10": {
+          "n": 20,
+          "retained": 0.01132735133818577,
+          "pos": 18
+        },
+        "15": {
+          "n": 19,
+          "retained": 0.013493908235004407,
+          "pos": 18
+        },
+        "20": {
+          "n": 21,
+          "retained": -0.05287305558505602,
+          "pos": 20
+        },
+        "25": {
+          "n": 19,
+          "retained": -1.279326964246048,
+          "pos": 19
+        },
+        "28": {
+          "n": 22,
+          "retained": 0.12183029912242546,
+          "pos": 19
+        },
+        "29": {
+          "n": 25,
+          "retained": 0.24898854028142223,
+          "pos": 21
+        },
+        "30": {
+          "n": 23,
+          "retained": 0.5784630447758647,
+          "pos": 18
+        }
+      },
+      "by_entropy": {
+        "[0.0,0.5)": {
+          "n": 33,
+          "K_real": 0.278881990274144,
+          "K_within": -1.24845419186849,
+          "pos": 30
+        },
+        "[0.5,1.0)": {
+          "n": 31,
+          "K_real": 0.25701228350263156,
+          "K_within": -0.11648787622847556,
+          "pos": 30
+        },
+        "[1.0,2.0)": {
+          "n": 60,
+          "K_real": 0.25515581902879875,
+          "K_within": 0.010228646795139441,
+          "pos": 58
+        },
+        "[2.0,4.0)": {
+          "n": 30,
+          "K_real": 0.25287700135446745,
+          "K_within": 0.11991848359458882,
+          "pos": 25
+        },
+        "[4.0,inf)": {
+          "n": 32,
+          "K_real": 0.21073771233940783,
+          "K_within": 0.13643410559447966,
+          "pos": 25
+        }
+      }
+    }
+  },
+  "profiles": {
+    "rows": {
+      "n": 456,
+      "per_model": {
+        "EleutherAI/pythia-160m": {
+          "n": 130,
+          "median_K": 0.2738122584408422
+        },
+        "HuggingFaceTB/SmolLM2-135M-Instruct": {
+          "n": 108,
+          "median_K": 0.25478206453451424
+        },
+        "JackFram/llama-160m": {
+          "n": 101,
+          "median_K": 0.25586329133314556
+        },
+        "gpt2": {
+          "n": 117,
+          "median_K": 0.2599105420355384
+        }
+      },
+      "spread": 0.019030193906327986,
+      "negative_planes": {
+        "n_neg": 49,
+        "n": 456,
+        "k_eff_neg": 248.0,
+        "k_eff_pos": 122.0,
+        "auc": 0.6175349746778318,
+        "z": 2.6899117760979756,
+        "entropy_neg": 1.9089243848640907,
+        "entropy_pos": 1.952498972958143,
+        "z_entropy": -0.4503783187113826,
+        "z_cond": -1.3890011587264426
+      }
+    },
+    "distinct": {
+      "n": 425,
+      "per_model": {
+        "EleutherAI/pythia-160m": {
+          "n": 108,
+          "median_K": 0.2720853336971807
+        },
+        "HuggingFaceTB/SmolLM2-135M-Instruct": {
+          "n": 108,
+          "median_K": 0.25478206453451424
+        },
+        "JackFram/llama-160m": {
+          "n": 101,
+          "median_K": 0.25586329133314556
+        },
+        "gpt2": {
+          "n": 108,
+          "median_K": 0.26010120878432985
+        }
+      },
+      "spread": 0.017303269162666446,
+      "negative_planes": {
+        "n_neg": 48,
+        "n": 425,
+        "k_eff_neg": 249.5,
+        "k_eff_pos": 123.0,
+        "auc": 0.6235908488063661,
+        "z": 2.790703910551353,
+        "entropy_neg": 1.9295693390611237,
+        "entropy_pos": 1.9293089179361005,
+        "z_entropy": -0.3044279280058159,
+        "z_cond": -1.24640778720414
+      }
+    }
+  }
+}
