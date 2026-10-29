@@ -244,3 +244,35 @@ Three more errors surfaced while tracing the numbers to their sources:
 | LayerNorm models, untrained-model control | optional, not run | [13-revision-plan.md](13-revision-plan.md) §5 |
 
 **The answers the paper can now give.** RQ1: yes, and validated. RQ2: `K ≈ +1/4` on every model and every genuine pullback (0.255–0.285); it is inherited from the simplex, and learning shifts it slightly towards +1/4 rather than creating it. RQ3: the spectral summaries track predictive concentration. Seven errors in the submitted paper are listed in [12-audit-log.md](12-audit-log.md) §8.6 for the rewrite.
+
+---
+
+## 10. 🔴 The projected metric used the RMSNorm Jacobian on every model
+
+Found while building the LayerNorm controls. `metrics.fisher_metric_projected` — called by `curvature.metric_in_frame`, and so by every Riemann-derived number on every model — built the frame Jacobian with the RMSNorm closed form `diag(g)(F − ĥĥᵀF)/r`. GPT-2, Pythia-70M, Pythia-160M and GPT-Neo-125M use LayerNorm, whose Jacobian (`LM.norm_jacobian`, verified against autograd) is `diag(g)(F − 1(1ᵀF)/d − c(cᵀF)/(d s²))/s`, with `c = h − mean(h)` and `s² = var(h) + eps`. The probabilities came from the correct LayerNorm, so on those models the metric paired a correct probability map with an RMSNorm Jacobian.
+
+**Size** ([check_layernorm_projection.py](check_layernorm_projection.py), 12 states per model, [results/layernorm/](results/layernorm/)):
+
+| model | median r/s | metric error, median | median \|ΔK\| | largest \|ΔK\| |
+|---|---|---|---|---|
+| GPT-2 | 1.0001 | 2.9e−4 | 6.3e−5 | 2.4e−4 |
+| Pythia-160M | 1.0002 | 3.2e−4 | 5.8e−5 | 1.1e−3 |
+
+It is small for two reasons. On these models a hidden state's mean across dimensions is negligible against its spread (r/s = 1.000). And at the base point the slice is orthogonal to both null directions, so the two Jacobians differ only through that ratio there, and through second-order terms off it. No reported number moves at the precision the paper quotes.
+
+**Fixed.** `metrics.frame_jacobian` now uses the exact LayerNorm form. The RMSNorm path is unchanged: SmolLM2's per-state `K` reproduces to 0.0. After the fix the projected metric matches `Fᵀ G F` from the full `fisher_metric` to 1.8e−14 on GPT-2 and 1.1e−12 on Pythia-160M. The saved GPT-2 and Pythia profile values predate the fix; the measured error above bounds the difference.
+
+---
+
+## 11. Validation outputs are now results files, and two more errors in the paper
+
+The validation scripts printed to the console only. Their outputs are now kept in [results/validation/](results/validation/) and read by `make_tables.py` (Table 7):
+
+- rung 7: worst error 9.7e−12; reparameterisation 1.9e−11; scalar curvature 4.9e−12; the broken assembly is caught at 0.263;
+- geomstats: agreement on the normal (2.2e−16), gamma (2.3e−13) and beta (4.9e−14) families, and disagreement, with identical metrics, on the Poincaré and categorical ones.
+
+Fig. 3(b)'s sphere calibration is now a function (`make_figures.sphere_calibration`, byte-identical figure), and its values are tabulated (Table 8): the unit 3-sphere gives 7.8e−3 at threshold 0.99 and 1.5e−31 at 0.999.
+
+**Error 8 in the submitted paper.** Section IV.B says the KL–Hessian identity "was verified on a real model … at relative error 8.7 × 10⁻⁶". 8.7e−6 is the synthetic softmax model of `gate_a_kl_test.py`. On a real model (SmolLM2-135M, Stage 0) the plateau is at **4.3e−5**, at ε = 10⁻³. Both pass, but the paper must attribute each correctly.
+
+**Error 9.** Table IV, effective dimension by layer, also used lower medians. With true medians the real profile is 14.5, 8.5, 6, 7, 6, 23.5, 80, 167.5, 218.5. The scrambled one is 13.5, 8, 5, 6, 6, 25, 67, 151, 216: at layer 28 the scrambled value is 67, not 54. The conclusion stands, because the minimum layer and 99 % of the range are retained and the per-state ρ is +0.991.
