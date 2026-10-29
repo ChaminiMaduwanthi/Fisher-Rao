@@ -225,7 +225,9 @@ If the metric tracks the model's predictive state, distance under it should resp
 | Euclidean | 260.0 | 552.5 | 2.13× | 32/32 | +5.66 |
 | Unembedding `UᵀU` | 10459 | 17838 | 1.71× | 23/32 | +2.47 |
 
-The Fisher–Rao geodesic distance separates a sense change from a matched context change by a factor of 2.03 at 30 of 32 pairs, and considerably more reliably than the unembedding metric used in the comparison literature, which reaches 1.71× at 23 of 32. On this probe a plain Euclidean distance performs comparably to Fisher–Rao. The probe therefore establishes that the metric is behaviourally meaningful; separating it from Euclidean distance requires the causal experiment named in Section VI.
+The Fisher–Rao geodesic distance separates a sense change from a matched context change by a factor of 2.03 at 30 of 32 pairs, and considerably more reliably than the unembedding metric used in the comparison literature, which reaches 1.71× at 23 of 32. On this probe a plain Euclidean distance performs comparably to Fisher–Rao. The probe therefore establishes that the metric is behaviourally meaningful; separating it from Euclidean distance requires the causal experiment named in Section VII.
+
+Magnitude is not the only axis. Half-separation depth is the first layer at which a pair reaches half of its final separation; over 64 hand-written different-sense pairs the Fisher–Rao distance places it at layer 4.5 while the Euclidean and unembedding distances place it at 26.6 and 26.3. The paired gap against the unembedding metric is 21.8 layers, 95 % bootstrap interval [20.5, 22.9], with Fisher–Rao earlier in 64 of 64 pairs. It reproduces on the 163 different-sense pairs of the word-in-context set whose target is the same token in both sentences, at 6.7 against 26.6 for both flat measures. The mechanism is scale invariance rather than Fisher–Rao specifically: dividing the Euclidean distance by the residual norm at each layer moves its half-depth from 26.6 to 5.2. Fisher–Rao gets that invariance by construction, from the null direction of Section III.B.
 
 ### G. A near-zero reading is not evidence of flatness
 
