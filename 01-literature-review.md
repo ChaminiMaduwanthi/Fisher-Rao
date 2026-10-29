@@ -341,3 +341,10 @@ A search on 29 October 2026 found five relevant papers from June–September 202
 - **What it does:** measures trajectory length, curvature (in radians), a semantic convergence index, layer-wise cosine similarity and representational stability directly in the ambient activation space of GPT-2, TinyLlama and Qwen2.5.
 - **Main results:** reasoning prompts bend more (0.71–0.83 rad) than lexical variations (0.27–0.31 rad); ambiguous tokens split into separate trajectories; the effects vanish under shuffled-layer and random-embedding controls.
 - **Relevance:** another flat-metric curvature, in the same group as Manson (B1) and King et al. (B2).
+
+### C6. 🟡 Konior, Quemy, Klocek, Sobieski & Cattan (2026), *Riemannian Geometry for Pre-trained Language Model Embeddings* — `arXiv:2607.07047`
+
+- **What it does:** builds a per-token pullback metric from an encoder's analytical Jacobian and pools tokens by the Fréchet mean on the SPD manifold ("Riemannian Mean Pooling") for sentence classification.
+- **Main results:** beats Euclidean mean pooling on CoLA, CREAK and RTE and is at chance on FEVER-Symmetric. A randomly initialised encoder with the same aggregation already beats Euclidean pooling on two of the three datasets.
+- **Curvature:** none.
+- **Relevance:** a precedent for random-network controls of pullback geometry; it motivates the untrained-model control (E2) in [13-revision-plan.md](13-revision-plan.md).
