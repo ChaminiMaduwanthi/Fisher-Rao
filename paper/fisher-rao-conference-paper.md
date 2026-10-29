@@ -240,6 +240,12 @@ Fig. 3(b) applies the same estimator, at the same thresholds, to a unit 3-sphere
 
 An estimator that reports a unit sphere as flat to 10⁻³¹ cannot support the inference from "the residual is 10⁻⁵" to "the manifold is flat"; the residual is a function of the threshold at least as much as of the geometry. Measured intrinsically, the same states give `K ≈ +1/4`. The original observation replicates exactly; the reading that follows from it is that the representation manifold is strongly curved, and that the apparent flatness is a property of the estimator's operating point.
 
+### H. A causal probe, and where it stops
+
+Equation (2) has one further use. If two directions are scaled to the same Fisher norm, `vᵀG(h)v` = 1, the metric predicts the same change in the output distribution along both to leading order, so any systematic difference at a larger step is beyond what the metric alone encodes, and is where curvature has room to act. The prediction tested is that directions of high Ricci curvature, taken from the generalised eigenproblem `Ric v = λ G v`, leave the quadratic sooner than directions of low Ricci curvature. Over 14 runs on six models at `k` = 4 to 6, a paired sign test at a unit Fisher step supports it on both GPT-NeoX models at every `k` tested, at z = +4.75, +4.54 and +3.86 on Pythia-160M and +3.65 on Pythia-70M, while the other four models are `k`-dependent or at chance. The same 14 runs confirm the null-direction prediction of Table I without exception. What separates the two groups of models is not established here, and the result is reported as a hypothesis.
+
+---
+
 ## VI. Discussion
 
 Three findings stand, in decreasing order of how firmly they are established.
