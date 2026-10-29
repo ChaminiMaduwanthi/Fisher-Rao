@@ -154,3 +154,15 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 | 4 | 20 – 24 Nov | Revision; §8 checklist; submission | Submitted by 24 Nov |
 
 **Fallback.** If E1–E2 are inconclusive by 12 November, or the supervisor prefers more time, do not submit to ICARC; target a later venue with the complete study. A correct paper later is worth more than an unsupported one now.
+
+## 10. Risks
+
+| Risk | Effect | Mitigation |
+|---|---|---|
+| E1 differs from the pilot on other architectures | The framing changes | The decision rule in §5 sets the claim either way |
+| LayerNorm support takes longer than planned | E1 incomplete | Run the two RMSNorm models first (SmolLM2-135M, LLaMA-160M) |
+| `k` = 6 costs about three times `k` = 5 | Compute overrun | Run `k` = 6 on a subset of about 70 states, as before |
+| Six pages are not enough | Content cut | Merge the validation tables; move detail to the anonymised code repository |
+| A null-type result is judged insignificant | Rejection | State the practical consequence — which geometric probes can be trusted for interpretability — and position against the 2026 papers that rely on them |
+| If this repository is public, it shows the paper and the author's name | Reviewers could identify the author | Consider making it private until the decision on 6 January 2027 |
+| The deadline slips | No submission | The fallback in §9 |
