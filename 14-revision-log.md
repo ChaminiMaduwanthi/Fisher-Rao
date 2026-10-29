@@ -149,3 +149,34 @@ By entropy, `k` = 5:
 1. The paper's scramble collapses on this model too (116/118). The consistent one does not: 0.2794 against the real 0.2565.
 2. Unlike SmolLM2, the trained model sits *below* the structure-free control in every band, including 0.5–4 nats where §2 found slice curvature reliable (z between −2.04 and −2.86). The gap is about 0.01–0.03 at `k` = 5 and larger at `k` = 4 and 6.
 3. Across both models, then, learning leaves `K` near +1/4. Where it moves it at all, it moves it *down towards* +1/4 relative to a structure-free pullback — the opposite direction to the submitted claim, and of model-dependent size (0.002 on SmolLM2, 0.023 on LLaMA-160M). This is a small, secondary observation, not a replacement headline.
+
+---
+
+## 7. Duplicated states across all results
+
+[audit_duplicates.py](audit_duplicates.py) scans every checkpoint and recomputes each affected paper number twice: on the rows as stored, which reproduces the submitted paper exactly, and on distinct states ([results/audit/duplicates.json](results/audit/duplicates.json)).
+
+| file | rows | identical copies |
+|---|---|---|
+| `results/scramble/within_points.jsonl` | 221 | 35 |
+| `results/profiles/profile_points.jsonl` | 463 | 31 |
+| `results/corpus_compare/points.jsonl` | 702 | 49 |
+| `results/negplanes/points.jsonl` | 135 | 48 |
+| `results/e5/e5_points_llama-160m_k6.jsonl` | 129 | 1 |
+
+The summary `.json` files written by `run_profiles.py`, `run_corpus_compare.py`, `run_stage4.py`, `run_e5.py` and `check_negative_planes.py` are keyed by state and hold no copies, so the 653 corpus states, the 360 E2 states and the E5 tables are clean. The damage is confined to numbers read straight from raw checkpoints:
+
+| paper number | as submitted (rows) | distinct states |
+|---|---|---|
+| Section VI.B scramble, `k` = 5 | 0.2546 → 0.0109, 201/221, z = +12.18 | 0.2547 → 0.0096, 168/186, z = +11.00 |
+| `k` = 4 | 0.2543 → 0.0137, 63/69, z = +6.86 | 0.2554 → 0.0110, 55/60, z = +6.45 |
+| `k` = 6 | 0.2532 → 0.0512, 58/69, z = +5.66 | 0.2544 → 0.0304, 51/60, z = +5.42 |
+| Table V, layer 25 retained | −95.5 %, 20/20 | −127.9 %, 19/19 |
+| Table VI, [4, ∞) | 0.2064 / +0.1238, 33/42 | 0.2107 / +0.1364, 25/32 |
+| Section VI.A and Fig. 1, states | 456 | 425 |
+| Pythia-160M median `K` | 0.2738 (130) | 0.2721 (108) |
+| GPT-2 median `K` | 0.2599 (117) | 0.2601 (108) |
+| spread across the four models | 0.019 | 0.017 |
+| negative planes, Section VII | 49/456; `k_eff` 248 vs 122; AUC 0.618, z = +2.69 | 48/425; 250 vs 123; AUC 0.624, z = +2.79 |
+
+No conclusion changes, but every count and z-statistic must be quoted on distinct states. `make_figures.py` Fig. 1 read the raw checkpoint; it now counts each state once.
