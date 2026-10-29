@@ -52,6 +52,8 @@ This is a `d × d` matrix, available in closed form and inexpensive to evaluate.
 
 > **KL(p(h) ‖ p(h + εv)) = ½ ε² vᵀ G(h) v + O(ε³).**  (2)
 
+Two evaluation choices matter here. The sum in (1) is taken over the 512 tokens of highest probability, renormalised, rather than over the whole vocabulary; measured on SmolLM2-135M against its full 49 152 tokens, the relative error of the truncated metric is 3.2 × 10⁻³ at 500 retained tokens and 8.8 × 10⁻⁴ at 2000. That index set is then frozen at the base point before any derivative is taken. Were it re-selected at each evaluation, membership would change discretely as `h` moves, `G(h)` would be only piecewise smooth, and its second derivatives meaningless.
+
 ### B. Exact null directions
 
 Both normalisation layers annihilate directions exactly. RMSNorm [14] has Jacobian `A = diag(g)(1/r)(I − ĥĥᵀ)` and one null direction, `h` itself. LayerNorm [15] additionally subtracts the mean and so annihilates two: the radial direction and the all-ones direction. `G(h)` is therefore singular by construction, with rank at most `d − 1` or `d − 2`.
