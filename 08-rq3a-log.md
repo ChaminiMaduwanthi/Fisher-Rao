@@ -106,8 +106,9 @@ The original plan set the target as *"beat the `r ≈ 0.15` curvature–entropy 
 |---|---|---|
 | §5.0 | permute `U`'s **rows** | 🔴 **vacuous** — provably the identity on this metric |
 | §5.1–5.3 | **Gaussian** `U` | ⚠️ suggestive, but changes everything at once |
-| **§5.4** | **paired scramble** — real `p`, permuted directions | ✅ **decisive: learned structure, not concentration** |
+| **§5.4** | **paired scramble** — real `p`, permuted directions | ⚠️ ~~decisive: learned structure, not concentration~~ **not a pullback; see §5.7** |
 | **§5.5** | the same control on the **volume profile** | 🔴 **that one *is* largely definitional** |
+| **§5.7** | **consistent** scramble — the same permutation as a genuine pullback | 🔴 **§5.4's collapse does not survive (pilot, n = 30)** |
 
 Entropy and curvature are both computed from the same `p(h)`. As `p` concentrates, the reachable simplex region shrinks toward a low-dimensional face and the induced geometry changes **whether or not the model learned anything**. So the correlation could be a mathematical consequence of concentration rather than a fact about the network.
 
