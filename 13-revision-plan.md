@@ -180,13 +180,13 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 
 ## 12. Progress
 
-**29 October 2026 — step 1 (science) complete** ([14-revision-log.md](14-revision-log.md) §9).
+**29 October 2026 — step 1 (science) complete** ([14-revision-log.md](14-revision-log.md) §15).
 
 | step | content | status |
 |---|---|---|
-| 1. Science | consistent control on SmolLM2 and LLaMA-160M; entropy-matched Gaussian control; slice against manifold (Gauss); control validity; duplicate audit; tables rebuilt and checked; reproducibility record | ✅ |
+| 1. Science | consistent and entropy-matched Gaussian controls on four models; spectral control on four models; E1 decision rule applied; slice against manifold (Gauss); control validity; duplicate audit; LayerNorm Jacobian fixed; tables rebuilt and checked (69/69); reproducibility record | ✅ |
 | 2. Writing | title, abstract, introduction with RQ1–RQ3, related work, method, validation, results, threats to validity, discussion, figures, six pages | to do, after the supervisor meeting |
 | 3. Compliance | anonymisation (author line, Word metadata), IEEE references, number check, similarity check, AI disclosure, anonymous code link | to do |
 | 4. Submission | supervisor decisions (§11), final read, CMT Track 01 by 24 November | to do |
 
-The rewrite must also correct the seven errors listed in [12-audit-log.md](12-audit-log.md) §8.6.
+The rewrite must also correct the ten errors listed in [12-audit-log.md](12-audit-log.md) §8.6.
