@@ -380,17 +380,19 @@ At `h0` it agrees with `within` exactly — same `p`, metric, frame, conditionin
 
 | condition | median `K` | real > condition |
 |---|---|---|
-| real | **0.2554** | — |
-| `within` (§5.4) | **−0.0004** | 27/30, z = +4.38 |
-| **consistent** | **0.2532** | **15/30, z = +0.00** |
+| real | **0.2563** | — |
+| `within` (§5.4) | **−0.0001** | 27/30, z = +4.38 |
+| **consistent** | **0.2540** | **15/30, z = +0.00** |
 
 | entropy (nats) | n | real | `within` | consistent |
 |---|---|---|---|---|
-| [0, 0.5) | 6 | 0.2828 | −4.2419 | 0.2704 |
-| [0.5, 1) | 6 | 0.2684 | −0.2516 | 0.2527 |
-| [1, 2) | 6 | 0.2520 | +0.0044 | 0.2655 |
-| [2, 4) | 6 | 0.2571 | +0.0710 | 0.2428 |
-| [4, ∞) | 6 | 0.1701 | +0.0308 | 0.2190 |
+| [0, 0.5) | 6 | 0.3083 | −3.1179 | 0.2810 |
+| [0.5, 1) | 6 | 0.2687 | −0.1931 | 0.2543 |
+| [1, 2) | 6 | 0.2537 | +0.0056 | 0.2721 |
+| [2, 4) | 6 | 0.2577 | +0.1065 | 0.2460 |
+| [4, ∞) | 6 | 0.1777 | +0.0327 | 0.2231 |
+
+*True medians; the first version of these two tables used `torch.median`, which takes the lower middle value ([14-revision-log.md](14-revision-log.md) §8).*
 
 > 🔴 **The §5.4 collapse does not survive a consistent control.** The same scramble, realised as a genuine pullback, leaves `K` where the real model has it — in every entropy band, with no paired difference (15/30). The collapse comes from the inconsistency between `p` and the Jacobian, not from destroying the learned assignment.
 
