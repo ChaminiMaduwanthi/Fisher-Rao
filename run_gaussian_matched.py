@@ -93,7 +93,7 @@ def main():
             for t in range(H.shape[1]):
                 states.append((l, H[l, t]))
 
-    U_real = lm.U
+    U_real, bias_real = lm.U, lm.bias      # the Gaussian model has no output bias
     U_g = torch.randn(U_real.shape, generator=torch.Generator().manual_seed(0),
                       dtype=torch.float64) / U_real.shape[1] ** 0.5
 
@@ -119,7 +119,7 @@ def main():
         n0 = lm.apply_norm(h0)
         zg = U_g @ n0
         s = matched_scale(zg, rr["entropy"])
-        lm.U = s * U_g
+        lm.U, lm.bias = s * U_g, None
         rec = dict(_i=i, layer=layer, entropy=rr["entropy"], entropy_gauss=entropy_of(s * zg),
                    scale=s, K_real=rr["K_real"])
         try:
@@ -129,7 +129,7 @@ def main():
             rec["K_gauss"] = median_K(lambda x: fisher_metric_projected(lm, h0 + F @ x, F, idx), K_DIM)
         except Exception as e:                                   # noqa: BLE001
             rec["error"] = repr(e)
-        lm.U = U_real
+        lm.U, lm.bias = U_real, bias_real
         rows.append(rec)
         n_new += 1
         with ckpt.open("a", encoding="utf-8") as fh:
