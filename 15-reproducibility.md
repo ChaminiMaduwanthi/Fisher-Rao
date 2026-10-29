@@ -51,6 +51,7 @@ Revisions are the first eight characters of the commit hash resolved on 29 Octob
 |---|---|
 | retained vocabulary | the 512 most probable tokens at the base point, renormalised, frozen before any derivative is taken |
 | null directions | quotiented with `P = I − NNᵀ`: one for RMSNorm, two for LayerNorm |
+| frame Jacobian | `metrics.frame_jacobian`: the RMSNorm closed form on RMSNorm models, the exact LayerNorm form on LayerNorm models (fixed 29 October 2026; before that the RMSNorm form was used everywhere, an error of about 6e−5 in `K` — [14-revision-log.md](14-revision-log.md) §10) |
 | slice | `h₀ + span(F)`, `F` the top-`k` eigenvectors of `PGP` at the base point; `k` = 5, with 4 and 6 for sweeps; Riemann quantities are capped at `k` ≤ 8 |
 | planes | 16 random 2-planes per state from a generator seeded 0 |
 | per-state `K` | `torch.median` of the 16 plane values — the lower of the two middle values. Every saved `K` in the project uses this definition |
@@ -68,8 +69,11 @@ Runtimes are wall-clock on the machine in §1.
 | paper element | command | output | runtime |
 |---|---|---|---|
 | validation ladder | `python check_ladder_precision.py` | `results/ladder/ladder_precision.json` | minutes |
-| independent implementation | `python validate_geomstats.py` | console | minutes |
-| KL–Hessian identity | `python gate_a_kl_test.py` | console | seconds |
+| rung 7, the pullback | `python validate_pullback.py > results/validation/validate_pullback.txt` | `results/validation/validate_pullback.txt` | seconds |
+| independent implementation | `python validate_geomstats.py > results/validation/validate_geomstats.txt` | `results/validation/validate_geomstats.txt` | minutes |
+| KL–Hessian identity, synthetic | `python gate_a_kl_test.py > results/validation/gate_a_kl_test.txt` | `results/validation/gate_a_kl_test.txt` | seconds |
+| KL–Hessian identity, real model | `python run_stage0.py` | `results/stage0/stage0.json` (`gate_a`) | minutes |
+| LayerNorm Jacobian check | `python check_layernorm_projection.py gpt2 12` (and Pythia-160M) | `results/layernorm/` | minutes |
 | null directions, six models | `python check_null_all.py` | `results/nulltest/nulltest.json` | minutes |
 | `K` across architectures | `python run_profiles.py` | `results/profiles/` | about 3 s per state at `k` = 5 |
 | paper's scramble (`within`) | `python run_scramble_within.py` | `results/scramble/within_points.jsonl` | about 3 s per state per condition |
