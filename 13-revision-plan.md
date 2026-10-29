@@ -85,6 +85,8 @@ The Gaussian-unembedding control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, whic
 
 ## 5. Experiments
 
+**Scope agreed on 29 October 2026.** The thesis topic is unchanged. Required: E1 on SmolLM2-135M at the paper's sample with `k` = 4–6, and E4. Added: E1 on LLaMA-160M, which needs no new code. Optional, only if time allows: E1 on the LayerNorm models, E2, E3 and E6–E8. With two models, the E1 decision rule becomes agreement on both. Results are logged in [14-revision-log.md](14-revision-log.md).
+
 | ID | Purpose | Method | Estimated cost | Decision rule |
 |---|---|---|---|---|
 | **E1** | Answer Reviewer 3 (a) at scale | The consistent control on SmolLM2-135M, LLaMA-160M, GPT-2 and Pythia-160M: the 221 states of the paper's control on SmolLM2, 60–120 on the others, `k` = 4, 5, 6. LayerNorm models need the general norm Jacobian (`LM.norm_jacobian`) in place of the RMSNorm closed form | About 8 s per state for three conditions at `k` = 5 (measured), so about 30 min per model at n = 221; `k` = 6 costs about three times as much | If real and consistent agree (sign test \|z\| < 2, median difference < 0.01) on at least three of four models, adopt §4; otherwise report where they differ |
