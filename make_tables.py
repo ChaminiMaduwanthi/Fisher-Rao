@@ -264,11 +264,20 @@ def spectral():
             t[f"{label}_profile"] = dict(real=pr, within=pw)
             t[f"{label}_min_layer"] = dict(real=layers[pr.index(min(pr))], within=layers[pw.index(min(pw))])
             t[f"{label}_range_retained"] = (max(pw) - min(pw)) / (max(pr) - min(pr))
+            t[f"{label}_shape_rho"] = spearman(pr, pw)
             t[f"{label}_rho_entropy_real"] = spearman([r["entropy"] for r in ok], [r[f"{q}_real"] for r in ok])
+        if "model" in d:        # written by the current run_volume_scramble.py, which uses true medians
+            check(f"spectral, {name}: log-volume per-state rho", t["log_volume_rho"], d["point_rho"]["lv_within"])
+            check(f"spectral, {name}: k_eff per-state rho", t["k_eff_rho"], d["point_rho"]["ke_within"])
+            check(f"spectral, {name}: log-volume profile shape", t["log_volume_shape_rho"], d["shape_rho"]["within"])
+            check(f"spectral, {name}: k_eff profile shape", t["k_eff_shape_rho"], d["k_eff_shape_rho"]["within"])
+            check(f"spectral, {name}: rho(log-volume, entropy)", t["log_volume_rho_entropy_real"], d["rho_real_entropy"])
         out[name] = t
     if "SmolLM2-135M" in out:
         PAPER.append(("spectral: log-volume, per-state rho (SmolLM2)", out["SmolLM2-135M"]["log_volume_rho"], 0.957))
         PAPER.append(("spectral: k_eff, per-state rho (SmolLM2)", out["SmolLM2-135M"]["k_eff_rho"], 0.991))
+        PAPER.append(("spectral: k_eff range retained (SmolLM2), Section VI.B text",
+                      out["SmolLM2-135M"]["k_eff_range_retained"], 0.995))
     return out
 
 
@@ -425,14 +434,17 @@ def markdown(T):
     if S:
         L += ["", "## 6. Spectral control — log-volume and effective dimension under the paired scramble "
               "(at h₀ the paper's scramble and the consistent one coincide, so this control is valid)", "",
-              "| model | n | log-volume ρ, per state | min layer real / scrambled | range kept | `k_eff` ρ, per state "
-              "| min layer real / scrambled | range kept | ρ(log-volume, entropy) |",
-              "|---|---|---|---|---|---|---|---|---|"]
+              "Real against scrambled: ρ across states, ρ between the two layer profiles (medians by layer), the "
+              "layer where each profile is lowest, and the scrambled profile's range as a share of the real one's. "
+              "Last column: the real quantity's ρ with predictive entropy.", "",
+              "| model | n | quantity | ρ, per state | ρ, layer profile | min layer real / scrambled | range kept "
+              "| ρ with entropy |",
+              "|---|---|---|---|---|---|---|---|"]
         for m, t in S.items():
-            L.append(f"| {m} | {t['n']} | {t['log_volume_rho']:+.3f} | {t['log_volume_min_layer']['real']} / "
-                     f"{t['log_volume_min_layer']['within']} | {t['log_volume_range_retained']*100:.0f} % | "
-                     f"{t['k_eff_rho']:+.3f} | {t['k_eff_min_layer']['real']} / {t['k_eff_min_layer']['within']} | "
-                     f"{t['k_eff_range_retained']*100:.0f} % | {t['log_volume_rho_entropy_real']:+.3f} |")
+            for label, name in (("log_volume", "log-volume"), ("k_eff", "`k_eff`")):
+                L.append(f"| {m} | {t['n']} | {name} | {t[f'{label}_rho']:+.3f} | {t[f'{label}_shape_rho']:+.3f} | "
+                         f"{t[f'{label}_min_layer']['real']} / {t[f'{label}_min_layer']['within']} | "
+                         f"{t[f'{label}_range_retained']*100:.0f} % | {t[f'{label}_rho_entropy_real']:+.3f} |")
         ex = [f"{m}, {t['excluded']} of {t['n'] + t['excluded']}" for m, t in S.items() if t.get("excluded")]
         if ex:
             L += ["", "States excluded because the metric is undefined there (a hidden state that is exactly zero; "
