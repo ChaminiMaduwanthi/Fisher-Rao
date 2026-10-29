@@ -65,19 +65,19 @@ Three samples are used. The profile sample holds 12 states per depth, 425 distin
 
 *Comparators.* Three controls replace the readout while keeping the hidden state, the final normalisation and the retained-token set fixed (Section IV-D): C0, an inconsistent scramble used in a preliminary version of this analysis; C1, a consistent scramble; and C2, an entropy-matched Gaussian readout. For RQ3, the local-PCA residual [8], Frenet curvature under UᵀU [3] and the Euclidean angle [4] are computed on 360 SmolLM2 states as external comparators.
 
-*Metrics.* The primary metric is slice sectional curvature K, the median over 16 random planes per state; scalar curvature R is also reported. The spectral summaries are the effective dimension k<sub>eff</sub>, the number of eigenvalues of the quotiented metric that hold 99 % of its trace, and the log-volume per dimension of its top-k block, ℓ = (1/2k) Σᵢ log(r² λᵢ), where r, the root-mean-square (RMSNorm) or standard deviation (LayerNorm) of h, removes the metric's 1/r² scaling.
+*Metrics.* The primary metric is slice sectional curvature K on slices of dimension k = 5 (Section IV-B), the median over 16 random planes per state; scalar curvature R is also reported. The spectral summaries are the effective dimension k<sub>eff</sub>, the number of leading eigenvalues of the quotiented metric that hold 99 % of its trace, and the log-volume per dimension of its top-k block, ℓ = (1/2k) Σᵢ log(r² λᵢ), where r, the root-mean-square (RMSNorm) or standard deviation (LayerNorm) of h, removes the metric's 1/r² scaling.
 
-*Statistics.* Medians are reported. Trained and control values are compared by a paired sign test, z = (n₊ − n/2)/(√n/2), and monotone agreement by Spearman's ρ with midranks. A decision rule was fixed after a 30-state pilot and before the reported runs: a trained model and a control agree when |z| < 2 and their medians differ by less than 0.01; agreement on at least three of the four models would indicate that learning leaves curvature unchanged, and otherwise the differences are reported.
+*Statistics.* Medians are reported. Trained and control values are compared by a paired sign test, z = (n₊ − n/2)/(√n/2), where the trained value is higher at n₊ of n states, and monotone agreement by Spearman's ρ with midranks. A decision rule was fixed after a 30-state pilot and before the reported runs: a trained model and a control agree when |z| < 2 and their medians differ by less than 0.01; agreement on at least three of the four models would indicate that learning leaves curvature unchanged, and otherwise the differences are reported.
 
 ## IV. Pipeline Design and Implementation
 
 ### A. The Pullback Metric
 
-For a hidden state h, the model predicts p(h) = softmax(U n(h)), where n is the final normalisation and U is the readout restricted to the 512 most probable tokens at the base point. With A(h) the Jacobian of n and J = U A(h), the Fisher–Rao metric of the simplex pulls back to
+For a hidden state h of width d, the model predicts p(h) = softmax(U n(h)), where n is the final normalisation and U is the readout restricted to the 512 most probable tokens at the base point h₀, with p renormalised over them. With A(h) the Jacobian of n and J = U A(h), the Fisher–Rao metric of the simplex pulls back to
 
 > G(h) = Jᵀ (diag p − p pᵀ) J. (1)
 
-The metric is the Hessian of the Kullback–Leibler divergence at zero displacement,
+The metric is the Hessian of the Kullback–Leibler (KL) divergence at zero displacement,
 
 > KL(p(h) ‖ p(h + εv)) = ½ ε² vᵀ G(h) v + O(ε³), (2)
 
@@ -89,9 +89,9 @@ Both normalisation layers annihilate directions exactly. RMSNorm has one null di
 
 ### C. Curvature on a Slice
 
-On S, the Christoffel symbols and the Riemann tensor R of the induced metric g are formed by nested reverse-mode automatic differentiation of (1) in double precision [30]. The sectional curvature of the plane spanned by u and v is [31]
+On S, the Christoffel symbols and the Riemann tensor Rm of the induced metric g are formed by nested reverse-mode automatic differentiation of (1) in double precision [30]. The sectional curvature of the plane spanned by u and v is [31]
 
-> K(u, v) = R(u, v, v, u) / (g(u, u) g(v, v) − g(u, v)²), (3)
+> K(u, v) = Rm(u, v, v, u) / (g(u, u) g(v, v) − g(u, v)²), (3)
 
 and the value reported for a state is the median over 16 random planes. Every number is therefore a slice sectional curvature K<sub>S</sub>. For orthonormal u and v it differs from the curvature K<sub>M</sub> of the full quotient manifold through the Gauss equation [31],
 
@@ -109,7 +109,7 @@ and p(h) = softmax(z(h)). It coincides with C0 at h₀ (same p, metric, slice an
 
 ### E. Validation and Implementation
 
-Table II lists the validation. Seven manifolds of known curvature are run through the code path used for the transformers, among them the categorical simplex, which under the Fisher–Rao metric is part of a sphere of radius 2 with K = 1/4 [15], and a synthetic pullback softmax(Uh) with d equal to the number of outcomes minus one, whose curvature must be exactly 1/4. A deliberately broken assembly of (1) must fail. Identity (2) is evaluated on SmolLM2 at the base point and, for each control, 5 % of ‖h₀‖ away from it, which separates genuine pullbacks from C0. An independent implementation, geomstats [32], provides a second opinion on the parametric families.
+Table II lists the validation. Seven manifolds of known curvature are run through the code path used for the transformers, among them the categorical simplex, which under the Fisher–Rao metric is part of a sphere of radius 2 with K = 1/4 [15], and a synthetic pullback softmax(Uh) with d equal to the number of outcomes minus one, whose curvature must be exactly 1/4 and must not change when U is replaced by UM for an invertible M. A deliberately broken assembly of (1) must fail. Identity (2) is evaluated on SmolLM2 at the base point and, for each control, 5 % of ‖h₀‖ away from it, which separates genuine pullbacks from C0. An independent implementation, geomstats [32], provides a second opinion on the parametric families.
 
 The implementation uses Python 3.13, PyTorch 2.12 in float64 on a four-core laptop CPU without a GPU, Transformers [33] with pinned model revisions, and geomstats 2.8. A state costs about 3 s at k = 5. Seeds are fixed: 0 for planes and for W, and 1000 plus the state index for Π. One correction was made during the study: the projected metric had used the RMSNorm Jacobian for LayerNorm models; the exact form changes K by at most 1.1 × 10⁻³ (median 6 × 10⁻⁵), and every control run uses it.
 
