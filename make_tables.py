@@ -108,6 +108,15 @@ def controls():
                 b.update(gauss=median([gauss[r["_i"]] for r in gsub]),
                          real_gt_gauss=sign([r["K_real"] - gauss[r["_i"]] for r in gsub]))
             t["by_entropy"][band_label(lo, hi)] = b
+        # "Learning moves K towards +1/4" (14-revision-log.md S5-S6), tested state by state:
+        # a state counts when the real K is the closer of the pair to 1/4.
+        q = lambda x: abs(x - 0.25)
+        t["quarter"] = dict(real=median([q(r["K_real"]) for r in rows]),
+                            consistent=median([q(r["K_consistent"]) for r in rows]),
+                            real_closer_than_consistent=sign([q(r["K_consistent"]) - q(r["K_real"]) for r in rows]))
+        if paired:
+            t["quarter"].update(gauss=median([q(gauss[r["_i"]]) for r in paired]),
+                                real_closer_than_gauss=sign([q(gauss[r["_i"]]) - q(r["K_real"]) for r in paired]))
         sw = [r for r in rows if "K4_real" in r]
         for k in (4, 6):
             t[f"k{k}"] = dict(n=len(sw), real=median([r[f"K{k}_real"] for r in sw]),
@@ -360,6 +369,14 @@ def markdown(T):
                   f"z = {b['real_gt_gauss']['z']:+.2f}") if "gauss" in b else "— | —"
             L.append(f"| {m} | {bl} | {b['n']} | {b['real']:.4f} | {b['consistent']:.4f} | "
                      f"{rc['pos']}/{rc['n']}, z = {rc['z']:+.2f} | {gg} |")
+    L += ["", "Distance from +1/4, `k` = 5: median \\|`K` − 1/4\\|, and the states where the real `K` is the "
+          "closer of the pair to 1/4:", "",
+          "| model | real | consistent | real closer | Gaussian `U` | real closer |", "|---|---|---|---|---|---|"]
+    for m, t in T["controls"].items():
+        qd, rc = t["quarter"], t["quarter"]["real_closer_than_consistent"]
+        gg = (f"{qd['gauss']:.4f} | {qd['real_closer_than_gauss']['pos']}/{qd['real_closer_than_gauss']['n']}, "
+              f"z = {qd['real_closer_than_gauss']['z']:+.2f}") if "gauss" in qd else "— | —"
+        L.append(f"| {m} | {qd['real']:.4f} | {qd['consistent']:.4f} | {rc['pos']}/{rc['n']}, z = {rc['z']:+.2f} | {gg} |")
     L += ["", "## 2. Slice sectional curvature across architectures (distinct states)", "",
           "| model | n | median `K` | quartiles |", "|---|---|---|---|"]
     for m, t in T["architectures"].items():
