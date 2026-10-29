@@ -59,6 +59,7 @@ from fisherrao import LM, corpus
 from fisherrao.metrics import fisher_metric_projected, topk_indices
 from fisherrao.curvature import null_projector, riemann, sectional
 from fisherrao.model import DEFAULT_MODEL
+from fisherrao.stats import median
 
 OUT = pathlib.Path("results/scramble")
 WITHIN_POINTS = OUT / "within_points.jsonl"
@@ -124,8 +125,10 @@ def three_conditions(lm, h0, idx, P, within, k):
 
 
 def med(xs):
-    t = torch.tensor([x for x in xs if x == x], dtype=torch.float64)
-    return float(t.median()) if len(t) else float("nan")
+    """Summary median across states: the true median (fisherrao.stats), not torch's
+    lower-middle element.  Per-state K inside median_K keeps torch.median, the
+    definition every saved K in this project uses."""
+    return median(xs)
 
 
 def sign_test(d):
