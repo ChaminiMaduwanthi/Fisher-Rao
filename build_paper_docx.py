@@ -13,8 +13,16 @@ the abstract onwards -- is two columns, and full-width figures sit in their own
 single-column continuous sections so they span both columns instead of being
 squeezed into one.
 
-Usage:  python build_paper_docx.py
+Markdown conventions read here: `**[FIGURE n: file.png]**` (add ` | full` for a
+figure spanning both columns) followed by a `*Fig. n. ...*` caption line;
+`**TABLE n. ...**` followed by a pipe table; `> expression (n)` for a numbered
+equation; the first bold and italic lines after the title for the author block.
+The document properties are written blank, so the file names no person, as
+double-blind review requires.
+
+Usage:  python build_paper_docx.py [template.docx]
 Output: paper/Fisher-Rao-Curvature-IEEE.docx
+        (export to PDF from Word; see paper/README.md)
 """
 
 from __future__ import annotations
@@ -95,8 +103,10 @@ def sectpr(cols: int) -> str:
 
 
 def para(text: str, style: str = "BodyText", sect: str | None = None,
-         jc: str | None = None) -> str:
+         jc: str | None = None, keep: bool = False) -> str:
     ppr = f'<w:pStyle w:val="{style}"/>'
+    if keep:
+        ppr += "<w:keepNext/>"
     if jc:
         ppr += f'<w:jc w:val="{jc}"/>'
     if sect:
@@ -137,15 +147,21 @@ def image_para(rid: str, w_in: float, path: str, name: str) -> str:
 def table(rows: list[list[str]], width_in: float) -> str:
     ncol = max(len(r) for r in rows)
     tw = int(width_in * 1440)                      # twips
-    # Wide tables (the 10-column layer sweeps) wrap their row labels into
-    # unreadable stacks under equal widths, so the label column gets more room.
-    lead = 2.2 if ncol >= 8 else 1.0
-    cw = int(tw / (ncol - 1 + lead))
-    widths = [int(cw * lead)] + [cw] * (ncol - 1)
+    # Columns share the width in proportion to their longest body entry, with the
+    # header counting half (headers may wrap, numbers should not), bounded so no
+    # column starves or dominates.
+    def need_of(j):
+        body = max((len(visible(r[j])) for r in rows[1:] if j < len(r)), default=0)
+        head = len(visible(rows[0][j])) if j < len(rows[0]) else 0
+        return min(max(body, (head + 1) // 2), 30) + 3
+    need = [need_of(j) for j in range(ncol)]
+    widths = [int(tw * n / sum(need)) for n in need]
     grid = "".join(f'<w:gridCol w:w="{w}"/>' for w in widths)
     body = []
     for i, row in enumerate(rows):
         cells = []
+        # keep-with-next on every row but the last keeps the table in one piece
+        keep = "<w:keepNext/>" if i < len(rows) - 1 else ""
         for j in range(ncol):
             txt = row[j] if j < len(row) else ""
             style = "tablecolhead" if i == 0 else "tablecopy"
@@ -153,7 +169,7 @@ def table(rows: list[list[str]], width_in: float) -> str:
             cells.append(
                 f'<w:tc><w:tcPr><w:tcW w:w="{widths[j]}" w:type="dxa"/>'
                 '<w:vAlign w:val="center"/></w:tcPr>'
-                + f"<w:p><w:pPr><w:pStyle w:val=\"{style}\"/>"
+                + f"<w:p><w:pPr><w:pStyle w:val=\"{style}\"/>{keep}"
                   f'<w:jc w:val="{jc}"/><w:spacing w:before="20" w:after="20"/>'
                   f"</w:pPr>{runs(txt)}</w:p></w:tc>")
         trpr = ('<w:trPr><w:cantSplit/><w:tblHeader/></w:trPr>' if i == 0
@@ -244,6 +260,9 @@ def build_body(md: str, figs: dict) -> str:
                 continue
             if head.startswith("Index Terms"):
                 continue
+            if head in ("Acknowledgment", "References"):
+                out.append(para(head, "Heading5", keep=True))   # IEEE component heads: unnumbered
+                continue
             # fallback: if there was no abstract, the first numbered section
             # opens the two-column body instead
             sect = None
@@ -285,7 +304,7 @@ def build_body(md: str, figs: dict) -> str:
         if ln.startswith("**TABLE "):
             cap_idx = len(out)
             out.append(para(re.sub(r"^TABLE\s+[IVX]+\.\s*", "",
-                                   ln.strip("*")), "tablehead", jc="center"))
+                                   ln.strip("*")), "tablehead", jc="center", keep=True))
             continue
 
         # ---- equations ----------------------------------------------------
