@@ -70,6 +70,8 @@ def tmed(xs):
 def fig1():
     pts = [r for r in jl("results/profiles/profile_points.jsonl")
            if isinstance(r.get("K"), (int, float)) and r["K"] == r["K"]]
+    # the checkpoint holds 31 states twice across resumed runs: one row per state
+    pts = list({(r["model"], r["layer"], r["_i"]): r for r in pts}.values())
     by = defaultdict(list)
     for r in pts:
         by[r["model"]].append(r["K"])
