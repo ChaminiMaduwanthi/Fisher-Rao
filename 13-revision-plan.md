@@ -43,21 +43,22 @@ A check made while writing this plan (§3) shows that Reviewer 3's first objecti
 
 which agrees with the paper's control exactly at the base point (same `p`, metric, frame, conditioning and row multiset; relative difference 0) and differs only in that `p` moves along the directions the metric uses. With the identity permutation it reproduces the real metric to 1.4 × 10⁻¹⁴.
 
-**Pilot result** (SmolLM2-135M, `k` = 5, 16 planes, 30 states stratified by entropy; [results/scramble/consistent_pilot.json](results/scramble/consistent_pilot.json)):
+**Result** (`k` = 5, on the same states; [results/tables/tables.md](results/tables/tables.md) Table 1):
 
-| condition | median `K` | real > condition |
+| condition | SmolLM2-135M (186 states) | LLaMA-160M (118 states) |
 |---|---|---|
-| real model | 0.2554 | — |
-| paper's scramble (not a pullback) | −0.0004 | 27/30, z = +4.38 |
-| consistent scramble (a pullback) | 0.2532 | 15/30, z = 0.00 |
+| real model | 0.2547 | 0.2565 |
+| paper's scramble (not a pullback) | 0.0096 (real higher 168/186, z = +11.00) | −0.0056 (116/118, z = +10.49) |
+| consistent scramble (a pullback) | 0.2565 (real higher 72/186, z = −3.08) | 0.2794 (33/118, z = −4.79) |
+| Gaussian `U`, entropy-matched (no learning) | 0.2730 (real higher 40/186, z = −7.77) | 0.2846 (35/118, z = −4.42) |
 
-The Gaussian-unembedding control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, which is also a genuine pullback with no learned structure, had already matched the real `K` to within 0.002.
+The earlier Gaussian control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, matched by entropy band rather than state by state, had already pointed the same way.
 
-**What it implies.** The collapse reported in the paper comes from the scrambled metric not being a pullback, not from destroying the learned assignment. `K ≈ +1/4` appears to be a property of softmax-pullback geometry rather than of learning.
+**What it implies.** The collapse reported in the paper comes from the scrambled metric not being a pullback, not from destroying the learned assignment. `K ≈ +1/4` appears to be a property of softmax-pullback geometry rather than of learning. The trained models sit slightly *below* both learning-free controls (by 0.002–0.028), so learning, if anything, pulls `K` towards +1/4 rather than creating it.
 
 **What it does not affect.** The spectral results (log-volume ρ = +0.957, effective dimension ρ = +0.991) are functions of `G(h0)` alone, and at `h0` the two controls are identical. The validation ladder, the null-direction test, `K ≈ +1/4` as a measurement, the calibration of the 10⁻⁵ reading and the behavioural probe also stand.
 
-**Caveat.** One model, 30 states and `k` = 5. E1 and E2 (§5) decide the claim. Full record: [08-rq3a-log.md](08-rq3a-log.md) §5.7 and [12-audit-log.md](12-audit-log.md) §8.
+**Status.** Done on both RMSNorm models at `k` = 4–6, with a learning-free Gaussian control in place of E2 ([14-revision-log.md](14-revision-log.md) §4–§6). The LayerNorm models and an untrained-model control remain optional. Full record: [08-rq3a-log.md](08-rq3a-log.md) §5.7, [12-audit-log.md](12-audit-log.md) §8, [14-revision-log.md](14-revision-log.md).
 
 ## 4. Proposed framing (to be agreed with the supervisor)
 
