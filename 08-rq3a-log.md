@@ -401,7 +401,7 @@ At `h0` it agrees with `within` exactly — same `p`, metric, frame, conditionin
 - *"Which probability sits on which direction is what puts the manifold at the simplex value"* (§5.4), *"the learned assignment stabilises `K`"* (§5.3) and the curvature half of the separation (§5.5, README item 7, the conference paper) are **not supported as stated**. `K ≈ +1/4` looks like a property of softmax-pullback geometry generally, not of learning.
 - **Unaffected:** the spectral results of §5.5. Log-volume and `k_eff` are functions of `G(h0)` alone, and at `h0` the two controls are identical, so the reproduction of the volume and `k_eff` profiles stands. So do the validation ladder, the null-direction test, the Mabrok calibration and RQ3b.
 
-⚠️ One model, 30 points, `k` = 5. Scaling it — four architectures, the 221 points of §5.4, `k` = 4–6, and an untrained-model control — is E1–E2 of [13-revision-plan.md](13-revision-plan.md). At entropy ≥ 4 the real `K` sits below the consistent one at 5 of 6 points; that is too thin to read, and §5.1's [5, ∞) bin pointed the other way.
+⚠️ One model, 30 points, `k` = 5. Scaling it — four architectures, the 186 distinct states (221 rows) of §5.4, `k` = 4–6, and an untrained-model control — is E1–E2 of [13-revision-plan.md](13-revision-plan.md). At entropy ≥ 4 the real `K` sits below the consistent one at 5 of 6 points; that is too thin to read, and §5.1's [5, ∞) bin pointed the other way.
 
 ---
 
@@ -417,7 +417,7 @@ At `h0` it agrees with `within` exactly — same `p`, metric, frame, conditionin
 
 ## 7. Next
 
-0. **Scale the consistent control (§5.7)** to the four architectures and the 221 points of §5.4, at `k` = 4–6, with an untrained-model control alongside. It decides whether any claim that curvature reads learned structure survives ([13-revision-plan.md](13-revision-plan.md) E1–E2).
+0. **Scale the consistent control (§5.7)** to the four architectures and the 186 distinct states (221 rows) of §5.4, at `k` = 4–6, with an untrained-model control alongside. It decides whether any claim that curvature reads learned structure survives ([13-revision-plan.md](13-revision-plan.md) E1–E2).
 1. **Raise `n` on the §5.4 paired control and break it down by layer.** It is the load-bearing result of this document and it rests on 17–19 points. The measurement is ~44 s/point at `k`=5; `run_frame_resolution.py main` checkpoints, so this is just wall time.
 2. Re-run on GPT-2 / Pythia — **no longer blocked**, the TLS problem is fixed and all three architectures pass their checks ([10-architecture-log.md](10-architecture-log.md)).
 3. Replicate Mabrok's proxy faithfully so the magnitude comparison can be made or dropped ([07-stage4-log.md](07-stage4-log.md) §1.2).
