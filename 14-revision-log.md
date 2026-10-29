@@ -226,3 +226,21 @@ Three more errors surfaced while tracing the numbers to their sources:
 5. **The half-separation depths are means** — 4.53, 26.56 and 26.28 layers over 64 pairs. The paper should say "mean".
 
 **And one of mine.** The scripts added for this revision first summarised across states with `torch.median`, the convention the audit had already retired ([12-audit-log.md](12-audit-log.md) §4). They now use `fisherrao.stats.median`, and §2–§4 above and [08-rq3a-log.md](08-rq3a-log.md) §5.7 have been corrected. The changes are in the third or fourth decimal, except in the pilot's six-state bands. Per-state `K` keeps `torch.median` over its 16 planes, the definition behind every saved `K`. `make_figures.py` also prints lower medians to the console; the plotted boxes use matplotlib's true median.
+
+---
+
+## 9. Status at the end of step 1 (29 October 2026)
+
+| task | status | where |
+|---|---|---|
+| consistent control, SmolLM2 at the paper's sample, `k` = 4–6 | ✅ | §4 |
+| consistent control, LLaMA-160M | ✅ | §5 |
+| learning-free control, entropy-matched Gaussian `U`, both models | ✅ | §6 |
+| slice against manifold curvature | ✅ | §2; paper Section III.C |
+| control validity: probability map, derivatives, conditioning | ✅ | §3 |
+| duplicated states across all results | ✅ | §7 |
+| every paper table rebuilt and checked, 30/30 | ✅ | §8; [results/tables/tables.md](results/tables/tables.md) |
+| reproducibility record | ✅ | [15-reproducibility.md](15-reproducibility.md) |
+| LayerNorm models, untrained-model control | optional, not run | [13-revision-plan.md](13-revision-plan.md) §5 |
+
+**The answers the paper can now give.** RQ1: yes, and validated. RQ2: `K ≈ +1/4` on every model and every genuine pullback (0.255–0.285); it is inherited from the simplex, and learning shifts it slightly towards +1/4 rather than creating it. RQ3: the spectral summaries track predictive concentration. Seven errors in the submitted paper are listed in [12-audit-log.md](12-audit-log.md) §8.6 for the rewrite.
