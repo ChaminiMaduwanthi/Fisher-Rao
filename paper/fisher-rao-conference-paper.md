@@ -262,17 +262,9 @@ One methodological point is worth recording, since it shaped what is reported. S
 
 ---
 
-## VII. Limitations
+## VIII. Limitations
 
-**Scale.** Models range from 70M to 160M parameters. Nothing here rules out the geometry changing at 1B and above.
-
-**The `k` ≤ 8 ceiling.** Riemann-derived quantities are computed on a slice of dimension 4 to 6, holding a median 92 % to 97 % of the metric's trace. The central result is stable across that range, but the slice remains a slice.
-
-**Cell sizes.** Pooled samples run from 221 to 653 states; per-layer cells are smaller, and the pooled figures are the ones to rely on.
-
-**Corpora.** Two, both English edited prose.
-
-**One validation arm open.** The independent library agrees on three Fisher–Rao families and differs on two, with the metrics themselves agreeing exactly in both cases, as reported in Section III.B.
+Five limitations bound what has been established here. (i) Scale: the models examined range from 70M to 160M parameters, and nothing reported here rules out the geometry changing at 1B parameters and above. (ii) The `k` ≤ 8 ceiling: Riemann-derived quantities are computed on a slice of dimension 4 to 6, holding a median 92 % to 97 % of the metric's trace, and although the central result is stable across that range, the slice remains a slice. (iii) Cell sizes: pooled samples run from 221 to 653 states, per-layer cells are smaller than that, and the pooled figures are accordingly the ones to rely on. (iv) Corpora: two were used, both of them English edited prose. (v) One validation arm remains open, in that the independent library agrees on three Fisher–Rao families and differs on two, with the metrics themselves agreeing exactly in both of the differing cases, as reported in Section IV.B.
 
 ---
 
