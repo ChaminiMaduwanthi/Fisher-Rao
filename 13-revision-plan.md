@@ -82,7 +82,7 @@ The earlier Gaussian control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, matched 
 
 **Dropped:** "curvature carries learned structure". **Moved to future work:** the causal probe (current §VI.H). **Kept briefly if space allows:** the behavioural probe.
 
-**If E1 differs from the pilot** on other architectures, the framing changes to report where real and consistent curvature diverge. The claim follows the data either way.
+**If E1 differs from the pilot** on other architectures, the framing changes to report where real and consistent curvature diverge. The claim follows the data either way. **Outcome, 29 October 2026:** agreement on none of the four models. The divergence is a consistent offset of 0.002–0.024, so the framing stands with contribution 2 revised as above ([14-revision-log.md](14-revision-log.md) §14).
 
 ## 5. Experiments
 
@@ -172,7 +172,7 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 
 ## 11. Decisions needed from the supervisor
 
-1. Adopt the framing in §4, conditional on E1–E2?
+1. Adopt the framing in §4, with contribution 2 revised after E1? The agreement rule was not met ([14-revision-log.md](14-revision-log.md) §14).
 2. Submit to ICARC by 25 November, or take more time for a later venue?
 3. Authorship and affiliation for the camera-ready version.
 4. Wording of the AI-use disclosure.
