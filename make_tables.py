@@ -8,11 +8,16 @@ Spearman (fisherrao.stats).  Where a stored summary exists the recomputed value
 is compared with it and any disagreement is printed.
 
 Tables
-  1  controls       K of the real model and three controls on the same states
+  1  controls       K of the real model and three controls on the same states,
+                    by entropy band, and each one's distance from +1/4
   2  architectures  K across four models, distinct states
   3  agreement      rank correlation between curvature instruments (E2)
   4  corpus         each instrument's correlation with entropy on two corpora
   5  behaviour      sense change against a matched same-sense control
+  6  spectral       log-volume and effective dimension under the paired scramble
+  7  validation     ladder, rung 7, geomstats, KL-Hessian identity, null directions
+  8  calibration    the near-flat reading: local-PCA residual by threshold
+  9  LayerNorm      the RMSNorm-form Jacobian on LayerNorm models, before the fix
 
 Usage:  python make_tables.py      -> results/tables/tables.md and tables.json
 """
