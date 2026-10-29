@@ -200,6 +200,34 @@ def fig2():
 
 
 # ---------------------------------------------------------------- figure 3
+def sphere_calibration(tl=(0.9, 0.95, 0.99, 0.999, 0.9999)):
+    """The local-PCA residual on a unit 3-sphere (K = +1) and a flat 3-plane (K = 0)
+    in 12 dimensions, at each retained-variance threshold -- Fig. 3(b).  Seeded,
+    so the numbers are reproducible; make_tables.py records them."""
+    rng = np.random.default_rng(3)
+    n, amb = 1800, 12
+    X = rng.normal(size=(n, 4))
+    X /= np.linalg.norm(X, axis=1, keepdims=True)          # unit 3-sphere, K=+1
+    Q, _ = np.linalg.qr(rng.normal(size=(amb, 4)))
+    S = X @ Q.T
+    P = rng.normal(size=(n, amb)) @ np.diag([1] * 3 + [0] * (amb - 3))  # a plane
+
+    def residual(pts, thr, nn=60):
+        d = ((pts[:, None, :] - pts[None, :, :]) ** 2).sum(-1)
+        np.fill_diagonal(d, np.inf)
+        out = []
+        for i in rng.choice(len(pts), 120, replace=False):
+            nb = pts[np.argsort(d[i])[:nn]]
+            nb = nb - nb.mean(0)
+            sv = np.linalg.svd(nb, compute_uv=False) ** 2
+            frac = np.cumsum(sv) / sv.sum()
+            j = int(np.searchsorted(frac, thr)) + 1
+            out.append(sv[j:].sum() / sv.sum() if j < len(sv) else 0.0)
+        return float(np.median(out))
+
+    return [residual(S, t) for t in tl], [residual(P, t) for t in tl]
+
+
 def fig3():
     """Why a published near-zero curvature is not evidence of flatness.
 
@@ -252,29 +280,7 @@ def fig3():
             fontsize=5.8, color="#555555", ha="right")
 
     # ---- panel (b): the same estimator on a manifold of known curvature ----
-    rng = np.random.default_rng(3)
-    n, amb = 1800, 12
-    X = rng.normal(size=(n, 4))
-    X /= np.linalg.norm(X, axis=1, keepdims=True)          # unit 3-sphere, K=+1
-    Q, _ = np.linalg.qr(rng.normal(size=(amb, 4)))
-    S = X @ Q.T
-    P = rng.normal(size=(n, amb)) @ np.diag([1] * 3 + [0] * (amb - 3))  # a plane
-
-    def residual(pts, thr, nn=60):
-        d = ((pts[:, None, :] - pts[None, :, :]) ** 2).sum(-1)
-        np.fill_diagonal(d, np.inf)
-        out = []
-        for i in rng.choice(len(pts), 120, replace=False):
-            nb = pts[np.argsort(d[i])[:nn]]
-            nb = nb - nb.mean(0)
-            sv = np.linalg.svd(nb, compute_uv=False) ** 2
-            frac = np.cumsum(sv) / sv.sum()
-            j = int(np.searchsorted(frac, thr)) + 1
-            out.append(sv[j:].sum() / sv.sum() if j < len(sv) else 0.0)
-        return float(np.median(out))
-
-    ys = [residual(S, t) for t in tl]
-    yp = [residual(P, t) for t in tl]
+    ys, yp = sphere_calibration(tl)
 
     # Grouped bars, because both series underflow to exactly 0 at tight
     # thresholds and a log line plot simply drops them off the axis.
