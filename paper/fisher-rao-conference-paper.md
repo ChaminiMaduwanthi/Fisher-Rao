@@ -105,7 +105,7 @@ Let Π permute the retained rows of U. C0 takes p from the trained readout but t
 
 > z(h) = U n(h₀) + ΠU (n(h) − n(h₀)) (5)
 
-and p(h) = softmax(z(h)). It coincides with C0 at h₀ (same p, metric, slice and row multiset) and is a genuine pullback everywhere; with Π the identity it reproduces the trained metric to 2.4 × 10⁻¹⁴ on GPT-2 and 1.2 × 10⁻¹³ on Pythia-160M. The permutation does not hold the conditioning of the slice fixed state by state, but it leaves its distribution unchanged (median ratio of first to fifth eigenvalue 15.6 against 15.1, z = −0.4, on 30 SmolLM2 states). C2 removes the trained readout altogether: p(h) = softmax(sW n(h)), with W one fixed Gaussian matrix with entries of variance 1/d and s chosen per state so that the predictive entropy equals the trained model's, to within 10⁻¹³ nats. C2 keeps the trained hidden states and final normalisation, including LayerNorm's learned bias.
+and p(h) = softmax(z(h)). It coincides with C0 at h₀ (same p, metric, slice and row multiset) and is a genuine pullback everywhere; with Π the identity it reproduces the trained metric to 2.4 × 10⁻¹⁴ on GPT-2 and 1.2 × 10⁻¹³ on Pythia-160M. The permutation does not hold the conditioning of the slice fixed state by state, but it does not shift it systematically (median ratio of first to fifth eigenvalue 15.6 against 15.1, z = −0.4, on 30 SmolLM2 states). C2 removes the trained readout altogether: p(h) = softmax(sW n(h)), with W one fixed Gaussian matrix with entries of variance 1/d and s chosen per state so that the predictive entropy equals the trained model's, to within 10⁻¹³ nats. C2 keeps the trained hidden states and final normalisation, including LayerNorm's learned bias.
 
 ### E. Validation and Implementation
 
@@ -113,7 +113,7 @@ Table II lists the validation. Seven manifolds of known curvature are run throug
 
 The implementation uses Python 3.13, PyTorch 2.12 in float64 on a four-core laptop CPU without a GPU, Transformers [33] with pinned model revisions, and geomstats 2.8. A state costs about 3 s at k = 5. Seeds are fixed: 0 for planes and for W, and 1000 plus the state index for Π. One correction was made during the study: the projected metric had used the RMSNorm Jacobian for LayerNorm models; the exact form changes K by at most 1.1 × 10⁻³ (median 6 × 10⁻⁵). Every control run uses it, and the profile values of the two LayerNorm models, computed before the correction, carry at most that error.
 
-**TABLE II. VALIDATION OF THE PIPELINE: WORST-CASE ERROR UNLESS MARKED AS A MEDIAN**
+**TABLE II. VALIDATION OF THE PIPELINE: WORST-CASE ERROR UNLESS MARKED OTHERWISE**
 
 | Check | Expected | Observed |
 |---|---|---|
@@ -121,11 +121,11 @@ The implementation uses Python 3.13, PyTorch 2.12 in float64 on a four-core lapt
 | Poincaré half-plane | K = −1 | 1.0 × 10⁻¹³ |
 | Categorical simplex | K = 1/4 | 6.6 × 10⁻¹⁰ |
 | Univariate Gaussian | K = −1/2 | 2.6 × 10⁻¹⁵ |
-| Gamma, beta families | geomstats [32] | 2.3 × 10⁻¹³ |
+| Gamma, beta families | agree with [32] | 2.3 × 10⁻¹³ |
 | Synthetic pullback | K = 1/4 | 9.7 × 10⁻¹² |
 | Reparameterised, U → UM | invariant | 1.9 × 10⁻¹¹ |
-| Outer product of (1) dropped | must fail | fails, 0.263 |
-| Identity (2), SmolLM2 | ratio 1 | 4.3 × 10⁻⁵ |
+| Outer product of (1) dropped | must fail | fails by 0.263 |
+| Identity (2), SmolLM2 (plateau) | ratio 1 | 4.3 × 10⁻⁵ |
 | (2) off h₀: trained, C1 (median) | ratio 1 | 8.5 × 10⁻⁴, 1.1 × 10⁻³ |
 | (2) off h₀: C0 (median) | ratio 1 | 0.66–0.93, fails |
 | Null directions, six models | KL = 0 | ≤ 2.0 × 10⁻¹³ nats |
@@ -135,11 +135,11 @@ The implementation uses Python 3.13, PyTorch 2.12 in float64 on a four-core lapt
 
 ### A. Validation (RQ1)
 
-Table II answers RQ1. The pipeline reproduces every analytic curvature to 6.6 × 10⁻¹⁰ or better, including the categorical simplex, which carries the metric under study, and the synthetic pullback, which tests the assembly of (1). It is blind to reparameterisation and fails, as it must, when the outer-product term of (1) is dropped. On SmolLM2, (2) holds to 4.3 × 10⁻⁵. On all six models the number of null directions matches the normalisation type, and a step of length ‖h‖ along them changes the prediction by at most 2.0 × 10⁻¹³ nats, against 2.96 to 32.3 nats for a random step of the same length; the quotiented metric is therefore the model's own. The independent library agrees on three families; on the Poincaré half-plane and the categorical simplex it reports different curvatures from identical metrics, whereas this pipeline reproduces the analytic values; the difference therefore arises in the curvature computation rather than in the metric, and its cause is not resolved. Eigen-frame slices deviate from the known manifold curvature by 0.005 to 0.028 between 0.5 and 4 nats, against 0.04 to 0.16 for random slices, and by 0.20 and 0.12 below 0.5 and above 4 nats.
+Table II answers RQ1. The pipeline reproduces every analytic curvature to 6.6 × 10⁻¹⁰ or better, including the categorical simplex, which carries the metric under study, and the synthetic pullback, which tests the assembly of (1). It is blind to reparameterisation and fails, as it must, when the outer-product term of (1) is dropped. On SmolLM2, (2) holds to 4.3 × 10⁻⁵. On all six models the number of null directions matches the normalisation type, and a step of length ‖h‖ along them changes the prediction by at most 2.0 × 10⁻¹³ nats, against 2.96 to 32.3 nats for a random step of the same length; the directions the metric discards are therefore exactly those the model cannot see. The independent library agrees on three families; on the Poincaré half-plane and the categorical simplex it reports different curvatures from identical metrics, whereas this pipeline reproduces the analytic values; the difference therefore arises in the curvature computation rather than in the metric, and its cause is not resolved. Eigen-frame slices deviate from the known manifold curvature by 0.005 to 0.028 between 0.5 and 4 nats, against 0.04 to 0.16 for random slices, and by 0.20 and 0.12 below 0.5 and above 4 nats.
 
 ### B. Curvature Across Architectures and Controls (RQ2)
 
-On the profile sample, median slice curvature is 0.255 for SmolLM2 (quartiles 0.251–0.261), 0.256 for LLaMA-160M (0.240–0.286), 0.260 for GPT-2 (0.240–0.294) and 0.272 for Pythia-160M (0.261–0.308): a spread of 0.017 around the simplex value of 1/4 across both normalisation schemes and both embedding regimes. Table III and Fig. 2 compare the trained models with the controls.
+On the profile sample, median slice curvature is 0.255 for SmolLM2 (quartiles 0.251–0.261), 0.256 for LLaMA-160M (0.240–0.286), 0.260 for GPT-2 (0.240–0.294) and 0.272 for Pythia-160M (0.261–0.308): all slightly above the simplex value of 1/4, with a spread of 0.017 across both normalisation schemes and both embedding regimes. Table III and Fig. 2 compare the trained models with the controls.
 
 **TABLE III. SLICE SECTIONAL CURVATURE ON FIVE-DIMENSIONAL SLICES: MEDIANS, WITH THE SIGN-TEST STATISTIC FOR TRAINED ABOVE CONTROL IN PARENTHESES**
 
@@ -154,11 +154,11 @@ On the profile sample, median slice curvature is 0.255 for SmolLM2 (quartiles 0.
 **[FIGURE 2: fig2_controls.png]**
 *Fig. 2. Median slice sectional curvature by predictive-entropy band for the trained models and the three controls. Dashed line: K = 1/4. C0 values below the axis are marked by triangles on its lower edge.*
 
-The inconsistent control C0 collapses curvature on all four models (z from +9.5 to +11.0), which reproduces the preliminary result. The two genuine pullbacks do not: C1 and C2 give medians from 0.230 to 0.285, within 0.035 of 1/4, although neither contains the learned pairing between readout rows and probabilities and C2 contains no trained readout at all. The collapse is therefore an artefact of a control whose derivatives belong to no probability map (Table II), and a value near 1/4 does not require learning. It is inherited from the simplex and the slice construction: with no learning at all, the eigen-frame slices of the synthetic pullback give 0.25 to 0.28 between 0.5 and 4 nats.
+The inconsistent control C0 collapses curvature on all four models (z from +9.5 to +11.0), which reproduces the preliminary result. The two genuine pullbacks do not: C1 and C2 give medians from 0.230 to 0.285, within 0.035 of 1/4, although neither contains the learned pairing between readout rows and probabilities and C2 contains no trained readout at all. The collapse is therefore an artefact of a control whose derivatives belong to no probability map (Table II), and a value near 1/4 does not require a learned readout. It is inherited from the simplex and the slice construction: with nothing learned at all, the eigen-frame slices of the synthetic pullback give 0.25 to 0.28 between 0.5 and 4 nats.
 
-Learning nevertheless leaves a trace. By the decision rule of Section III-C, the trained models agree with neither control on any model. They lie below C1 on all four models, by 0.002 to 0.024 at the median (z from −3.1 to −5.3); the direction is the same at k = 4 and k = 6 in all eight cases (|z| ≥ 2 in six), and in every entropy band fewer than half of the states have the trained value higher. Against C2 the direction depends on the model: GPT-2's Gaussian readout gives the lower curvature (0.230 against 0.258), the other three the higher. Removing LayerNorm's bias from C2 leaves the GPT-2 result unchanged (0.114 against 0.117 above 4 nats, where the trained model gives 0.209), and its cause remains open. A further hypothesis from the preliminary analysis, that learning moves curvature towards 1/4, is not supported: the trained value is significantly closer to 1/4 in only four of the eight model–control comparisons.
+Learning nevertheless leaves a trace. By the decision rule of Section III-C, the trained models agree with neither control on any model. They lie below C1 on all four models, by 0.002 to 0.024 at the median (z from −3.1 to −5.3); the direction is the same at k = 4 and k = 6 in all eight cases (|z| ≥ 2 in six), and in every entropy band fewer than half of the states have the trained value higher. Against C2 the direction depends on the model: GPT-2's Gaussian readout gives the lower curvature (0.230 against 0.258), the other three the higher. Removing LayerNorm's bias from C2 leaves the GPT-2 result unchanged (0.114 against 0.117 above 4 nats, where the trained model gives 0.209), so the cause of the reversal remains open. A further hypothesis from the preliminary analysis, that learning moves curvature towards 1/4, is not supported: a paired sign test on |K − 1/4| finds the trained value significantly closer to 1/4 (z ≥ 2) in only four of the eight model–control comparisons.
 
-Fig. 2 locates the differences. Between 0.5 and 4 nats the trained medians stay within 0.02 of 1/4 and the genuine controls within 0.06; the larger departures occur below 0.5 and above 4 nats, the bands with the largest extrinsic term in Table II. Because the trained and control slices are chosen from different metrics, their extrinsic terms in (4) differ, and the offset, 0.002 to 0.024, is of the same order as that term. It is therefore a property of slice curvature; whether it reflects the curvature of the full manifold cannot be settled with slices of dimension k ≤ 6.
+Fig. 2 locates the differences. Between 0.5 and 4 nats the trained medians stay within 0.02 of 1/4 and the genuine controls within 0.06; the larger departures occur below 0.5 and above 4 nats, the bands where Section V-A finds the largest extrinsic term. Because the trained and control slices are chosen from different metrics, their extrinsic terms in (4) differ, and the offset, 0.002 to 0.024, is of the same order as that term. It is therefore a property of slice curvature; whether it reflects the curvature of the full manifold cannot be settled with slices of dimension k ≤ 6.
 
 ### C. Spectral Summaries (RQ3)
 
@@ -166,7 +166,7 @@ Both spectral summaries are evaluated at h₀, where C0 coincides with C1, so fo
 
 **TABLE IV. SPECTRAL SUMMARIES UNDER THE CONTROL: RANK CORRELATION WITH THE TRAINED VALUE, AND WITH PREDICTIVE ENTROPY**
 
-| Model (states) | ρ, log-volume | ρ, k<sub>eff</sub> | Lowest layer | ρ with entropy, k<sub>eff</sub> / log-volume |
+| Model (states) | ρ, log-volume | ρ, k<sub>eff</sub> | Lowest layer, trained / control | ρ with entropy, k<sub>eff</sub> / log-volume |
 |---|---|---|---|---|
 | SmolLM2 (360) | 0.957 | 0.991 | 10 / 10 | 0.71 / 0.86 |
 | LLaMA (335) | 0.847 | 0.988 | 11 / 11 | 0.90 / 0.38 |
@@ -192,7 +192,7 @@ Table V compares intrinsic curvature with the three published instruments on 360
 
 ### E. Implications for Interpretability
 
-Three practical rules follow for studies that use Fisher–Rao geometry as evidence. First, a curvature near 1/4 is the expected value of a softmax pullback and is not by itself evidence of learned structure; claims should rest on differences from genuine-pullback controls computed on slices of identical construction. Second, every control should be checked with identity (2) away from the base point, since a control that fails it can manufacture a large effect, as C0 does. Third, spectral summaries of the metric should be read as summaries of predictive concentration unless a control shows otherwise.
+Three practical rules follow for studies that use Fisher–Rao geometry as evidence. First, a curvature near 1/4 is what a softmax pullback produces on such slices even without a learned readout, and it is not by itself evidence of learned structure; claims should rest on differences from genuine-pullback controls computed on slices of identical construction. Second, every control should be checked with identity (2) away from the base point, since a control that fails it can manufacture a large effect, as C0 does. Third, spectral summaries of the metric should be read as summaries of predictive concentration unless a control shows otherwise.
 
 ### F. Threats to Validity
 
@@ -200,7 +200,7 @@ Three practical rules follow for studies that use Fisher–Rao geometry as evide
 
 ## VI. Conclusion and Future Work
 
-This article asked what the intrinsic curvature of the Fisher–Rao metric on transformer hidden states measures. A pipeline that quotients the normalisation layer's null directions and differentiates the metric twice on low-dimensional slices was validated against seven manifolds of known curvature and a Kullback–Leibler identity, which answers RQ1. On four models, slice curvature sits near the simplex value of 1/4 (medians 0.255 to 0.272), and two genuine-pullback controls without learned structure give 0.230 to 0.285, so the value is inherited rather than learned; learning leaves a small offset, 0.002 to 0.024 below a scramble of the same rows on every model, while an inconsistent control manufactures a spurious collapse (RQ2). The metric's spectral summaries are reproduced by the same control, and effective dimension tracks predictive entropy (RQ3). For interpretability, the curvature and spectrum of this metric are dominated by the predictive distribution and the simplex, and geometric controls must themselves be genuine pullbacks. The main limitations are the slice construction and model scale. Future work will test models above 1B parameters, add randomly initialised networks as controls, and estimate the extrinsic term on real models.
+This article asked what the intrinsic curvature of the Fisher–Rao metric on transformer hidden states measures. A pipeline that quotients the normalisation layer's null directions and differentiates the metric twice on low-dimensional slices was validated against seven manifolds of known curvature and a Kullback–Leibler identity, which answers RQ1. On four models, slice curvature sits near the simplex value of 1/4 (medians 0.255 to 0.272), and two genuine-pullback controls that remove the learned readout structure give 0.230 to 0.285, so the value is inherited rather than learned; learning leaves a small offset, 0.002 to 0.024 below a scramble of the same rows on every model, while an inconsistent control manufactures a spurious collapse (RQ2). The metric's spectral summaries are reproduced by the same control, and effective dimension tracks predictive entropy (RQ3). For interpretability, the curvature and spectrum of this metric are dominated by the predictive distribution and the simplex, and geometric controls must themselves be genuine pullbacks. The main limitations are the slice construction and model scale. Future work will test models above 1B parameters, add randomly initialised networks as controls, and estimate the extrinsic term on real models.
 
 ## Acknowledgment
 
