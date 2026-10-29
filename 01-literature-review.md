@@ -313,3 +313,18 @@ Handling this in a principled, documented, sensitivity-tested way is **the core 
 - [ ] Check whether C1's index-symmetry simplification of the Ricci scalar applies to the Fisher pullback.
 - [ ] **Search for work published after 10 August 2026** — this field is producing relevant papers monthly (2602, 2603, 2604, 2605, 2606 all appeared within six months). Re-run the search before submission; set up arXiv alerts now (see [04-stage-plan.md](04-stage-plan.md) Stage 1).
 - [ ] Email Mabrok and Manson. Both are recent single/small-author works; both left the exact next step undone. **Manson's own future-work list names "singularity analysis of embedding space combined with contextual curvature"** — which is this thesis. A short, specific email is low cost and high expected value.
+
+---
+
+## 9. Addendum — papers since the review (checked 29 October 2026)
+
+A search on 29 October 2026 found five relevant papers from June–September 2026. **None computes the Riemann tensor of the Fisher pullback metric**, so the gap in §6 still stands. Two of them change how the work is positioned: Picozzi builds on the metric's spectrum, which this project finds reproduced by structure-free controls, and Mudarisov et al. work at 1B–9B parameters, an order of magnitude above the models studied here.
+
+> ⚠️ All five were read through summaries of the full text or the abstract, so all are 🟡 under the convention of §0. Re-read before citing.
+
+### A4. 🟡 Picozzi (2026), *The information geometry of large language models is shared, learned, and controllable* — `arXiv:2609.11063`
+
+- **What it does:** pulls the output Fisher–Rao metric back to an intervention layer and studies its eigenvalue spectrum and an effective dimension `N_eff(α) = Σ λ/(λ+α)`, with `KL ≈ ½ δhᵀGδh` as the local cost of an intervention. Pythia 70M–6.9B, plus GPT-2, Qwen2, BLOOM, GPT-Neo, Mistral-7B, Mamba, RWKV and StarCoder2.
+- **Main results:** output geometry agrees across models more than activation geometry does (rank agreement 0.88 against 0.61–0.62); the spectrum can be predicted from token probabilities and read-out structure (effective-dimension RMSE 0.027–0.052); Fisher-based edits and fine-tuning disturb off-target behaviour far less than Euclidean ones.
+- **Curvature:** none computed in the part read.
+- **Relevance:** the closest paper to this project. Its spectrum-from-probabilities result is independent support for the finding that spectral quantities track predictive concentration ([08-rq3a-log.md](08-rq3a-log.md) §5.5).
