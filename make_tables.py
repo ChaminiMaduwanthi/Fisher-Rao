@@ -58,6 +58,13 @@ def check(label, recomputed, stored, tol=1e-6):
 
 
 # ---------------------------------------------------------------- 1 controls
+BANDS = ((0.0, 0.5), (0.5, 1.0), (1.0, 2.0), (2.0, 4.0), (4.0, float("inf")))
+
+
+def band_label(lo, hi):
+    return f"[{lo:g}, {hi:g})" if hi != float("inf") else f"[{lo:g}, ∞)"
+
+
 def controls():
     out = {}
     for name, tag in (("SmolLM2-135M", "SmolLM2-135M-Instruct_paper"), ("LLaMA-160M", "llama-160m_draw"),
@@ -88,6 +95,19 @@ def controls():
                 gs = json.loads(gsum.read_text(encoding="utf-8"))["summary"]
                 check(f"controls, {name}: median K, Gaussian U", t["gauss"], gs["K_gauss"])
                 check(f"controls, {name}: real > Gaussian U", t["real_gt_gauss"]["pos"], gs["real_gt_gauss"]["pos"])
+        t["by_entropy"] = {}
+        for lo, hi in BANDS:
+            sub = [r for r in rows if lo <= r["entropy"] < hi]
+            if not sub:
+                continue
+            b = dict(n=len(sub), real=median([r["K_real"] for r in sub]),
+                     consistent=median([r["K_consistent"] for r in sub]),
+                     real_gt_consistent=sign([r["K_real"] - r["K_consistent"] for r in sub]))
+            gsub = [r for r in sub if r["_i"] in gauss]
+            if gsub:
+                b.update(gauss=median([gauss[r["_i"]] for r in gsub]),
+                         real_gt_gauss=sign([r["K_real"] - gauss[r["_i"]] for r in gsub]))
+            t["by_entropy"][band_label(lo, hi)] = b
         sw = [r for r in rows if "K4_real" in r]
         for k in (4, 6):
             t[f"k{k}"] = dict(n=len(sw), real=median([r[f"K{k}_real"] for r in sw]),
@@ -330,6 +350,16 @@ def markdown(T):
             s = t[f"k{k}"]
             L.append(f"| {m} | {k} | {s['n']} | {s['real']:.4f} | {s['within']:.4f} | {s['consistent']:.4f} | "
                      f"{s['real_gt_consistent']['pos']}/{s['real_gt_consistent']['n']}, z = {s['real_gt_consistent']['z']:+.2f} |")
+    L += ["", "By entropy band, `k` = 5 (median `K`; sign test of real > control):", "",
+          "| model | entropy (nats) | n | real | consistent | real > consistent | Gaussian `U` | real > Gaussian `U` |",
+          "|---|---|---|---|---|---|---|---|"]
+    for m, t in T["controls"].items():
+        for bl, b in t["by_entropy"].items():
+            rc = b["real_gt_consistent"]
+            gg = (f"{b['gauss']:.4f} | {b['real_gt_gauss']['pos']}/{b['real_gt_gauss']['n']}, "
+                  f"z = {b['real_gt_gauss']['z']:+.2f}") if "gauss" in b else "— | —"
+            L.append(f"| {m} | {bl} | {b['n']} | {b['real']:.4f} | {b['consistent']:.4f} | "
+                     f"{rc['pos']}/{rc['n']}, z = {rc['z']:+.2f} | {gg} |")
     L += ["", "## 2. Slice sectional curvature across architectures (distinct states)", "",
           "| model | n | median `K` | quartiles |", "|---|---|---|---|"]
     for m, t in T["architectures"].items():
