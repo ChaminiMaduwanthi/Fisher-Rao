@@ -276,3 +276,7 @@ A consistent version of the same scramble ([run_scramble_consistent.py](run_scra
 ### 8.4 🟡 n = 221 is 186 distinct states
 
 §3 above noted that 35 `_i` values recur in `within_points.jsonl` but kept n = 221. The recurring rows are identical to their first occurrence, so they are not independent observations: on distinct states the sign test is **168/186, z = +11.00** (medians 0.2547 → 0.0096), not 201/221, z = +12.18. Every figure computed from these rows must use the 186 distinct states. Details: [14-revision-log.md](14-revision-log.md) §1.
+
+### 8.5 🟡 My own slip: summary medians taken with `torch.median`
+
+The scripts added for the revision (`run_scramble_consistent.py`, `check_slice_gauss.py`, `check_control_validity.py`) first summarised across states with `torch.median`, which returns the lower of the two middle values — the convention §4 above had already retired. They now use `fisherrao.stats.median`. Every affected figure in [14-revision-log.md](14-revision-log.md) and [08-rq3a-log.md](08-rq3a-log.md) §5.7 has been recomputed. The changes are in the third or fourth decimal, except in the pilot's six-state entropy bands. Per-state `K` still uses `torch.median` over its 16 planes: that is the definition every saved `K` in the project uses, and changing it would break comparability.
