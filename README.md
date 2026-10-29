@@ -25,6 +25,8 @@
 | [12-audit-log.md](12-audit-log.md) | 🔴 **Full end-to-end audit — one headline claim withdrawn (ρ = +0.42 was a rank-tie artefact), two restated, everything else reproduced** | Progress, Ch. 5 & 8 |
 | [13-revision-plan.md](13-revision-plan.md) | **ICARC 2027 resubmission plan** — reviewer comments mapped to fixes, the consistent-control finding, experiments, timeline, checklist | Supervisor, writing |
 | [run_scramble_consistent.py](run_scramble_consistent.py) | 🔴 **The consistent scramble** — the §5.4 control realised as a genuine pullback; `K` does not collapse (pilot) | Revision |
+| [14-revision-log.md](14-revision-log.md) | **Revision experiments** — the duplicate-state count, slice against manifold curvature, the consistent control at scale | Revision |
+| [check_slice_gauss.py](check_slice_gauss.py) | **Slice vs manifold curvature** on a known answer (rung 7): the Gauss-equation term, measured | Revision |
 | [fisherrao/](fisherrao/) | `model.py`, `metrics.py`, `trajectory.py`, `curvature.py`, `corpus.py`, `net.py` | Code |
 | [run_stage0.py](run_stage0.py) / [run_stage3.py](run_stage3.py) / [run_control.py](run_control.py) | Reproduce every number in the logs | Code |
 | [gate_a_kl_test.py](gate_a_kl_test.py) | **Working** — the Gate A KL–Hessian test, plus the `ε`-cancellation trap | Stage 2 |
