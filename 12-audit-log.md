@@ -294,8 +294,10 @@ The scripts added for the revision (`run_scramble_consistent.py`, `check_slice_g
 | Table VII | Fisher–Rao 0.754 → 1.532 (2.03×) | true medians 0.774 → 1.537 (1.98×); the submitted values are lower medians |
 | Sections III.D and VI.E | WikiText-2 | WikiText-103, validation split |
 | Section VI.F | "places it at layer 4.5" | a mean half-separation depth (4.53), to be called one |
+| Section IV.B | KL–Hessian identity "on a real model" at 8.7 × 10⁻⁶ | 8.7e−6 is the synthetic model; the real model gives 4.3e−5 |
+| Table IV | effective dimension by layer, lower medians (scrambled layer 28: 54) | true medians (layer 28: 67); minimum layer and 99 % of the range unchanged |
 
-None of these reverses a conclusion. They are listed because the revision must quote the right numbers.
+None of these reverses a conclusion. They are listed because the revision must quote the right numbers. `results/tables/tables.md` closes with the same comparison, recomputed.
 
 ### 8.7 🟡 The projected metric used the RMSNorm Jacobian on LayerNorm models
 
