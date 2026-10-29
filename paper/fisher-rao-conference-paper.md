@@ -26,6 +26,18 @@ The article makes three contributions. (i) It computes the intrinsic Riemannian 
 
 ---
 
+## II. Related Work
+
+The pullback of the Fisher–Rao metric onto hidden-state space has been derived before and put to work: it has been applied to activation steering [4] and to the analysis of sparse autoencoder scaling [5]. Both stop at the metric itself; neither forms its curvature.
+
+Existing geometric readings of transformers stop short of the curvature step in one of two ways. (i) Curvature is measured under a flat metric, as in a Frenet-style curvature of residual-stream trajectories [6] and an angular curvature between successive difference vectors [7]. Both report that curvature varies with semantic content and predictive uncertainty, which is good evidence that geometry carries signal; but both compute the quantity in Euclidean coordinates, so what varies is a property of the coordinate chart together with the trajectory rather than an invariant of a manifold. (ii) A local-PCA residual on the ambient activation cloud is reported as a curvature of order 10⁻⁵ and read as near-flatness [8]. Section VI.G returns to that reading with the same estimator.
+
+Intrinsic Riemannian curvature has been computed for neural representations under a data-induced metric [9], which establishes that the machinery is tractable, but the metric there is not Fisher–Rao and the models are not transformers.
+
+Outside the curvature literature, a parallel line of work measures intrinsic dimension across depth and reports a characteristic profile with a minimum roughly one third of the way through the network [10], usually estimated by a nearest-neighbour method [11] and more recently given a manifold-theoretic account [12]. Section VI.B shows that the analogous profile under the Fisher–Rao metric is reproduced almost exactly by a control containing no learned structure, which raises a testable question for that literature.
+
+---
+
 ## II. The Metric and Its Curvature
 
 ### A. The pullback
