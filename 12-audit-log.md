@@ -262,7 +262,7 @@ Prompted by a conference reviewer, who asked whether the scrambled metric is "a 
 
 `fisher_metric_projected(rows=...)` takes `p(h)` from the real logits and the Jacobian from permuted rows. Curvature is built from derivatives of the metric, and away from the base point the two no longer correspond: `p` moves along the real directions while the metric measures along the permuted ones. The object is a valid Riemannian metric, but not `JᵀΣ_pJ` for any map `h → p`.
 
-A consistent version of the same scramble ([run_scramble_consistent.py](run_scramble_consistent.py)), identical at the base point, leaves `K` at the real value: **0.2532 against 0.2554, 15/30 paired, z = 0.00**, where the `within` control gives −0.0004 (n = 30, SmolLM2-135M, `k` = 5). Details and the entropy breakdown: [08-rq3a-log.md](08-rq3a-log.md) §5.7.
+A consistent version of the same scramble ([run_scramble_consistent.py](run_scramble_consistent.py)), identical at the base point, leaves `K` at the real value: **0.2565 against 0.2547 on the paper's 186 distinct states**, where the `within` control gives 0.0096; on LLaMA-160M it gives 0.2794 against 0.2565 (118 states). The 30-state pilot gave 0.2540 against 0.2563. Details and the entropy breakdown: [08-rq3a-log.md](08-rq3a-log.md) §5.7.
 
 ### 8.2 What this withdraws, and what it does not
 
