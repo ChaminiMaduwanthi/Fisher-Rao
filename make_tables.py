@@ -20,6 +20,7 @@ Usage:  python make_tables.py      -> results/tables/tables.md and tables.json
 from __future__ import annotations
 
 import json
+import re
 import pathlib
 import sys
 
@@ -59,9 +60,12 @@ def check(label, recomputed, stored, tol=1e-6):
 # ---------------------------------------------------------------- 1 controls
 def controls():
     out = {}
-    for name, tag in (("SmolLM2-135M", "SmolLM2-135M-Instruct_paper"), ("LLaMA-160M", "llama-160m_draw")):
-        rows = [r for r in json.loads((R / "scramble" / f"consistent_{tag}.json").read_text(encoding="utf-8"))["rows"]
-                if "error" not in r]
+    for name, tag in (("SmolLM2-135M", "SmolLM2-135M-Instruct_paper"), ("LLaMA-160M", "llama-160m_draw"),
+                      ("GPT-2", "gpt2_draw"), ("Pythia-160M", "pythia-160m_draw")):
+        path = R / "scramble" / f"consistent_{tag}.json"
+        if not path.exists():
+            continue
+        rows = [r for r in json.loads(path.read_text(encoding="utf-8"))["rows"] if "error" not in r]
         gpath = R / "scramble" / f"gaussian_{tag}_points.jsonl"
         gauss = {r["_i"]: r["K_gauss"] for r in jl(gpath) if "K_gauss" in r} if gpath.exists() else {}
         t = dict(n=len(rows), real=median([r["K_real"] for r in rows]))
@@ -197,6 +201,100 @@ def behaviour():
     return out
 
 
+# ---------------------------------------------------------------- 6 spectral
+SPECTRAL = (("SmolLM2-135M", "volume_scramble.json"), ("LLaMA-160M", "volume_scramble_llama-160m.json"),
+            ("GPT-2", "volume_scramble_gpt2.json"), ("Pythia-160M", "volume_scramble_pythia-160m.json"))
+PAPER = []          # (what, recomputed, value in the submitted paper)
+
+
+def spectral():
+    out = {}
+    for name, fn in SPECTRAL:
+        path = R / "volume_scramble" / fn
+        if not path.exists():
+            continue
+        rows = json.loads(path.read_text(encoding="utf-8"))["rows"]
+        layers = sorted({r["layer"] for r in rows})
+        t = dict(n=len(rows), layers=layers)
+        for q, label in (("lv", "log_volume"), ("ke", "k_eff")):
+            ok = [r for r in rows if finite(r[f"{q}_real"], r[f"{q}_within"])]
+            t[f"{label}_rho"] = spearman([r[f"{q}_real"] for r in ok], [r[f"{q}_within"] for r in ok])
+            pr = [median([r[f"{q}_real"] for r in rows if r["layer"] == l]) for l in layers]
+            pw = [median([r[f"{q}_within"] for r in rows if r["layer"] == l]) for l in layers]
+            t[f"{label}_profile"] = dict(real=pr, within=pw)
+            t[f"{label}_min_layer"] = dict(real=layers[pr.index(min(pr))], within=layers[pw.index(min(pw))])
+            t[f"{label}_range_retained"] = (max(pw) - min(pw)) / (max(pr) - min(pr))
+            t[f"{label}_rho_entropy_real"] = spearman([r["entropy"] for r in ok], [r[f"{q}_real"] for r in ok])
+        out[name] = t
+    if "SmolLM2-135M" in out:
+        PAPER.append(("spectral: log-volume, per-state rho (SmolLM2)", out["SmolLM2-135M"]["log_volume_rho"], 0.957))
+        PAPER.append(("spectral: k_eff, per-state rho (SmolLM2)", out["SmolLM2-135M"]["k_eff_rho"], 0.991))
+    return out
+
+
+# ---------------------------------------------------------------- 7 validation
+def validation():
+    V = R / "validation"
+    out = {"ladder_autodiff": json.loads((R / "ladder" / "ladder_precision.json").read_text(encoding="utf-8"))}
+    s0 = json.loads((R / "stage0" / "stage0.json").read_text(encoding="utf-8"))
+    mdl = s0.get("model")
+    out["gate_a_real"] = dict(model=mdl.get("model_id") if isinstance(mdl, dict) else mdl,
+                              eps=s0["gate_a"]["best_eps"], rel_err=s0["gate_a"]["best_rel_err"])
+    g = re.search(r"plateau at eps = (\S+), relative error (\S+)", (V / "gate_a_kl_test.txt").read_text(encoding="utf-8"))
+    out["gate_a_synthetic"] = dict(eps=float(g.group(1)), rel_err=float(g.group(2)))
+    PAPER.append(("Gate A on a real model (KL-Hessian relative error)", out["gate_a_real"]["rel_err"], 8.7e-6))
+
+    pb = (V / "validate_pullback.txt").read_text(encoding="utf-8")
+    sec = {int(m.group(1)): m.start() for m in re.finditer(r"^(\d)\. ", pb, re.M)}
+    part = lambda k: pb[sec[k]: sec.get(k + 1, len(pb))]
+    lastnum = lambda txt: [float(m.group(1)) for m in re.finditer(r"(\S+)\s+PASS\s*$", txt, re.M)]
+    out["rung7"] = dict(sectional_worst=max(lastnum(part(1))), reparam_worst=max(lastnum(part(2))),
+                        scalar_worst=max(lastnum(part(3))),
+                        broken_assembly=float(re.search(r"term dropped: (\S+)\s+CAUGHT", pb).group(1)))
+
+    gs = (V / "validate_geomstats.txt").read_text(encoding="utf-8")
+    fam = {}
+    for m in re.finditer(r"^(?:rung|RUNG) (\d)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s.*?(DISAGREE|AGREE)", gs, re.M):
+        f_ = fam.setdefault(m.group(2), dict(rung=int(m.group(1)), n=0, agree=0, max_diff=0.0))
+        f_["n"] += 1
+        f_["agree"] += m.group(6) == "AGREE"
+        f_["max_diff"] = max(f_["max_diff"], float(m.group(5)))
+    for m in re.finditer(r"^\s*(\w+)\s*: metrics identical\?\s+(True|False)", gs, re.M):
+        fam.setdefault(m.group(1), {})["metrics_identical"] = m.group(2) == "True"
+    out["geomstats"] = fam
+
+    out["null"] = [dict(model=r["short"], norm=r["norm"], expect=r["expect"], found=r["found"],
+                        kl_null=r["kl_null"], kl_rand=r["kl_rand"], ok=r["pass"])
+                   for r in json.loads((R / "nulltest" / "nulltest.json").read_text(encoding="utf-8"))]
+    out["trace_fraction"] = json.loads((R / "tracefrac" / "tracefrac.json").read_text(encoding="utf-8"))["frac"]
+    return out
+
+
+# ---------------------------------------------------------------- 8 near-flat calibration
+def calibration():
+    import make_figures                           # Fig. 3(b) is computed there, seeded
+    m = json.loads((R / "mabrok" / "mabrok.json").read_text(encoding="utf-8"))
+    th = ["var0.9", "var0.95", "var0.99", "var0.999", "var0.9999"]
+    layer12 = {k: [m["results"][f"L12_k{k}"].get(t) for t in th]
+               for k in m["k_sweep"] if f"L12_k{k}" in m["results"]}
+    ys, yp = make_figures.sphere_calibration()
+    return dict(model=m["model"], thresholds=[0.9, 0.95, 0.99, 0.999, 0.9999], layer12=layer12,
+                sphere=ys, plane=yp)
+
+
+# ---------------------------------------------------------------- 9 LayerNorm projection check
+def layernorm_check():
+    out = {}
+    for path in sorted((R / "layernorm").glob("projection_*.json")):
+        d = json.loads(path.read_text(encoding="utf-8"))
+        s, rows = d["summary"], d["rows"]
+        out[s["model"]] = dict(n=s["n"], r_over_s=s["median_r_over_s"], metric_err=s["proj_vs_full_x1"],
+                               median_abs_dK=s["median_abs_dK"],
+                               max_abs_dK=max(abs(r["K_projected"] - r["K_exact"]) for r in rows),
+                               package_vs_full=s.get("package_vs_full_x1"))
+    return out
+
+
 def f(x, nd=4):
     return f"{x:+.{nd}f}" if isinstance(x, float) else str(x)
 
@@ -253,6 +351,72 @@ def markdown(T):
           f"{h['gap_vs_uu']['fr_earlier']}/{h['gap_vs_uu']['n']}. WiC different-sense pairs — Fisher–Rao "
           f"{h['wic_different_sense']['d_fr']:.2f}, Euclidean {h['wic_different_sense']['d_euc']:.2f}, UᵀU "
           f"{h['wic_different_sense']['d_uu']:.2f}. (Means, as computed by run_polysemy.py and run_wic.py.)"]
+    S = T.get("spectral", {})
+    if S:
+        L += ["", "## 6. Spectral control — log-volume and effective dimension under the paired scramble "
+              "(at h₀ the paper's scramble and the consistent one coincide, so this control is valid)", "",
+              "| model | n | log-volume ρ, per state | min layer real / scrambled | range kept | `k_eff` ρ, per state "
+              "| min layer real / scrambled | range kept | ρ(log-volume, entropy) |",
+              "|---|---|---|---|---|---|---|---|---|"]
+        for m, t in S.items():
+            L.append(f"| {m} | {t['n']} | {t['log_volume_rho']:+.3f} | {t['log_volume_min_layer']['real']} / "
+                     f"{t['log_volume_min_layer']['within']} | {t['log_volume_range_retained']*100:.0f} % | "
+                     f"{t['k_eff_rho']:+.3f} | {t['k_eff_min_layer']['real']} / {t['k_eff_min_layer']['within']} | "
+                     f"{t['k_eff_range_retained']*100:.0f} % | {t['log_volume_rho_entropy_real']:+.3f} |")
+        for m, t in S.items():
+            L += ["", f"Effective dimension by layer, {m} (true medians):", "",
+                  "| layer | " + " | ".join(str(l) for l in t["layers"]) + " |",
+                  "|---|" + "---|" * len(t["layers"]),
+                  "| real | " + " | ".join(f"{v:g}" for v in t["k_eff_profile"]["real"]) + " |",
+                  "| scrambled | " + " | ".join(f"{v:g}" for v in t["k_eff_profile"]["within"]) + " |"]
+    V = T["validation"]
+    L += ["", "## 7. Validation", "", "Ladder, autodiff implementation, worst over 12 base points and 12 planes:", "",
+          "| rung | manifold | expected `K` | worst error |", "|---|---|---|---|"]
+    for r in V["ladder_autodiff"]:
+        L.append(f"| {r['rung']} | {r['manifold']} | {r['expect']:+g} | {r['worst']:.1e} |")
+    r7 = V["rung7"]
+    L += ["", f"Rung 7 (synthetic pullback, `K` = 1/4 exactly): worst sectional error {r7['sectional_worst']:.1e}; "
+          f"reparameterisation {r7['reparam_worst']:.1e}; scalar curvature {r7['scalar_worst']:.1e}; the broken "
+          f"assembly (outer-product term dropped) fails, at {r7['broken_assembly']:.3f}.",
+          "", "Independent implementation (geomstats 2.8.0):", "",
+          "| family | rung | comparisons | agree | largest difference | metrics identical |", "|---|---|---|---|---|---|"]
+    for fam, v in V["geomstats"].items():
+        if "n" in v:
+            L.append(f"| {fam} | {v['rung']} | {v['n']} | {v['agree']} | {v['max_diff']:.1e} | "
+                     f"{v.get('metrics_identical', '—')} |")
+    ga, gsy = V["gate_a_real"], V["gate_a_synthetic"]
+    L += ["", f"KL–Hessian identity (Gate A): real model ({ga['model']}), relative error {ga['rel_err']:.1e} at "
+          f"ε = {ga['eps']:g}; synthetic softmax model, {gsy['rel_err']:.1e} at ε = {gsy['eps']:g}.",
+          "", "Null directions — a step of ‖h‖ along the null space against a random step of the same size:", "",
+          "| model | norm | null directions expected / found | KL along null | KL along random |",
+          "|---|---|---|---|---|"]
+    for r in V["null"]:
+        L.append(f"| {r['model']} | {r['norm']} | {r['expect']} / {r['found']} | {r['kl_null']:.1e} | {r['kl_rand']:.2f} |")
+    tf = V["trace_fraction"]
+    L += ["", f"Share of the quotiented metric's trace held by the slice ({tf['5']['n']} states): " +
+          "; ".join(f"`k` = {k}: median {tf[k]['median']*100:.1f} %, mean {tf[k]['mean']*100:.1f} %"
+                    for k in ("4", "5", "6")) + "."]
+    C = T["calibration"]
+    L += ["", "## 8. The near-flat reading — local-PCA residual by retained-variance threshold", "",
+          "| | " + " | ".join(str(t) for t in C["thresholds"]) + " |", "|---|" + "---|" * len(C["thresholds"])]
+    for k, vals in C["layer12"].items():
+        L.append(f"| {C['model']} layer 12, k = {k} | " + " | ".join(f"{v:.1e}" for v in vals) + " |")
+    L.append("| unit 3-sphere (`K` = +1) | " + " | ".join(f"{v:.1e}" for v in C["sphere"]) + " |")
+    L.append("| flat 3-plane (`K` = 0) | " + " | ".join(f"{v:.1e}" for v in C["plane"]) + " |")
+    LN = T.get("layernorm", {})
+    if LN:
+        L += ["", "## 9. The RMSNorm-form Jacobian on LayerNorm models, as it was before the 29 October fix", "",
+              "| model | states | median r/s | metric error, median | median \\|ΔK\\| | largest \\|ΔK\\| | package after the fix |",
+              "|---|---|---|---|---|---|---|"]
+        for m, v in LN.items():
+            pk = f"{v['package_vs_full']:.1e}" if v.get("package_vs_full") is not None else "—"
+            L.append(f"| {m} | {v['n']} | {v['r_over_s']:.4f} | {v['metric_err']:.1e} | {v['median_abs_dK']:.1e} | "
+                     f"{v['max_abs_dK']:.1e} | {pk} |")
+    if PAPER:
+        L += ["", "## Recomputed values against the submitted paper", "",
+              "| quantity | recomputed | in the submitted paper |", "|---|---|---|"]
+        for what, a, b in PAPER:
+            L.append(f"| {what} | {a:.4g} | {b:.4g} |")
     bad = [c for c in CHECKS if not c["ok"]]
     L += ["", f"## Verification against stored summaries: {len(CHECKS) - len(bad)}/{len(CHECKS)} agree", ""]
     for c in bad:
@@ -263,8 +427,23 @@ def markdown(T):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     T = dict(controls=controls(), architectures=architectures(), agreement=agreement(),
-             corpus=corpus(), behaviour=behaviour())
+             corpus=corpus(), behaviour=behaviour(), spectral=spectral(), validation=validation(),
+             calibration=calibration(), layernorm=layernorm_check())
+    a = T["architectures"]
+    meds = [v["median"] for v in a.values()]
+    PAPER.extend([
+        ("states in the cross-architecture sweep", sum(v["n"] for v in a.values()), 456),
+        ("Pythia-160M median K", a["EleutherAI/pythia-160m"]["median"], 0.2738),
+        ("GPT-2 median K", a["gpt2"]["median"], 0.2599),
+        ("spread of median K across the four models", max(meds) - min(meds), 0.019),
+        ("paper's scramble, SmolLM2, median K", T["controls"]["SmolLM2-135M"]["within"], 0.0109),
+        ("paper's scramble, SmolLM2, states", T["controls"]["SmolLM2-135M"]["n"], 221),
+        ("sense change / same sense, Fisher-Rao ratio", T["behaviour"]["final_layer"]["d_fr"]["ratio"], 2.03),
+        ("largest cross-family |rho| between instruments",
+         max(abs(v["pooled"]) for p, v in T["agreement"]["pairs"].items()
+             if not p.startswith("intrinsic_K|intrinsic_R")), 0.248)])
     T["checks"] = CHECKS
+    T["paper"] = [dict(what=w, recomputed=x, submitted=y) for w, x, y in PAPER]
     (OUT / "tables.json").write_text(json.dumps(T, indent=2, ensure_ascii=False), encoding="utf-8")
     md = markdown(T)
     (OUT / "tables.md").write_text(md, encoding="utf-8")
