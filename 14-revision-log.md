@@ -152,6 +152,35 @@ By entropy, `k` = 5:
 
 ---
 
+## 6. A learning-free pullback, entropy-matched state by state (Gaussian `U`)
+
+[run_gaussian_matched.py](run_gaussian_matched.py) replaces the trained unembedding with one fixed Gaussian matrix and, at each state, scales it until the predictive entropy equals the real model's (largest mismatch 9.4e−14). The map is a genuine pullback with no learned structure at all. Frames, planes and `k` = 5 are the pipeline's; the real `K` comes from §4–§5 on the same states.
+
+| model | n | real | consistent scramble | Gaussian `U` | real > Gaussian |
+|---|---|---|---|---|---|
+| SmolLM2-135M | 186 | 0.2547 | 0.2565 | 0.2730 | 40/186, z = −7.77 |
+| LLaMA-160M | 118 | 0.2565 | 0.2794 | 0.2846 | 35/118, z = −4.42 |
+
+By entropy (real / Gaussian; real > Gaussian):
+
+| entropy (nats) | SmolLM2-135M | LLaMA-160M |
+|---|---|---|
+| [0, 0.5) | 0.2789 / 0.2556; 17/33, z = +0.17 | 0.3740 / 0.3625; 9/24, z = −1.22 |
+| [0.5, 1) | 0.2570 / 0.2755; 8/31, z = −2.69 | 0.2564 / 0.2726; 7/24, z = −2.04 |
+| [1, 2) | 0.2552 / 0.2726; 12/60, z = −4.65 | 0.2574 / 0.2782; 6/24, z = −2.45 |
+| [2, 4) | 0.2529 / 0.2785; 1/30, z = −5.11 | 0.2518 / 0.2821; 8/24, z = −1.63 |
+| [4, ∞) | 0.2107 / 0.2739; 2/32, z = −4.95 | 0.2438 / 0.2780; 5/22, z = −2.56 |
+
+**Reading.**
+
+1. **`K ≈ +1/4` does not need learning.** A pullback through a random unembedding, matched in entropy at every state, gives 0.273 and 0.285, within 0.035 of +1/4, as the consistent scramble does. With §2's synthetic case this settles the first half of RQ2: the value is inherited from the simplex and the slicing.
+2. **The trained models are the lowest of the genuine pullbacks.** In both models and against both controls, the trained `K` sits slightly below the structure-free one: by 0.002–0.018 on SmolLM2 and 0.023–0.028 on LLaMA-160M. On SmolLM2, against the Gaussian control, the gap holds in every band from 0.5 nats up (z between −2.69 and −5.11).
+3. **A possible reading, not yet a measurement.** In Gauss-equation terms (§2), a `K` closer to +1/4 is what slices with a smaller extrinsic term produce, so the trained slices may sit closer to totally geodesic faces of the simplex than random ones do. §2 measured that term only where the full curvature is known, so this stays a hypothesis for the discussion, not a result.
+
+This replaces the submitted claim with a smaller one of the opposite sign: learning does not create the curvature; if anything it pulls it slightly towards the simplex value.
+
+---
+
 ## 7. Duplicated states across all results
 
 [audit_duplicates.py](audit_duplicates.py) scans every checkpoint and recomputes each affected paper number twice: on the rows as stored, which reproduces the submitted paper exactly, and on distinct states ([results/audit/duplicates.json](results/audit/duplicates.json)).
