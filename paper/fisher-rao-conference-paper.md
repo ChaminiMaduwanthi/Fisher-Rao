@@ -38,7 +38,7 @@ Outside the curvature literature, a parallel line of work measures intrinsic dim
 
 ---
 
-## II. The Metric and Its Curvature
+## III. Methodology
 
 ### A. The pullback
 
