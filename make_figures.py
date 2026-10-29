@@ -1,14 +1,14 @@
 """
 Regenerate every figure in the conference paper from the saved result files.
 
-No number in a figure is typed by hand: each panel reads results/*.json or
-results/*.jsonl and recomputes its own summary.  Run this before rebuilding the
-paper so the figures and the text cannot drift apart.
+No number in a figure is typed by hand: each panel reads results/*.json and
+recomputes its own summary with the project's true median.  Run this before
+rebuilding the paper so the figures and the text cannot drift apart.
 
 Usage:  python make_figures.py
-Output: paper/figures/fig1_curvature.png
-        paper/figures/fig2_split.png
-        paper/figures/fig3_threshold.png
+Output: paper/figures/fig1_pipeline.png   workflow of the study (full width)
+        paper/figures/fig2_controls.png   K by entropy band, trained model and controls
+        paper/figures/fig3_spectral.png   effective dimension by layer, trained and control
 """
 
 from __future__ import annotations
@@ -16,14 +16,15 @@ from __future__ import annotations
 import json
 import os
 import sys
-from collections import defaultdict
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
+from matplotlib.ticker import NullFormatter, ScalarFormatter
 import numpy as np
 
-from fisherrao.stats import spearman
+from fisherrao.stats import median, spearman
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -35,6 +36,7 @@ os.makedirs(OUT, exist_ok=True)
 plt.rcParams.update({
     "font.family": "serif",
     "font.serif": ["Times New Roman", "DejaVu Serif"],
+    "mathtext.fontset": "stix",
     "font.size": 8,
     "axes.linewidth": 0.7,
     "axes.grid": True,
@@ -46,164 +48,173 @@ plt.rcParams.update({
 })
 
 INK = "#1a1a1a"
-REAL = "#1f4e79"
-SCR = "#c1121f"
-GLOB = "#8d8d8d"
+# Okabe-Ito colours, with distinct line styles so the figures survive greyscale
+TRAINED = dict(color="#0072B2", ls="-", marker="o", label="trained")
+C1 = dict(color="#E69F00", ls="--", marker="s", label="C1 consistent scramble")
+C2 = dict(color="#009E73", ls="-.", marker="^", label="C2 Gaussian readout")
+C0 = dict(color="#7f7f7f", ls=":", marker="x", label="C0 inconsistent scramble")
+
+MODELS = (("SmolLM2-135M", "SmolLM2-135M-Instruct_paper", "volume_scramble.json"),
+          ("LLaMA-160M", "llama-160m_draw", "volume_scramble_llama-160m.json"),
+          ("GPT-2", "gpt2_draw", "volume_scramble_gpt2.json"),
+          ("Pythia-160M", "pythia-160m_draw", "volume_scramble_pythia-160m.json"))
+BANDS = ((0.0, 0.5), (0.5, 1.0), (1.0, 2.0), (2.0, 4.0), (4.0, float("inf")))
+BAND_LABELS = ("<0.5", "0.5–1", "1–2", "2–4", ">4")
 
 
-def jl(path):
+def load(path):
     with open(path, encoding="utf-8") as f:
-        return [json.loads(line) for line in f]
-
-
-def tmed(xs):
-    """torch.median semantics: lower of the two middle values for even n.
-
-    The result files were aggregated this way, so the figures reproduce them
-    exactly rather than approximately.
-    """
-    s = sorted(xs)
-    return s[(len(s) - 1) // 2] if s else float("nan")
+        return json.load(f)
 
 
 # ---------------------------------------------------------------- figure 1
 def fig1():
-    pts = [r for r in jl("results/profiles/profile_points.jsonl")
-           if isinstance(r.get("K"), (int, float)) and r["K"] == r["K"]]
-    # the checkpoint holds 31 states twice across resumed runs: one row per state
-    pts = list({(r["model"], r["layer"], r["_i"]): r for r in pts}.values())
-    by = defaultdict(list)
-    for r in pts:
-        by[r["model"]].append(r["K"])
+    """The workflow: measurement chain, the controls that replace the readout,
+    and the validation that guards the chain."""
+    fig, ax = plt.subplots(figsize=(7.0, 2.05))
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 34.5)
+    ax.axis("off")
 
-    short = {
-        "gpt2": "GPT-2\n(124M)",
-        "EleutherAI/pythia-160m": "Pythia\n(160M)",
-        "JackFram/llama-160m": "LLaMA\n(160M)",
-        "HuggingFaceTB/SmolLM2-135M-Instruct": "SmolLM2\n(135M)",
-    }
-    order = ["gpt2", "EleutherAI/pythia-160m", "JackFram/llama-160m",
-             "HuggingFaceTB/SmolLM2-135M-Instruct"]
-    order = [m for m in order if m in by]
+    def box(x, y, w, h, text, face="#eef3f8", edge="#1f4e79", fs=6.4):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.2,rounding_size=0.8",
+                                    fc=face, ec=edge, lw=0.8))
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs,
+                color=INK, linespacing=1.3)
 
-    fig, ax = plt.subplots(figsize=(3.45, 2.35))
-    rng = np.random.default_rng(0)
-    for i, m in enumerate(order):
-        v = np.array(by[m])
-        x = i + 1 + rng.normal(0, 0.055, size=len(v))
-        ax.scatter(x, v, s=3.2, alpha=0.30, color=REAL, linewidths=0, zorder=2)
+    def arrow(x0, y0, x1, y1, color="#1f4e79", ls="-"):
+        ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
+                    arrowprops=dict(arrowstyle="-|>", lw=0.8, color=color, ls=ls,
+                                    shrinkA=0, shrinkB=0, mutation_scale=7))
 
-    bp = ax.boxplot([by[m] for m in order], widths=0.42, showfliers=False,
-                    medianprops=dict(color=SCR, linewidth=1.4),
-                    boxprops=dict(color=INK, linewidth=0.8),
-                    whiskerprops=dict(color=INK, linewidth=0.8),
-                    capprops=dict(color=INK, linewidth=0.8), zorder=3)
-    ax.axhline(0.25, color=INK, linestyle="--", linewidth=0.9, zorder=1)
-    ax.text(len(order) + 0.44, 0.25, r"$K=\frac{1}{4}$", va="center",
-            ha="left", fontsize=8, color=INK)
+    ya, ha = 21.0, 12.5                      # measurement chain
+    yb, hb = 1.0, 13.5                       # controls, validation, spectrum
+    box(0.5, ya, 12.0, ha, "Hidden state $h$\n(layer $\\ell$,\ntoken $t$)")
+    box(15.0, ya, 18.0, ha, "Final norm $n(h)$,\nreadout $U$ (512 tokens)\n"
+                            "$p=\\mathrm{softmax}(U\\,n(h))$")
+    box(35.5, ya, 17.0, ha, "Pullback metric (1)\n$G=J^{\\top}(\\mathrm{diag}\\,p-pp^{\\top})J$")
+    box(55.0, ya, 18.0, ha, "Null directions quotiented,\n$P=I-NN^{\\top}$; slice\n"
+                            "$h_0+\\mathrm{span}\\,F$, with $F$\nthe top-$k$ eigenvectors", fs=6.2)
+    box(75.3, ya, 13.0, ha, "Slice curvature (3)\nautodiff, float64\n16 random planes")
+    box(75.3, yb, 13.0, hb, "Spectrum of $PGP$:\n$k_{\\mathrm{eff}}$, log-volume")
+    box(90.6, yb, 9.0, ya + ha - yb, "Paired\nstatistics:\nsign test $z$,\nSpearman $\\rho$,\n"
+                                       "decision\nrule", face="#f2f2f2", edge="#555555")
+    for x0, x1 in ((12.5, 15.0), (33.0, 35.5), (52.5, 55.0), (73.0, 75.3)):
+        arrow(x0, ya + ha / 2, x1, ya + ha / 2)
+    arrow(73.0, ya + 2.0, 78.5, yb + hb)                      # slice -> spectrum
+    arrow(88.3, ya + ha / 2, 90.6, ya + ha / 2, color="#555555")
+    arrow(88.3, yb + hb / 2, 90.6, yb + hb / 2, color="#555555")
 
-    ax.set_xticks(range(1, len(order) + 1))
-    ax.set_xticklabels([short[m] for m in order], fontsize=7)
-    ax.set_ylabel("sectional curvature $K$")
-    ax.set_ylim(-0.05, 0.55)
-    ax.set_xlim(0.45, len(order) + 1.25)
-    for i, m in enumerate(order):
-        ax.text(i + 1, 0.525, f"n={len(by[m])}", ha="center", fontsize=6.2,
-                color="#555555")
+    box(15.0, yb, 37.5, hb,
+        "Controls replace the readout at the same $h_0$\n"
+        "C0: $p$ from $U$, Jacobian from $\\Pi U$ (not a pullback)\n"
+        "C1: $z=U\\,n(h_0)+\\Pi U\\,(n(h)-n(h_0))$\n"
+        "C2: $\\mathrm{softmax}(sW\\,n(h))$, entropy matched",
+        face="#fff4e0", edge="#b36b00")
+    arrow(24.0, yb + hb, 24.0, ya, color="#b36b00")
 
-    p = os.path.join(OUT, "fig1_curvature.png")
+    box(55.0, yb, 18.0, hb, "Validation: 7 manifolds\nof known curvature;\nidentity (2) on and off $h_0$;\n"
+                            "null test; Gauss check (4)", face="#e9f5ee", edge="#1b7a4a")
+    arrow(64.0, yb + hb, 64.0, ya, color="#1b7a4a", ls="--")
+
+    p = os.path.join(OUT, "fig1_pipeline.png")
     fig.savefig(p)
     plt.close(fig)
-    meds = {m: tmed(by[m]) for m in order}
     print(f"fig1 -> {p}")
-    print(f"      medians: " + ", ".join(f"{short[m].splitlines()[0]}={meds[m]:.4f}"
-                                         for m in order))
-    print(f"      spread across models = {max(meds.values())-min(meds.values()):.4f}"
-          f"   total points = {len(pts)}")
-    return meds
 
 
 # ---------------------------------------------------------------- figure 2
 def fig2():
-    """The central result: one control, three quantities, two outcomes."""
-    wp = jl("results/scramble/within_points.jsonl")
-    kl = defaultdict(list)
-    for r in wp:
-        if isinstance(r.get("K_real"), (int, float)) and \
-           isinstance(r.get("K_within"), (int, float)):
-            kl[r["layer"]].append(r)
-    klay = sorted(kl)
-    k_real = [tmed([r["K_real"] for r in kl[L]]) for L in klay]
-    k_scr = [tmed([r["K_within"] for r in kl[L]]) for L in klay]
-
-    v = json.load(open("results/volume_scramble/volume_scramble.json",
-                       encoding="utf-8"))
-    bl = defaultdict(list)
-    for r in v["rows"]:
-        bl[r["layer"]].append(r)
-    vlay = sorted(bl)
-    lv_real = [tmed([r["lv_real"] for r in bl[L]]) for L in vlay]
-    lv_scr = [tmed([r["lv_within"] for r in bl[L]]) for L in vlay]
-    ke_real = [tmed([r["ke_real"] for r in bl[L]]) for L in vlay]
-    ke_scr = [tmed([r["ke_within"] for r in bl[L]]) for L in vlay]
-
-    # The two rho values quoted in the panel titles are the paired per-point
-    # Spearman over all saved states, not the 9-point profile correlation --
-    # see 12-audit-log.md S4.  Recomputed here so the titles cannot drift.
-    rho_lv = spearman([r["lv_real"] for r in v["rows"]],
-                      [r["lv_within"] for r in v["rows"]])
-    rho_ke = spearman([r["ke_real"] for r in v["rows"]],
-                      [r["ke_within"] for r in v["rows"]])
-
-    fig, axes = plt.subplots(3, 1, figsize=(3.4, 4.15), sharex=True)
-
-    ax = axes[0]
-    ax.plot(klay, k_real, "o-", color=REAL, ms=3.4, lw=1.3, label="real")
-    ax.plot(klay, k_scr, "s--", color=SCR, ms=3.2, lw=1.3, label="scrambled")
-    ax.axhline(0.25, color=INK, ls=":", lw=0.8)
-    ax.axhline(0.0, color=INK, lw=0.6)
-    ax.set_title("(a) sectional curvature $K$\n" + r"$\bf{collapses}$",
-                 fontsize=8, pad=4)
-    ax.set_ylabel("$K$")
-    ax.set_ylim(-0.35, 0.35)
-    ax.legend(fontsize=6.5, frameon=False, loc="lower left")
-
-    ax = axes[1]
-    ax.plot(vlay, lv_real, "o-", color=REAL, ms=3.4, lw=1.3)
-    ax.plot(vlay, lv_scr, "s--", color=SCR, ms=3.2, lw=1.3)
-    ax.set_title("(b) log volume element\n"
-                 + r"$\bf{reproduced}$ " + rf"($\rho={rho_lv:+.2f}$)",
-                 fontsize=8, pad=4)
-    ax.set_ylabel(r"$\log\sqrt{\det G}$")
-
-    ax = axes[2]
-    ax.plot(vlay, ke_real, "o-", color=REAL, ms=3.4, lw=1.3)
-    ax.plot(vlay, ke_scr, "s--", color=SCR, ms=3.2, lw=1.3)
-    ax.set_yscale("log")
-    ax.set_title("(c) effective dimension $k_{\\mathrm{eff}}$\n"
-                 + r"$\bf{reproduced}$ " + rf"($\rho={rho_ke:+.2f}$)",
-                 fontsize=8, pad=4)
-    ax.set_xlabel("layer")
-    ax.set_ylabel(r"$k_{\mathrm{eff}}$")
-
-    fig.tight_layout(h_pad=0.55)
-    p = os.path.join(OUT, "fig2_split.png")
+    """Median K by predictive-entropy band: the trained model and the three
+    controls, on the same states."""
+    fig, axes = plt.subplots(2, 2, figsize=(3.45, 2.95), sharex=True, sharey=True)
+    lo_lim, hi_lim = -0.06, 0.53
+    for ax, (name, tag, _) in zip(axes.flat, MODELS):
+        rows = [r for r in load(f"results/scramble/consistent_{tag}.json")["rows"] if "error" not in r]
+        gauss = {r["_i"]: r["K_gauss"] for r in load(f"results/scramble/gaussian_{tag}.json")["rows"]
+                 if "K_gauss" in r}
+        series = {k: [] for k in ("real", "within", "consistent", "gauss")}
+        for lo, hi in BANDS:
+            sub = [r for r in rows if lo <= r["entropy"] < hi]
+            series["real"].append(median([r["K_real"] for r in sub]))
+            series["within"].append(median([r["K_within"] for r in sub]))
+            series["consistent"].append(median([r["K_consistent"] for r in sub]))
+            series["gauss"].append(median([gauss[r["_i"]] for r in sub if r["_i"] in gauss]))
+        x = np.arange(len(BANDS))
+        ax.axhline(0.25, color=INK, ls=(0, (4, 3)), lw=0.7, zorder=1)
+        w = np.array(series["within"])
+        inside = w >= lo_lim
+        ax.plot(x[inside], w[inside], color=C0["color"], ls=C0["ls"], marker=C0["marker"],
+                ms=3.2, lw=1.0, zorder=2)
+        if (~inside).any():                     # off the axis: marked on its lower edge
+            ax.plot(x[~inside], np.full((~inside).sum(), lo_lim + 0.012), ls="none",
+                    marker="v", ms=3.6, color=C0["color"], zorder=2)
+        for key, st in (("gauss", C2), ("consistent", C1), ("real", TRAINED)):
+            ax.plot(x, series[key], color=st["color"], ls=st["ls"], marker=st["marker"],
+                    ms=3.0, lw=1.1, zorder=3)
+        ax.set_title(f"{name} ($n$ = {len(rows)})", fontsize=7.2, pad=2.5)
+        ax.set_ylim(lo_lim, hi_lim)
+        ax.set_xticks(x)
+        ax.set_xticklabels(BAND_LABELS, fontsize=6.2)
+        ax.tick_params(axis="y", labelsize=6.5)
+        print(f"fig2 {name:12s} " + " ".join(f"{k}={[round(v, 3) for v in s]}" for k, s in series.items()))
+    for ax in axes[1]:
+        ax.set_xlabel("predictive entropy (nats)", fontsize=7)
+    for ax in axes[:, 0]:
+        ax.set_ylabel("median $K$", fontsize=7)
+    handles = [plt.Line2D([], [], color=s["color"], ls=s["ls"], marker=s["marker"], ms=3.2, lw=1.1,
+                          label=s["label"]) for s in (TRAINED, C1, C2, C0)]
+    fig.legend(handles=handles, loc="lower center", ncol=2, fontsize=6.2, frameon=False,
+               bbox_to_anchor=(0.5, 0.0), handlelength=2.6, columnspacing=1.0)
+    fig.tight_layout(h_pad=0.6, w_pad=0.4, rect=(0, 0.1, 1, 1))
+    p = os.path.join(OUT, "fig2_controls.png")
     fig.savefig(p)
     plt.close(fig)
     print(f"fig2 -> {p}")
-    print(f"      K  layers {klay}")
-    print(f"      K  real {[round(x,4) for x in k_real]}")
-    print(f"      K  scr  {[round(x,4) for x in k_scr]}")
-    print(f"      ke real {[round(x,1) for x in ke_real]}")
-    print(f"      ke scr  {[round(x,1) for x in ke_scr]}")
-    return klay, k_real, k_scr, vlay, lv_real, lv_scr, ke_real, ke_scr
 
 
 # ---------------------------------------------------------------- figure 3
+def fig3():
+    """Effective dimension by layer, trained metric against the paired scramble,
+    which coincides with the consistent control at the base point."""
+    fig, axes = plt.subplots(2, 2, figsize=(3.45, 2.55))
+    for ax, (name, _, fn) in zip(axes.flat, MODELS):
+        rows = load(os.path.join("results", "volume_scramble", fn))["rows"]
+        layers = sorted({r["layer"] for r in rows})
+        real = [median([r["ke_real"] for r in rows if r["layer"] == l]) for l in layers]
+        ctrl = [median([r["ke_within"] for r in rows if r["layer"] == l]) for l in layers]
+        rho = spearman([r["ke_real"] for r in rows], [r["ke_within"] for r in rows])
+        ax.plot(layers, real, color=TRAINED["color"], ls="-", marker="o", ms=2.8, lw=1.1)
+        ax.plot(layers, ctrl, color=C1["color"], ls="--", marker="s", ms=2.6, lw=1.1)
+        ax.set_yscale("log")
+        lo, hi = min(real + ctrl), max(real + ctrl)
+        ax.set_yticks([t for t in (5, 10, 20, 50, 100, 200, 400) if lo / 1.3 <= t <= hi * 1.3])
+        ax.yaxis.set_major_formatter(ScalarFormatter())
+        ax.yaxis.set_minor_formatter(NullFormatter())
+        ax.set_title(f"{name} ($\\rho$ = {rho:.2f})", fontsize=7.2, pad=2.5)
+        ax.tick_params(labelsize=6.3)
+        print(f"fig3 {name:12s} layers {layers} trained {real} control {ctrl} rho {rho:.3f}")
+    for ax in axes[1]:
+        ax.set_xlabel("layer", fontsize=7)
+    for ax in axes[:, 0]:
+        ax.set_ylabel("median $k_{\\mathrm{eff}}$", fontsize=7)
+    handles = [plt.Line2D([], [], color=TRAINED["color"], ls="-", marker="o", ms=3, lw=1.1, label="trained"),
+               plt.Line2D([], [], color=C1["color"], ls="--", marker="s", ms=3, lw=1.1,
+                          label="scrambled readout (C0 = C1 at $h_0$)")]
+    fig.legend(handles=handles, loc="lower center", ncol=2, fontsize=6.2, frameon=False,
+               bbox_to_anchor=(0.5, 0.0), handlelength=2.6)
+    fig.tight_layout(h_pad=0.5, w_pad=0.5, rect=(0, 0.06, 1, 1))
+    p = os.path.join(OUT, "fig3_spectral.png")
+    fig.savefig(p)
+    plt.close(fig)
+    print(f"fig3 -> {p}")
+
+
+# ---------------------------------------------------------------- calibration
 def sphere_calibration(tl=(0.9, 0.95, 0.99, 0.999, 0.9999)):
     """The local-PCA residual on a unit 3-sphere (K = +1) and a flat 3-plane (K = 0)
-    in 12 dimensions, at each retained-variance threshold -- Fig. 3(b).  Seeded,
-    so the numbers are reproducible; make_tables.py records them."""
+    in 12 dimensions, at each retained-variance threshold.  Seeded, so the numbers
+    are reproducible; make_tables.py records them (Table 8)."""
     rng = np.random.default_rng(3)
     n, amb = 1800, 12
     X = rng.normal(size=(n, 4))
@@ -226,94 +237,6 @@ def sphere_calibration(tl=(0.9, 0.95, 0.99, 0.999, 0.9999)):
         return float(np.median(out))
 
     return [residual(S, t) for t in tl], [residual(P, t) for t in tl]
-
-
-def fig3():
-    """Why a published near-zero curvature is not evidence of flatness.
-
-    The local-PCA residual proxy is a function of its variance threshold.  Panel
-    (a) is the measured proxy on GPT-2 across thresholds; panel (b) is the same
-    estimator applied to a UNIT 3-SPHERE, whose curvature is exactly +1.
-    """
-    m = json.load(open("results/mabrok/mabrok.json", encoding="utf-8"))
-    res = m["results"]
-    ks = m["k_sweep"]
-    thresholds = ["var0.9", "var0.95", "var0.99", "var0.999", "var0.9999"]
-    tl = [0.9, 0.95, 0.99, 0.999, 0.9999]
-
-    FLOOR = 1e-9
-
-    def clamp(y):
-        """Values that underflow to ~0 are drawn on the axis floor and marked.
-
-        Plotting them unclamped drops the series off the axis, which hides
-        exactly the behaviour the panel exists to show.
-        """
-        return [max(v, FLOOR) if v == v else np.nan for v in y], \
-               [v < FLOOR for v in y]
-
-    fig, axes = plt.subplots(2, 1, figsize=(3.4, 3.5), sharex=True)
-
-    ax = axes[0]
-    cmap = plt.get_cmap("viridis")
-    for i, k in enumerate(ks):
-        key = f"L12_k{k}"
-        if key not in res:
-            continue
-        y, under = clamp([res[key].get(t, np.nan) for t in thresholds])
-        c = cmap(i / max(1, len(ks) - 1))
-        ax.plot(range(len(tl)), y, "o-", ms=3.2, lw=1.2, color=c, label=f"$k$={k}")
-        xu = [j for j, u in enumerate(under) if u]
-        if xu:
-            ax.plot(xu, [FLOOR] * len(xu), "v", ms=4.2, color=c,
-                    markeredgecolor="white", markeredgewidth=0.4)
-    ax.axhline(1e-5, color=SCR, ls="--", lw=1.0)
-    ax.text(0.06, 1.7e-5, "published $10^{-5}$", color=SCR, fontsize=6.5)
-    ax.set_yscale("log")
-    ax.set_ylim(FLOOR / 3, 2)
-    ax.set_xticks(range(len(tl)))
-    ax.set_xticklabels([str(t) for t in tl], fontsize=6.5)
-    ax.set_ylabel("residual", fontsize=7.5)
-    ax.set_title("(a) the proxy on GPT-2 layer 12", fontsize=7.6, pad=3)
-    ax.legend(fontsize=5.8, frameon=False, ncol=2, loc="lower left")
-    ax.text(len(tl) - 1.05, FLOOR / 1.6, r"$\blacktriangledown$ = numerically 0",
-            fontsize=5.8, color="#555555", ha="right")
-
-    # ---- panel (b): the same estimator on a manifold of known curvature ----
-    ys, yp = sphere_calibration(tl)
-
-    # Grouped bars, because both series underflow to exactly 0 at tight
-    # thresholds and a log line plot simply drops them off the axis.
-    ax = axes[1]
-    x = np.arange(len(tl))
-    w = 0.36
-    for off, y, col, lab in ((-w / 2, ys, REAL, "unit 3-sphere ($K=+1$)"),
-                             (+w / 2, yp, GLOB, "flat 3-plane ($K=0$)")):
-        h = [max(v, FLOOR) for v in y]
-        ax.bar(x + off, h, w, bottom=FLOOR / 3, color=col, label=lab,
-               edgecolor="white", linewidth=0.4)
-    ax.axhline(1e-5, color=SCR, ls="--", lw=1.0)
-    ax.text(len(tl) - 0.45, 1.7e-5, "published $10^{-5}$", color=SCR,
-            fontsize=6.5, ha="right")
-    ax.set_yscale("log")
-    ax.set_ylim(FLOOR / 3, 2)
-    ax.set_xticks(x)
-    ax.set_xticklabels([str(t) for t in tl], fontsize=6.5)
-    ax.set_xlabel("retained-variance threshold")
-    ax.set_ylabel("residual", fontsize=7.5)
-    ax.set_title("(b) the same estimator, known curvature", fontsize=7.6, pad=3)
-    ax.legend(fontsize=6.2, frameon=False, loc="upper left")
-
-    fig.tight_layout(h_pad=0.6)
-    p = os.path.join(OUT, "fig3_threshold.png")
-    fig.savefig(p)
-    plt.close(fig)
-    print(f"fig3 -> {p}")
-    print(f"      sphere residual by threshold: "
-          + ", ".join(f"{t}:{y:.2e}" for t, y in zip(tl, ys)))
-    print(f"      plane  residual by threshold: "
-          + ", ".join(f"{t}:{y:.2e}" for t, y in zip(tl, yp)))
-    return tl, ys, yp
 
 
 if __name__ == "__main__":
