@@ -32,3 +32,29 @@ A check made while writing this plan (§3) shows that Reviewer 3's first objecti
 | 9 | R1 | Clarity is weak | Problem-first writing, a pipeline figure, fewer symbols before Section III | all |
 | 10 | R3 | Formatting problems | Official IEEE conference template, IEEE reference style, IEEE figure and table conventions | all |
 | 11 | R1, R3 | Significance is limited | Say in the first paragraph who needs the result and why: which geometric probes of a language model can be trusted for interpretability | I, VII |
+
+## 3. The finding that changes the central claim
+
+**The problem.** The paper's paired scramble (`fisher_metric_projected(rows=...)` in [fisherrao/metrics.py](fisherrao/metrics.py)) takes the predictive distribution `p(h)` from the real model but the Jacobian from permuted unembedding rows. At the base point that matches the paper's description. Curvature, however, is built from the first and second derivatives of the metric, and away from the base point `p` moves along the real directions while the metric measures along the permuted ones. The result is a valid Riemannian metric, but it is not the Fisher pullback of any statistical model.
+
+**The consistent control.** [run_scramble_consistent.py](run_scramble_consistent.py) realises the same permutation as a genuine model,
+
+    z(h) = U[idx] n(h0) + U[rows] (n(h) − n(h0)),    p(h) = softmax(z(h)),
+
+which agrees with the paper's control exactly at the base point (same `p`, metric, frame, conditioning and row multiset; relative difference 0) and differs only in that `p` moves along the directions the metric uses. With the identity permutation it reproduces the real metric to 1.4 × 10⁻¹⁴.
+
+**Pilot result** (SmolLM2-135M, `k` = 5, 16 planes, 30 states stratified by entropy; [results/scramble/consistent_pilot.json](results/scramble/consistent_pilot.json)):
+
+| condition | median `K` | real > condition |
+|---|---|---|
+| real model | 0.2554 | — |
+| paper's scramble (not a pullback) | −0.0004 | 27/30, z = +4.38 |
+| consistent scramble (a pullback) | 0.2532 | 15/30, z = 0.00 |
+
+The Gaussian-unembedding control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, which is also a genuine pullback with no learned structure, had already matched the real `K` to within 0.002.
+
+**What it implies.** The collapse reported in the paper comes from the scrambled metric not being a pullback, not from destroying the learned assignment. `K ≈ +1/4` appears to be a property of softmax-pullback geometry rather than of learning.
+
+**What it does not affect.** The spectral results (log-volume ρ = +0.957, effective dimension ρ = +0.991) are functions of `G(h0)` alone, and at `h0` the two controls are identical. The validation ladder, the null-direction test, `K ≈ +1/4` as a measurement, the calibration of the 10⁻⁵ reading and the behavioural probe also stand.
+
+**Caveat.** One model, 30 states and `k` = 5. E1 and E2 (§5) decide the claim. Full record: [08-rq3a-log.md](08-rq3a-log.md) §5.7 and [12-audit-log.md](12-audit-log.md) §8.
