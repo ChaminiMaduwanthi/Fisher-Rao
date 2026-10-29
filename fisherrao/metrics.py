@@ -127,6 +127,35 @@ def fisher_metric(
     return (J.T * p) @ J - torch.outer(Jp, Jp)
 
 
+def frame_jacobian(lm, h: torch.Tensor, frame: torch.Tensor) -> torch.Tensor:
+    """A(h) @ frame in closed form, without forming the (d, d) norm Jacobian.
+
+    RMSNorm    diag(g) (F - hhat hhat^T F) / r,   r = sqrt(mean(h^2) + eps)
+               The form used since Stage 3.  It drops eps from the projector,
+               1e-10 relative to the exact Jacobian (check_control_validity.py),
+               and is kept unchanged so every saved RMSNorm result reproduces.
+    LayerNorm  diag(g) (F - 1 (1^T F)/d - c (c^T F)/(d s^2)) / s,
+               c = h - mean(h),  s = sqrt(var(h) + eps)
+               Exact; matches LM.norm_jacobian to 1e-15.
+
+    Until 29 October 2026 the RMSNorm form was applied to every model, LayerNorm
+    ones included.  On GPT-2 and Pythia-160M a hidden state's mean is negligible
+    against its spread (r/s = 1.000), so the error was 3e-4 in the projected
+    metric and 6e-5 in K, median over states (check_layernorm_projection.py).
+    """
+    if "RMS" in lm.norm_kind:
+        r = torch.sqrt(h.pow(2).mean() + lm.eps)
+        hhat = h / torch.linalg.vector_norm(h)
+        Af = (frame - torch.outer(hhat, hhat @ frame)) / r
+    else:
+        d = h.shape[-1]
+        c = h - h.mean()
+        s2 = h.var(unbiased=False) + lm.eps
+        Af = (frame - torch.outer(torch.ones(d, dtype=h.dtype), frame.sum(0)) / d
+              - torch.outer(c, c @ frame) / (d * s2)) / torch.sqrt(s2)
+    return Af if lm.g is None else lm.g[:, None] * Af
+
+
 def fisher_metric_projected(
     lm,
     h: torch.Tensor,
@@ -176,12 +205,7 @@ def fisher_metric_projected(
     because it is the weaker, more aggressive control and the contrast between
     the two is itself informative.
     """
-    d = h.shape[-1]
-    r = torch.sqrt(h.pow(2).mean() + lm.eps)
-    hhat = h / torch.linalg.vector_norm(h)
-    Af = (frame - torch.outer(hhat, hhat @ frame)) / r          # (d, k)
-    if lm.g is not None:
-        Af = lm.g[:, None] * Af
+    Af = frame_jacobian(lm, h, frame)                            # (d, k)
 
     if rows is None:
         rows = idx if perm is None else perm[idx]
