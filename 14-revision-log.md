@@ -35,8 +35,8 @@ where `M` is the full quotient manifold and `II` the second fundamental form of 
 
 | k | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|
-| eigen | 0.121 | 0.111 | 0.092 | 0.047 | 0.026 | 0.008 | **0** |
-| random | 0.192 | 0.138 | 0.098 | 0.055 | 0.051 | 0.017 | **0** |
+| eigen | 0.125 | 0.111 | 0.092 | 0.048 | 0.026 | 0.009 | **0** |
+| random | 0.196 | 0.142 | 0.098 | 0.057 | 0.051 | 0.017 | **0** |
 
 **N = 512, d = 511, k = 5** — the transformer runs' retained-vocabulary size, by predictive entropy:
 
@@ -45,10 +45,10 @@ where `M` is the full quotient manifold and `II` the second fundamental form of 
 | [0, 0.5) | 21 | +0.450 | 0.200 | −1.288 | 2.311 |
 | [0.5, 1) | 9 | +0.255 | **0.005** | +0.209 | 0.041 |
 | [1, 2) | 13 | +0.264 | **0.014** | +0.146 | 0.104 |
-| [2, 4) | 20 | +0.278 | **0.028** | +0.086 | 0.155 |
+| [2, 4) | 20 | +0.278 | **0.028** | +0.091 | 0.159 |
 | [4, ∞) | 37 | +0.222 | 0.120 | +0.005 | 0.245 |
 
-Eigen frames, all entropies: median `K_S` = 0.280, 0.272, 0.266, 0.268, 0.260 at `k` = 2–6.
+Eigen frames, all entropies: median `K_S` = 0.281, 0.273, 0.266, 0.269, 0.260 at `k` = 2–6. (True medians across points; the first version of this section used `torch.median` — §8.)
 
 **Reading.**
 
