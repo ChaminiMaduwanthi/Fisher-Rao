@@ -27,6 +27,11 @@
 | [run_scramble_consistent.py](run_scramble_consistent.py) | 🔴 **The consistent scramble** — the §5.4 control realised as a genuine pullback; `K` does not collapse (pilot) | Revision |
 | [14-revision-log.md](14-revision-log.md) | **Revision experiments** — the duplicate-state count, slice against manifold curvature, the consistent control at scale | Revision |
 | [check_slice_gauss.py](check_slice_gauss.py) | **Slice vs manifold curvature** on a known answer (rung 7): the Gauss-equation term, measured | Revision |
+| [check_control_validity.py](check_control_validity.py) | **Is each control a pullback?** Gate A off the base point, the RMSNorm Jacobian, conditioning | Revision |
+| [run_gaussian_matched.py](run_gaussian_matched.py) | **Learning-free control** — Gaussian `U`, entropy matched state by state | Revision |
+| [audit_duplicates.py](audit_duplicates.py) | 🔴 **Duplicated states** in raw checkpoints, and every affected paper number recomputed on distinct states | Revision |
+| [make_tables.py](make_tables.py) / [results/tables/tables.md](results/tables/tables.md) | **Every table for the revised paper**, rebuilt from per-state rows and checked against the stored summaries | Writing |
+| [15-reproducibility.md](15-reproducibility.md) | **Reproducibility record** — environment, model revisions, data, settings, commands, runtimes | Writing |
 | [fisherrao/](fisherrao/) | `model.py`, `metrics.py`, `trajectory.py`, `curvature.py`, `corpus.py`, `net.py` | Code |
 | [run_stage0.py](run_stage0.py) / [run_stage3.py](run_stage3.py) / [run_control.py](run_control.py) | Reproduce every number in the logs | Code |
 | [gate_a_kl_test.py](gate_a_kl_test.py) | **Working** — the Gate A KL–Hessian test, plus the `ε`-cancellation trap | Stage 2 |
