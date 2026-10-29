@@ -1,0 +1,53 @@
+====================================================================================
+INDEPENDENT CROSS-CHECK vs geomstats 2.8.0   +  LADDER RUNGS 4 AND 5
+====================================================================================
+case                           this work     geomstats     |diff|   verdict
+------------------------------------------------------------------------------------
+rung 2  Poincare             -1.00000000    0.18392434   1.18e+00   ratio -5.4370  **DISAGREE**
+rung 2  Poincare             -1.00000000    0.42647088   1.43e+00   ratio -2.3448  **DISAGREE**
+rung 3  categorical           0.25000000    2.00000000   1.75e+00   ratio +0.1250  **DISAGREE**
+rung 3  categorical           0.25000000    2.00000000   1.75e+00   ratio +0.1250  **DISAGREE**
+rung 6  normal               -0.50000000   -0.50000000   1.11e-16   AGREE
+rung 6  normal               -0.50000000   -0.50000000   2.22e-16   AGREE
+RUNG 4  gamma                -0.46390348   -0.46390348   2.45e-14   AGREE
+RUNG 4  gamma                -0.47313320   -0.47313320   2.30e-13   AGREE
+RUNG 4  gamma                -0.46267527   -0.46267527   2.30e-14   AGREE
+RUNG 5  beta                 -0.45679484   -0.45679484   3.16e-14   AGREE
+RUNG 5  beta                 -0.42604467   -0.42604467   1.00e-14   AGREE
+RUNG 5  beta                 -0.44023279   -0.44023279   4.87e-14   AGREE
+
+------------------------------------------------------------------------------------
+RUNG 5's published answer is QUALITATIVE -- sectional curvature
+everywhere negative for multi-parameter Fisher-Rao families:
+   gamma    K = -0.46390, -0.47313, -0.46268   all negative: YES
+   beta     K = -0.45679, -0.42604, -0.44023   all negative: YES
+
+====================================================================================
+LOCALISING THE TWO DISAGREEMENTS
+====================================================================================
+   Poincare   : metrics identical?  True
+   categorical: metrics identical?  True
+
+   In BOTH cases the metrics agree exactly while the curvatures do
+   not, so neither disagreement is a metric convention -- it is
+   localised to a curvature routine.
+
+   Which side to doubt, on this evidence:
+     * geomstats' PoincareHalfSpace curvature is NOT CONSTANT across
+       base points.  Hyperbolic space has constant curvature by
+       definition, so a point-varying answer cannot be right.
+     * this work's +1/4 for the simplex is corroborated by THREE
+       independent routes: the analytic radius-2 sphere isometry,
+       ladder rung 3 (validate_curvature.py, a separate slow
+       implementation), and ladder rung 7 (validate_pullback.py, an
+       entirely different code path, through the pullback).
+     * this work's -1 for the Poincare half-plane is the textbook
+       value and is constant, as it must be.
+
+   Reported, not 'fixed'.  Chapter 5 S5.4.
+
+====================================================================================
+CROSS-CHECK: agreement at machine precision on 3 of 5 families
+   normal, gamma and beta agree to 1e-14 across 8 comparisons,
+   INCLUDING both new rungs (4 and 5).  The two that disagree are
+   localised above and this work's values are the corroborated ones.
