@@ -405,6 +405,8 @@ At `h0` it agrees with `within` exactly — same `p`, metric, frame, conditionin
 
 ⚠️ One model, 30 points, `k` = 5. Scaling it — four architectures, the 186 distinct states (221 rows) of §5.4, `k` = 4–6, and an untrained-model control — is E1–E2 of [13-revision-plan.md](13-revision-plan.md). At entropy ≥ 4 the real `K` sits below the consistent one at 5 of 6 points; that is too thin to read, and §5.1's [5, ∞) bin pointed the other way.
 
+✅ **Scaled since** ([14-revision-log.md](14-revision-log.md) §4–§5): on the paper's own 186 distinct states the consistent scramble gives 0.2565 against the real 0.2547, and on LLaMA-160M (118 states) 0.2794 against 0.2565. Neither collapses.
+
 ---
 
 ## 6. Limits
