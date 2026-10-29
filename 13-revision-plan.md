@@ -143,3 +143,14 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 - [ ] Every number in the paper re-measured from a results file
 - [ ] Supervisor has read the final PDF
 - [ ] Submitted by 24 November 2026, one day before the deadline
+
+## 9. Timeline
+
+| Week | Dates | Work | Gate |
+|---|---|---|---|
+| 1 | 30 Oct – 5 Nov | Supervisor meeting on §3–§4; E1 on the two RMSNorm models, then LayerNorm support; E2; start E4 | Framing agreed with the supervisor by 2 Nov |
+| 2 | 6 – 12 Nov | E1 on the LayerNorm models; E3; E4; literature to 35–40 references; tables and figures | E1–E2 decide the claim by 9 Nov |
+| 3 | 13 – 19 Nov | Full six-page draft in the IEEE template | Draft to the supervisor by 19 Nov |
+| 4 | 20 – 24 Nov | Revision; §8 checklist; submission | Submitted by 24 Nov |
+
+**Fallback.** If E1–E2 are inconclusive by 12 November, or the supervisor prefers more time, do not submit to ICARC; target a later venue with the complete study. A correct paper later is worth more than an unsupported one now.
