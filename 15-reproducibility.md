@@ -97,7 +97,7 @@ Checkpointed scripts (`run_*` with a `_points.jsonl`) resume where they stopped.
 
 - Re-running the paired controls reproduces the saved per-state `K` to 3 × 10⁻⁶ for the real model and to 2.5 × 10⁻⁴ for the paper's scramble. The larger figure comes from ill-conditioned low-entropy states, where that scramble's `K` reaches −270.
 - The slice is chosen by an eigendecomposition, so where `λ_k ≈ λ_{k+1}` a rerun can select a different `k`-th direction. That is the main source of run-to-run variation, and it is why summary statistics are medians over states.
-- 2 of 120 LLaMA-160M states fail: the pseudo-inverse in `christoffel()` does not converge at entropy 10.4 nats. They are recorded as errors and excluded.
+- LLaMA-160M's `<s>` position has a hidden state that is exactly zero at every layer, so its prediction is uniform (entropy ln 32 000) and the quotient metric is undefined there; `eigh` fails. Such states are recorded as errors and excluded: 2 of 120 in the controls and 25 of 360 in the spectral control ([14-revision-log.md](14-revision-log.md) §12).
 
 ## 7. Code for double-blind review
 
