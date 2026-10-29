@@ -81,6 +81,14 @@ In absolute terms the cost is modest at the working dimension and rises steeply 
 
 Sectional curvature is a property of a 2-plane rather than of a point, so the value reported at a state is the median over 16 random 2-planes drawn in the retained subspace, with 32 planes where the tail of that distribution is the quantity of interest.
 
+### D. Models and data
+
+Measurements are taken on GPT-2 [18], Pythia-70M and Pythia-160M [19], LLaMA-160M and SmolLM2-135M, spanning both normalisation schemes, tied and untied embeddings, depths from 6 to 30 layers and widths from 512 to 768. Text is drawn from WikiText-2 [20] and from hand-written probe sentences; the sense-disambiguation probe of Section VI.F follows the design of the word-in-context task [21].
+
+States are sampled at nine relative depths in each network and at token positions drawn uniformly from the corpus sentences. The cross-architecture sweep of Section VI.A gives 101 to 130 states per model and 456 in all; the paired control of Section VI.B is applied at 221 states for curvature and, for the two spectral quantities, at 40 states in each of nine layers, giving 360.
+
+---
+
 ## III. Validation
 
 Intrinsic curvature is expensive, silent when wrong, and plausible either way. Validation therefore precedes results and is reported in full.
