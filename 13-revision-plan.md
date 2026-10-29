@@ -45,12 +45,12 @@ which agrees with the paper's control exactly at the base point (same `p`, metri
 
 **Result** (`k` = 5, on the same states; [results/tables/tables.md](results/tables/tables.md) Table 1):
 
-| condition | SmolLM2-135M (186 states) | LLaMA-160M (118 states) |
-|---|---|---|
-| real model | 0.2547 | 0.2565 |
-| paper's scramble (not a pullback) | 0.0096 (real higher 168/186, z = +11.00) | −0.0056 (116/118, z = +10.49) |
-| consistent scramble (a pullback) | 0.2565 (real higher 72/186, z = −3.08) | 0.2794 (33/118, z = −4.79) |
-| Gaussian `U`, entropy-matched (no learning) | 0.2730 (real higher 40/186, z = −7.77) | 0.2846 (35/118, z = −4.42) |
+| condition | SmolLM2-135M (186 states) | LLaMA-160M (118) | GPT-2 (120) | Pythia-160M (120) |
+|---|---|---|---|---|
+| real model | 0.2547 | 0.2565 | 0.2580 | 0.2696 |
+| paper's scramble (not a pullback) | 0.0096 (real higher 168/186, z = +11.00) | −0.0056 (116/118, z = +10.49) | 0.0095 (112/120, z = +9.49) | 0.0218 (117/120, z = +10.41) |
+| consistent scramble (a pullback) | 0.2565 (real higher 72/186, z = −3.08) | 0.2794 (33/118, z = −4.79) | 0.2823 (31/120, z = −5.29) | 0.2827 (38/120, z = −4.02) |
+| Gaussian `U`, entropy-matched (no learning) | 0.2730 (real higher 40/186, z = −7.77) | 0.2846 (35/118, z = −4.42) | 0.2303 (100/120, z = +7.30) | 0.2816 (39/120, z = −3.83) |
 
 The earlier Gaussian control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, matched by entropy band rather than state by state, had already pointed the same way.
 
