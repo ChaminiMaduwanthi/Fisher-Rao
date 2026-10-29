@@ -245,22 +245,41 @@ def main():
                   flush=True)
 
         rec = dict(_i=i, layer=layer, entropy=ents[i])
-        for c, v in three_conditions(lm, h0, idx, P, within, K_DIM).items():
-            rec[f"K_{c}"] = v
-        if i in sweep:
-            for k in (4, 6):
-                for c, v in three_conditions(lm, h0, idx, P, within, k).items():
-                    rec[f"K{k}_{c}"] = v
+        # An ill-conditioned metric can make the pseudo-inverse in christoffel()
+        # fail to converge.  Record it and move on, as run_scramble_within.py does.
+        try:
+            for c, v in three_conditions(lm, h0, idx, P, within, K_DIM).items():
+                rec[f"K_{c}"] = v
+        except Exception as e:                                   # noqa: BLE001
+            rec = dict(_i=i, layer=layer, entropy=ents[i], error=repr(e))
+        if i in sweep and "error" not in rec:
+            try:
+                for k in (4, 6):
+                    for c, v in three_conditions(lm, h0, idx, P, within, k).items():
+                        rec[f"K{k}_{c}"] = v
+            except Exception as e:                               # noqa: BLE001
+                for key in [key for key in rec if key.startswith(("K4_", "K6_"))]:
+                    del rec[key]                                 # keep the sweep set whole
+                rec["error_sweep"] = repr(e)
         rows.append(rec)
         n_new += 1
         with ckpt.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec) + "\n")
+        if "error" in rec:
+            print(f"   {j+1:>3}/{len(pick)}  L{layer:<2} H={ents[i]:5.2f}  ERROR {rec['error'][:70]}",
+                  flush=True)
+            continue
         print(f"   {j+1:>3}/{len(pick)}  L{layer:<2} H={ents[i]:5.2f}  real {rec['K_real']:+.4f}  "
               f"within {rec['K_within']:+.4f}  consistent {rec['K_consistent']:+.4f}"
               f"   ({time.time()-t0:.0f}s)", flush=True)
 
+    complete = len(rows) == len(pick)
+    errors = [r for r in rows if "error" in r]
+    rows = [r for r in rows if "error" not in r]
     summary = dict(model=a.model, points=a.points, k=K_DIM, top_k=TOP_K, n_planes=N_PLANES,
-                   layers=layers, checks=checks, complete=len(rows) == len(pick),
+                   layers=layers, checks=checks, complete=complete, n_errors=len(errors),
+                   errors=[dict(_i=r["_i"], layer=r["layer"], entropy=r["entropy"],
+                                error=r["error"][:120]) for r in errors],
                    k5=summarise(rows, "K"))
     if any("K4_real" in r for r in rows):
         summary["k4"] = summarise(rows, "K4")
