@@ -52,10 +52,13 @@ def png_size(path: str) -> tuple[int, int]:
     return struct.unpack(">II", head[16:24])
 
 
-def runs(text: str) -> str:
-    """Convert inline **bold**, *italic* and `code` into w:r runs."""
+def runs(text: str, font: str | None = None) -> str:
+    """Convert inline **bold**, *italic*, `code`, <sub>..</sub> and <sup>..</sup>
+    into w:r runs.  `font` overrides the paragraph style's font (the template's
+    equation style uses Symbol, which would turn Latin letters into Greek)."""
     out = []
-    for part in re.split(r"(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)", text):
+    face = (f'<w:rFonts w:ascii="{font}" w:hAnsi="{font}" w:cs="{font}"/>' if font else "")
+    for part in re.split(r"(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|<sub>.*?</sub>|<sup>.*?</sup>)", text):
         if not part:
             continue
         props = ""
@@ -66,9 +69,18 @@ def runs(text: str) -> str:
             props, body = "<w:i/>", part[1:-1]
         elif part.startswith("`") and part.endswith("`"):
             props, body = "<w:i/>", part[1:-1]
-        rpr = f"<w:rPr>{props}</w:rPr>" if props else ""
+        elif part.startswith("<sub>"):
+            props, body = '<w:vertAlign w:val="subscript"/>', part[5:-6]
+        elif part.startswith("<sup>"):
+            props, body = '<w:vertAlign w:val="superscript"/>', part[5:-6]
+        rpr = f"<w:rPr>{face}{props}</w:rPr>" if (props or face) else ""
         out.append(f'<w:r>{rpr}<w:t xml:space="preserve">{esc(body)}</w:t></w:r>')
     return "".join(out)
+
+
+def visible(text: str) -> str:
+    """Cell text without inline markup, for sizing table columns."""
+    return re.sub(r"\*\*|\*|`|</?su[bp]>", "", text)
 
 
 def sectpr(cols: int) -> str:
@@ -90,6 +102,15 @@ def para(text: str, style: str = "BodyText", sect: str | None = None,
     if sect:
         ppr += sect
     return f"<w:p><w:pPr>{ppr}</w:pPr>{runs(text)}</w:p>"
+
+
+def equation(expr: str, number: str) -> str:
+    """The template's equation style: the expression on its centre tab, the
+    number on its right tab, in Times New Roman rather than the style's Symbol."""
+    tab = "<w:r><w:tab/></w:r>"
+    tnr = "Times New Roman"
+    return (f'<w:p><w:pPr><w:pStyle w:val="equation"/></w:pPr>{tab}{runs(expr, tnr)}'
+            f"{tab}{runs(f'({number})', tnr)}</w:p>")
 
 
 def image_para(rid: str, w_in: float, path: str, name: str) -> str:
@@ -243,17 +264,21 @@ def build_body(md: str, figs: dict) -> str:
             continue
 
         # ---- figures: their own single-column section --------------------
-        m = re.match(r"^\*\*\[FIGURE \d+: (\S+)\]\*\*", ln)
+        m = re.match(FIG_RE, ln)
         if m:
-            key = m.group(1)
+            key, full = m.group(1), bool(m.group(2))
             cap = ""
             if i < len(lines) and lines[i].startswith("*Fig."):
                 cap = re.sub(r"^Fig\.\s*\d+\.\s*", "",
                              lines[i].strip().strip("*"))
                 i += 1
-            out.append(image_para(figs[key]["rid"], COL_IN,
+            if full:                    # its own single-column section, as for wide tables
+                out.append(para("", "BodyText", sect=sectpr(2)))
+            out.append(image_para(figs[key]["rid"], FULL_IN if full else COL_IN,
                                   figs[key]["path"], key))
-            out.append(para(cap, "figurecaption", jc="center"))
+            out.append(para(cap, "figurecaption", jc="both" if full else "center"))
+            if full:
+                out.append(para("", "BodyText", sect=sectpr(1)))
             continue
 
         # ---- table captions ----------------------------------------------
@@ -265,7 +290,9 @@ def build_body(md: str, figs: dict) -> str:
 
         # ---- equations ----------------------------------------------------
         if ln.startswith("> "):
-            out.append(para(ln[2:], "BodyText", jc="center"))
+            m = re.fullmatch(r"> (.*?)\s+\((\d+)\)", ln)
+            out.append(equation(m.group(1), m.group(2)) if m else
+                       para(ln[2:], "BodyText", jc="center"))
             continue
 
         # ---- lists --------------------------------------------------------
@@ -323,8 +350,8 @@ def main() -> int:
     md = open(SRC_MD, encoding="utf-8").read()
 
     figs = {}
-    for n, fname in enumerate(["fig1_curvature.png", "fig2_split.png",
-                               "fig3_threshold.png"], start=1):
+    for n, m in enumerate(re.finditer(FIG_RE, md, re.M), start=1):
+        fname = m.group(1)
         figs[fname] = dict(rid=f"rIdFig{n}", path=os.path.join(FIGDIR, fname),
                            media=f"media/figure{n}.png")
         if not os.path.exists(figs[fname]["path"]):
