@@ -185,8 +185,8 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 | step | content | status |
 |---|---|---|
 | 1. Science | consistent and entropy-matched Gaussian controls on four models; spectral control on four models; E1 decision rule applied; slice against manifold (Gauss); control validity; duplicate audit; LayerNorm Jacobian fixed; tables rebuilt and checked (69/69); reproducibility record | ✅ |
-| 2. Writing | title, abstract, introduction with RQ1–RQ3, related work, method, validation, results, threats to validity, discussion, figures, six pages | to do, after the supervisor meeting |
-| 3. Compliance | anonymisation (author line, Word metadata), IEEE references, number check, similarity check, AI disclosure, anonymous code link | to do |
+| 2. Writing | title, abstract, introduction with RQ1–RQ3, related work, method, validation, results, threats to validity, discussion, figures, six pages | ✅ draft, 29 October 2026: six pages in the IEEE template, 96 number checks ([14-revision-log.md](14-revision-log.md) §16, [16-reviewer-response.md](16-reviewer-response.md)); awaiting the supervisor's reading |
+| 3. Compliance | anonymisation (author line, Word metadata), IEEE references, number check, similarity check, AI disclosure, anonymous code link | partly done: author line and document properties anonymous, references in IEEE style and checked, number check passing; to do: similarity check, AI disclosure, anonymous code link |
 | 4. Submission | supervisor decisions (§11), final read, CMT Track 01 by 24 November | to do |
 
-The rewrite must also correct the ten errors listed in [12-audit-log.md](12-audit-log.md) §8.6.
+The rewrite corrects the eleven errors listed in [12-audit-log.md](12-audit-log.md) §8.6.
