@@ -75,13 +75,11 @@ Suppressing this with a pseudo-inverse would return a plausible wrong answer. Th
 
 On the retained `k`-dimensional subspace, Christoffel symbols and the Riemann tensor are formed by nested reverse-mode differentiation of (1), and the sectional curvature of the plane spanned by `u, v` follows in the standard way [16]. All differentiation is reverse-mode automatic differentiation in double precision [17].
 
-The cost of the Riemann tensor grows by a factor of about 2.7 per unit increase in `k`, which places a hard ceiling at `k ≤ 8` on the hardware used. All curvature results below are computed at `k` = 4, 5 and 6, with `k` = 5 as the default, and the retained subspace holds a median 96 % of the quotiented metric's trace at `k` = 5 (mean 91 %, measured over 60 states). The reported curvature is accordingly that of a `k`-dimensional slice under the induced metric, and the stability of the central result across the accessible range of `k` is reported explicitly in Section V.B.
+The cost of the Riemann tensor grows by a factor of about 2.7 per unit increase in `k`, which places a hard ceiling at `k ≤ 8` on the hardware used. All curvature results below are computed at `k` = 4, 5 and 6, with `k` = 5 as the default, and the retained subspace holds a median 96 % of the quotiented metric's trace at `k` = 5 (mean 91 %, measured over 60 states). The reported curvature is accordingly that of a `k`-dimensional slice under the induced metric, and the stability of the central result across the accessible range of `k` is reported explicitly in Section VI.B.
 
-In absolute terms the cost is modest at the working dimension and rises steeply beyond it: a full sectional-curvature evaluation takes about 2.6 s per state at `k` = 5 and about 46 s at `k` = 8, which is why the sweep is reported at `k` = 4 to 6. The metric itself, being closed-form, is negligible by comparison; the expense is entirely in the second derivatives. This matters for the recommendation in Section VI, since it is precisely the expensive quantity that turns out to carry the signal.
+In absolute terms the cost is modest at the working dimension and rises steeply beyond it: a full sectional-curvature evaluation takes about 2.6 s per state at `k` = 5 and about 46 s at `k` = 8, which is why the sweep is reported at `k` = 4 to 6. The metric itself, being closed-form, is negligible by comparison; the expense is entirely in the second derivatives. This matters for the recommendation in Section VII, since it is precisely the expensive quantity that turns out to carry the signal.
 
-Measurements are taken on GPT-2 [18], Pythia-70M and Pythia-160M [19], LLaMA-160M and SmolLM2-135M, spanning both normalisation schemes, tied and untied embeddings, depths from 6 to 30 layers and widths from 512 to 768. Text is drawn from WikiText-2 [20] and from hand-written probe sentences; the sense-disambiguation probe of Section V.F follows the design of the word-in-context task [21].
-
----
+Sectional curvature is a property of a 2-plane rather than of a point, so the value reported at a state is the median over 16 random 2-planes drawn in the retained subspace, with 32 planes where the tail of that distribution is the quantity of interest.
 
 ## III. Validation
 
