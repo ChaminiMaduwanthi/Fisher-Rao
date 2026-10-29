@@ -179,6 +179,8 @@ By entropy (real / Gaussian; real > Gaussian):
 
 This replaces the submitted claim with a smaller one of the opposite sign: learning does not create the curvature; if anything it pulls it slightly towards the simplex value.
 
+> With four models (§13–§14), reading 2 does not hold: GPT-2's Gaussian readout gives a lower `K` than the trained model. The pull towards +1/4 in reading 3 and above is not significant state by state.
+
 ---
 
 ## 7. Duplicated states across all results
@@ -230,6 +232,8 @@ Three more errors surfaced while tracing the numbers to their sources:
 ---
 
 ## 9. Status at the end of step 1 (29 October 2026)
+
+> Superseded by §15. With four models the E1 decision rule is not met (§14), and "learning shifts it slightly towards +1/4" below is not supported state by state.
 
 | task | status | where |
 |---|---|---|
