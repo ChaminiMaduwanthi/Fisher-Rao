@@ -73,7 +73,7 @@ A Fisher pullback `G` of a map `x → p(x)` is the Hessian of that map's KL dive
 
 | metric | against the KL of | median \|ratio − 1\| at `h₀` | at `x₁` |
 |---|---|---|---|
-| real | `p_real` | 1.0e−3 | 8.6e−4 |
+| real | `p_real` | 1.0e−3 | 8.5e−4 |
 | consistent | `p_cons` | 1.1e−3 | 1.1e−3 |
 | `within` (the paper's) | `p_real` | 0.86 | 0.93 |
 | `within` (the paper's) | `p_cons` | 1.1e−3 | **0.66** |
@@ -302,7 +302,7 @@ Fig. 3(b)'s sphere calibration is now a function (`make_figures.sphere_calibrati
 
 1. **The spectral result replicates on all four models.** A scramble that keeps the predictive distribution and the row multiset but destroys their pairing reproduces both summaries: ρ across states 0.85–0.99, and the same lowest layer in all eight cases. Effective dimension is the tighter of the two, with ρ ≥ 0.97 across states and 94–99 % of the range.
 2. **Log-volume is reproduced less tightly outside SmolLM2.** ρ across states is 0.85 on LLaMA-160M and 0.88 on GPT-2, and the scrambled profile spans 80–138 % of the real one's range. On GPT-2 it is wider than the real profile, with the same lowest layer.
-3. **"The spectrum tracks predictive concentration" holds for effective dimension on all four models** (ρ with entropy +0.72 to +0.90). For log-volume it holds clearly on SmolLM2 and Pythia-160M (+0.86, +0.69) and only weakly on LLaMA-160M and GPT-2 (+0.38, +0.45). The paper must state it per quantity.
+3. **"The spectrum tracks predictive concentration" holds for effective dimension on all four models** (ρ with entropy +0.71 to +0.90). For log-volume it holds clearly on SmolLM2 and Pythia-160M (+0.86, +0.69) and only weakly on LLaMA-160M and GPT-2 (+0.38, +0.45). The paper must state it per quantity.
 4. **The "hourglass" is SmolLM2's.** SmolLM2's effective dimension is lowest at layer 10 of 30, the dip the paper describes. The other three are lowest late: at layer 11 of 12 on LLaMA-160M and Pythia-160M, and 9 of 12 on GPT-2. What generalises is that the control reproduces each model's own profile, not the shape of SmolLM2's.
 5. **One more number in the paper.** Section VI.B says the scrambled effective-dimension profile retains "99.5 %" of the real range. With true medians it is 99.3 % ([12-audit-log.md](12-audit-log.md) §8.6).
 
