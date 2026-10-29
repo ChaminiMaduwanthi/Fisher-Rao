@@ -65,19 +65,29 @@ def controls():
         path = R / "scramble" / f"consistent_{tag}.json"
         if not path.exists():
             continue
-        rows = [r for r in json.loads(path.read_text(encoding="utf-8"))["rows"] if "error" not in r]
+        d = json.loads(path.read_text(encoding="utf-8"))
+        rows = [r for r in d["rows"] if "error" not in r]
         gpath = R / "scramble" / f"gaussian_{tag}_points.jsonl"
         gauss = {r["_i"]: r["K_gauss"] for r in jl(gpath) if "K_gauss" in r} if gpath.exists() else {}
         t = dict(n=len(rows), real=median([r["K_real"] for r in rows]))
         for c in ("within", "consistent"):
             t[c] = median([r[f"K_{c}"] for r in rows])
             t[f"real_gt_{c}"] = sign([r["K_real"] - r[f"K_{c}"] for r in rows])
+        stored = d["summary"]["k5"]
+        for c in ("real", "within", "consistent"):
+            check(f"controls, {name}: median K, {c}", t[c], stored[c])
+        check(f"controls, {name}: real > consistent", t["real_gt_consistent"]["pos"], stored["real_gt_consistent"]["pos"])
         paired = [r for r in rows if r["_i"] in gauss]
         if paired:
             t["gauss_n"] = len(paired)
             t["gauss"] = median([gauss[r["_i"]] for r in paired])
             t["real_on_gauss_states"] = median([r["K_real"] for r in paired])
             t["real_gt_gauss"] = sign([r["K_real"] - gauss[r["_i"]] for r in paired])
+            gsum = R / "scramble" / f"gaussian_{tag}.json"
+            if gsum.exists():
+                gs = json.loads(gsum.read_text(encoding="utf-8"))["summary"]
+                check(f"controls, {name}: median K, Gaussian U", t["gauss"], gs["K_gauss"])
+                check(f"controls, {name}: real > Gaussian U", t["real_gt_gauss"]["pos"], gs["real_gt_gauss"]["pos"])
         sw = [r for r in rows if "K4_real" in r]
         for k in (4, 6):
             t[f"k{k}"] = dict(n=len(sw), real=median([r[f"K{k}_real"] for r in sw]),
