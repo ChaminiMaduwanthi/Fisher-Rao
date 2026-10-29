@@ -131,3 +131,15 @@ Five papers from 2026 are now in [references.bib](references.bib) and summarised
 **Figures.** (1) A pipeline diagram, new. (2) The controls figure: `K` for the real model, both scrambles, Gaussian `U` and the untrained model. (3) The spectral profiles, real against scrambled. The current threshold figure becomes a small panel or is cut.
 
 **Rules.** Problem before method. One claim per paragraph, each tied to a table or figure. Every number re-measured into its table from a results file ([12-audit-log.md](12-audit-log.md) §7.5). Call what is measured "slice sectional curvature".
+
+## 8. ICARC submission checklist
+
+- [ ] At most six A4 pages in the IEEE conference template; PDF only
+- [ ] Anonymised: no names, affiliations, e-mail addresses, acknowledgements or grant information; the author's earlier work cited in the third person; any code link anonymised
+- [ ] Similarity well under the 30 % desk-reject threshold; no reused source text
+- [ ] AI-use disclosure as required by the IEEE PSPB Operations Manual. The blind version must omit acknowledgements, so ask the organisers where the disclosure goes
+- [ ] Track 01 selected in CMT
+- [ ] References complete, in IEEE style, preprint metadata re-checked
+- [ ] Every number in the paper re-measured from a results file
+- [ ] Supervisor has read the final PDF
+- [ ] Submitted by 24 November 2026, one day before the deadline
