@@ -32,8 +32,8 @@ POINT SETS
          186 distinct states: 35 rows recur across checkpoint resumes with
          identical values, so the unique states are used and n = 186.
 
-RMSNorm only: the frame Jacobian below is the closed form fisher_metric_projected
-uses.  LayerNorm models need the general norm Jacobian (13-revision-plan.md E1).
+Either normalisation: the frame Jacobian is metrics.frame_jacobian, the one
+fisher_metric_projected uses, so the three conditions share it exactly.
 
 Usage:
   python run_scramble_consistent.py                                  # pilot, 6 per band
@@ -56,7 +56,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from fisherrao import LM, corpus
-from fisherrao.metrics import fisher_metric_projected, topk_indices
+from fisherrao.metrics import fisher_metric_projected, frame_jacobian, topk_indices
 from fisherrao.curvature import null_projector, riemann, sectional
 from fisherrao.model import DEFAULT_MODEL
 from fisherrao.stats import median
@@ -78,15 +78,10 @@ def depths_for(n_layers: int, n_depths: int = 9) -> list[int]:
 
 
 def metric_consistent(lm, h, h0, F, idx, rows):
-    """(k, k) Fisher pullback of h -> softmax(U[idx] n(h0) + U[rows](n(h) - n(h0)))."""
-    r = torch.sqrt(h.pow(2).mean() + lm.eps)
-    hhat = h / torch.linalg.vector_norm(h)
-    Af = (F - torch.outer(hhat, hhat @ F)) / r       # same Jacobian as fisher_metric_projected
-    if lm.g is not None:
-        Af = lm.g[:, None] * Af
-    M = lm.U[rows] @ Af
+    """(k, k) Fisher pullback of h -> softmax(z(h0)[idx] + U[rows](n(h) - n(h0)))."""
+    M = lm.U[rows] @ frame_jacobian(lm, h, F)   # same Jacobian as fisher_metric_projected
     n0 = lm.apply_norm(h0).detach()
-    z = lm.U[idx] @ n0 + lm.U[rows] @ (lm.apply_norm(h) - n0)
+    z = lm.logits(h0)[idx].detach() + lm.U[rows] @ (lm.apply_norm(h) - n0)
     p = torch.softmax(z - z.max(), -1)
     Mp = M.T @ p
     return (M.T * p) @ M - torch.outer(Mp, Mp)
@@ -172,8 +167,6 @@ def main():
 
     lm = LM(a.model)
     print(lm.summary())
-    if "RMS" not in lm.norm_kind:
-        raise SystemExit("consistent control is implemented for RMSNorm only")
     layers = SMOL_LAYERS if "SmolLM2" in a.model else depths_for(lm.n_layers)
 
     states = []
