@@ -145,6 +145,16 @@ STAGE 6  Write-up & dissemination        Weeks 36–48
 
 ---
 
+## Status as of 29 October 2026
+
+The conference paper was rejected at NSBM ICACT 2026 and is being revised for **ICARC 2027** (Track 01, deadline 25 November 2026) — see [13-revision-plan.md](13-revision-plan.md).
+
+Preparing the revision exposed a problem with the paper's central control. The paired `within` scramble takes `p(h)` from the real model but the Jacobian from permuted rows, so it is not the Fisher pullback of any statistical model. Realised as a genuine pullback, the same scramble leaves `K` at the real value: **0.2532 against 0.2554, 15/30 paired, z = 0.00** (pilot, SmolLM2-135M, `k` = 5; [08-rq3a-log.md](08-rq3a-log.md) §5.7). With the Gaussian-`U` control of §5.1, which also matched the real `K`, this means **"curvature carries learned structure" is not supported as stated**; `K ≈ +1/4` looks generic to softmax pullbacks.
+
+What stands: the validation ladder, the null-direction test, `K ≈ +1/4` as a measurement, the spectral results (they depend only on `G(h0)`, where both controls coincide), the Mabrok calibration and RQ3b. The status table below predates this and should be read with it.
+
+---
+
 ## Status as of 11 August 2026
 
 Both gates are **passed**, the core question has an answer, and the framework has now passed a **causal** test rather than only descriptive ones.
