@@ -387,3 +387,18 @@ Supersedes §9.
 | untrained-model control (E2) | optional, not run | [13-revision-plan.md](13-revision-plan.md) §5 |
 
 **The answers the paper can now give.** RQ1: yes, and validated. RQ2: `K` ≈ +1/4 on all four models and on every genuine pullback (0.230–0.285). The value is inherited from the simplex; learning leaves a small offset (0.002–0.024) against a structure-free pairing of the same rows. RQ3: both spectral summaries are reproduced, on four models, by a control that destroys that pairing. Effective dimension tracks predictive entropy on all four; log-volume does so clearly on two and weakly on two. Ten errors in the submitted paper are listed in [12-audit-log.md](12-audit-log.md) §8.6.
+
+---
+
+## 16. The paper rewritten for ICARC 2027 (29 October 2026)
+
+The paper ([paper/fisher-rao-conference-paper.md](paper/fisher-rao-conference-paper.md); Word and PDF in [paper/](paper/)) was rewritten around RQ1–RQ3 and the four-model results of §12–§15. It follows the section order and budgets of the supervisor's six-page guideline, with a short implications subsection added for significance. [16-reviewer-response.md](16-reviewer-response.md) maps each reviewer comment to the part of the paper that answers it.
+
+- **Six pages** in the IEEE A4 template, exported from Word: a 218-word abstract beginning "This article", no first-person pronouns, five tables, three figures, five numbered equations and 33 references.
+- **The claims follow §14.** The value near 1/4 is presented as inherited and the offset against C1 as a slice property. GPT-2's reversal, the unmet decision rule and the rejected "towards 1/4" hypothesis are all reported.
+- **Every number is checked.** [check_paper_numbers.py](check_paper_numbers.py) recomputes the 96 values the paper quotes from the results files and finds each in the text. It caught three rounding errors in the draft, two of which this log carried as well (§3 and §12, corrected): the trained model's off-base-point identity is 8.5e−4, not 8.6e−4, and ρ(`k_eff`, entropy) runs from 0.71 to 0.90, not 0.72, because 0.715 and 0.785 lie just below the rounding boundary.
+- **References were checked against arXiv.** Three author lists in the submitted paper were wrong and are corrected: FishBack has five authors, from S. Wang; King et al. begins J. King; Zaher et al. are E. Zaher and Q. Nguyen. Picozzi's full text was read for curvature, and it computes none.
+- **Anonymity.** The author block is anonymous, and the Word and PDF document properties are blank. The template's own properties named its last editor.
+- **Builder.** [build_paper_docx.py](build_paper_docx.py) now takes the template's path and sets numbered equations in Times New Roman. The template's equation style uses Symbol, which turned Latin letters into Greek in the first build. The builder also supports subscripts, keeps each table with its title, and sizes columns by their content.
+
+**Open before submission:** the anonymous code link (reference [16]), the AI-use disclosure, the supervisor's reading and a similarity check.
