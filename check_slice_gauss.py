@@ -47,6 +47,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from fisherrao.curvature import riemann, sectional
+from fisherrao.stats import median
 
 OUT = pathlib.Path("results/slice")
 N_PLANES = 16
@@ -99,8 +100,8 @@ def median_K(g, k, seed=0):
 
 
 def med(xs):
-    t = torch.tensor([x for x in xs if x == x], dtype=torch.float64)
-    return float(t.median()) if len(t) else float("nan")
+    """True median across points (fisherrao.stats); per-point K keeps torch.median."""
+    return median(xs)
 
 
 def ebin(e):
