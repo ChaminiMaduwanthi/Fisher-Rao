@@ -140,7 +140,7 @@ What it destroys is only *which probability sits on which direction* — the lea
 Fig. 1 shows sectional curvature at 456 sampled states across four architectures.
 
 **[FIGURE 1: fig1_curvature.png]**
-*Fig. 1. Sectional curvature at 456 states across four architectures. The dashed line marks the ambient simplex value +1/4. Boxes are quartiles; bars are medians.*
+*Fig. 1. Sectional curvature across four architectures. Dashed line, +1/4; boxes, quartiles; bars, medians.*
 
 Median values are +0.2599 for GPT-2, +0.2738 for Pythia-160M, +0.2559 for LLaMA-160M and +0.2548 for SmolLM2-135M — a spread of 0.019 across models differing in normalisation scheme, embedding tying, depth and width. The representation manifold under this metric is strongly positively curved, at the ambient simplex value, and consistently so across architecture. This is a direct measurement of the quantity, and it is a large number: the manifold is about as curved as the simplex it predicts into.
 
