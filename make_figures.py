@@ -23,6 +23,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from fisherrao.stats import spearman
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -143,6 +145,14 @@ def fig2():
     ke_real = [tmed([r["ke_real"] for r in bl[L]]) for L in vlay]
     ke_scr = [tmed([r["ke_within"] for r in bl[L]]) for L in vlay]
 
+    # The two rho values quoted in the panel titles are the paired per-point
+    # Spearman over all saved states, not the 9-point profile correlation --
+    # see 12-audit-log.md S4.  Recomputed here so the titles cannot drift.
+    rho_lv = spearman([r["lv_real"] for r in v["rows"]],
+                      [r["lv_within"] for r in v["rows"]])
+    rho_ke = spearman([r["ke_real"] for r in v["rows"]],
+                      [r["ke_within"] for r in v["rows"]])
+
     fig, axes = plt.subplots(3, 1, figsize=(3.4, 4.15), sharex=True)
 
     ax = axes[0]
@@ -159,7 +169,8 @@ def fig2():
     ax = axes[1]
     ax.plot(vlay, lv_real, "o-", color=REAL, ms=3.4, lw=1.3)
     ax.plot(vlay, lv_scr, "s--", color=SCR, ms=3.2, lw=1.3)
-    ax.set_title("(b) log volume element\n" + r"$\bf{reproduced}$ ($\rho=+0.96$)",
+    ax.set_title("(b) log volume element\n"
+                 + r"$\bf{reproduced}$ " + rf"($\rho={rho_lv:+.2f}$)",
                  fontsize=8, pad=4)
     ax.set_ylabel(r"$\log\sqrt{\det G}$")
 
@@ -168,7 +179,8 @@ def fig2():
     ax.plot(vlay, ke_scr, "s--", color=SCR, ms=3.2, lw=1.3)
     ax.set_yscale("log")
     ax.set_title("(c) effective dimension $k_{\\mathrm{eff}}$\n"
-                 + r"$\bf{reproduced}$ ($\rho=+0.99$)", fontsize=8, pad=4)
+                 + r"$\bf{reproduced}$ " + rf"($\rho={rho_ke:+.2f}$)",
+                 fontsize=8, pad=4)
     ax.set_xlabel("layer")
     ax.set_ylabel(r"$k_{\mathrm{eff}}$")
 
