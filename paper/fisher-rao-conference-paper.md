@@ -91,7 +91,7 @@ Both normalisation layers annihilate directions exactly. RMSNorm has one null di
 
 On S, the Christoffel symbols and the Riemann tensor Rm of the induced metric g are formed by nested reverse-mode automatic differentiation of (1) in double precision [30]. The sectional curvature of the plane spanned by u and v is [31]
 
-> K(u, v) = Rm(u, v, v, u) / (g(u, u) g(v, v) − g(u, v)²), (3)
+> K = Rm(u, v, v, u) / (g(u, u) g(v, v) − g(u, v)²), (3)
 
 and the value reported for a state is the median over 16 random planes. Every number is therefore a slice sectional curvature K<sub>S</sub>. For orthonormal u and v it differs from the curvature K<sub>M</sub> of the full quotient manifold through the Gauss equation [31],
 
@@ -164,9 +164,9 @@ Fig. 2 locates the differences. Between 0.5 and 4 nats the trained medians stay 
 
 Both spectral summaries are evaluated at h₀, where C0 coincides with C1, so for them C0 is a valid control. Table IV and Fig. 3 show that the control reproduces both summaries on every model, with the same lowest layer for both. Effective dimension is reproduced closely, with rank correlations across states of 0.97 to 0.99 and 94 % to 99 % of the range of the depth profile; log-volume is reproduced less tightly (0.85 to 0.96). Both summaries therefore depend on the predictive distribution and the multiset of readout rows rather than on their learned pairing. Effective dimension tracks predictive entropy on every model (ρ = 0.71 to 0.90), in line with the finding that the Fisher spectrum is predictable from token probabilities [10]; log-volume does so clearly on SmolLM2 and Pythia-160M and weakly on LLaMA-160M and GPT-2. The depth profile itself is model-specific: SmolLM2's effective dimension is lowest at layer 10 of 30, in the intermediate layers where intrinsic-dimension profiles contract [2], whereas the 12-layer models are lowest at layer 9 or 11. A control without the learned pairing reproduces each profile, which suggests applying such controls before reading intrinsic-dimension profiles as learned structure.
 
-**TABLE IV. SPECTRAL SUMMARIES UNDER THE CONTROL: RANK CORRELATION WITH THE TRAINED VALUE, AND WITH PREDICTIVE ENTROPY**
+**TABLE IV. SPECTRAL SUMMARIES UNDER THE CONTROL: RANK CORRELATION WITH THE TRAINED VALUE, LOWEST LAYER (TRAINED / CONTROL) AND RANK CORRELATION WITH PREDICTIVE ENTROPY**
 
-| Model (states) | ρ, log-volume | ρ, k<sub>eff</sub> | Lowest layer, trained / control | ρ with entropy, k<sub>eff</sub> / log-volume |
+| Model (states) | ρ, log-volume | ρ, k<sub>eff</sub> | Lowest layer | ρ with entropy, k<sub>eff</sub> / log-volume |
 |---|---|---|---|---|
 | SmolLM2 (360) | 0.957 | 0.991 | 10 / 10 | 0.71 / 0.86 |
 | LLaMA (335) | 0.847 | 0.988 | 11 / 11 | 0.90 / 0.38 |
