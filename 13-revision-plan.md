@@ -82,3 +82,16 @@ The Gaussian-unembedding control of [08-rq3a-log.md](08-rq3a-log.md) §5.1, whic
 **Dropped:** "curvature carries learned structure". **Moved to future work:** the causal probe (current §VI.H). **Kept briefly if space allows:** the behavioural probe.
 
 **If E1 differs from the pilot** on other architectures, the framing changes to report where real and consistent curvature diverge. The claim follows the data either way.
+
+## 5. Experiments
+
+| ID | Purpose | Method | Estimated cost | Decision rule |
+|---|---|---|---|---|
+| **E1** | Answer Reviewer 3 (a) at scale | The consistent control on SmolLM2-135M, LLaMA-160M, GPT-2 and Pythia-160M: the 221 states of the paper's control on SmolLM2, 60–120 on the others, `k` = 4, 5, 6. LayerNorm models need the general norm Jacobian (`LM.norm_jacobian`) in place of the RMSNorm closed form | About 8 s per state for three conditions at `k` = 5 (measured), so about 30 min per model at n = 221; `k` = 6 costs about three times as much | If real and consistent agree (sign test \|z\| < 2, median difference < 0.01) on at least three of four models, adopt §4; otherwise report where they differ |
+| **E2** | A learning-free genuine pullback | The same architectures with randomly initialised weights, states stratified by entropy | As E1 | `K` near +1/4 supports contribution 2 |
+| **E3** | Complete the paired picture | Re-run the Gaussian-`U` control on the E1 states | Small | Reported alongside E1 |
+| **E4** | Answer Reviewer 3 (b) | (i) Known answer: on the synthetic pullback of ladder rung 7 the full manifold has `K` = 1/4 exactly, so the curvature of `k`-dimensional linear slices measures the extrinsic (Gauss-equation) term directly. (ii) Real models: the same 2-planes in nested slices `k` = 2…8; convergence indicates a small extrinsic term in the retained directions | Moderate; `k` = 8 costs about 46 s per Riemann evaluation | Small extrinsic term: report slice `K` as representative. Large: restrict every claim to slices |
+| **E5** | Confirm the spectral result is unaffected | Show the two controls give the same `G(h0)` (already measured: relative difference 0) | None | One sentence and one check |
+| E6 | Scale (optional) | One model near 1B parameters (Pythia-1B or SmolLM2-1.7B), feasibility first | Unknown | Only if E1–E4 finish by 12 November |
+| E7 | Theory (optional) | Conditions under which a slice of a softmax pullback is locally close to a face of the simplex, extending rung 7 | Unknown | Drop if not complete by 12 November |
+| E8 | Spectrum from `p` (optional) | Predict the effective dimension from the predictive distribution alone, in the spirit of Picozzi (2026) | Small | Supports contribution 3 |
