@@ -359,6 +359,47 @@ Consequences, now enforced in code:
 - Any caller choosing `k` automatically must take `k = min(select_k(...), K_RIEMANN_MAX)` and **report both numbers**. `run_frame_resolution.py` records `k_want` (11) alongside `k_sel` (6).
 - **The `cond_eff` ceiling remains the right conditioning *diagnostic*, and is directly usable for the volume element and spectral diagnostics, which have no `k` ceiling. It is not usable as a `k` selector for Riemann-derived quantities.** That distinction belongs in Chapter 4.
 
+### 5.7 🔴 The paired scramble is not a pullback — and a consistent version does not collapse
+
+*Added 29 October 2026, prompted by a conference reviewer who asked whether the scrambled metric is "a valid and appropriately controlled geometric object" and whether its "local probability map" and "derivative construction" were established.*
+
+**What the `within` control computes.** `fisher_metric_projected(rows=within)` takes `p(h)` from the real logits ([metrics.py](fisherrao/metrics.py), "p ALWAYS from the real U") and the Jacobian from the permuted rows. At `h0` that is exactly what §5.4 describes. Curvature, however, is built from the first and second derivatives of the metric, and away from `h0` the two stop corresponding: `p` moves along the **real** directions while the metric measures along the **permuted** ones. The result is smooth, symmetric and positive semi-definite — a valid Riemannian metric — but it is not `JᵀΣ_pJ` for any map `h → p`. **It is not the Fisher pullback of any statistical model.**
+
+**The consistent control** ([run_scramble_consistent.py](run_scramble_consistent.py)) destroys the same assignment as a genuine model:
+
+```
+z(h) = U[idx] n(h0) + U[rows] (n(h) − n(h0)),     p(h) = softmax(z(h))
+```
+
+At `h0` it agrees with `within` exactly — same `p`, metric, frame, conditioning and row multiset (relative difference 0.0). The only difference is that `p` now moves along the same permuted directions the metric uses. With `rows = idx` it reproduces the real metric to 1.4e−14.
+
+**Pilot** — SmolLM2-135M, `k` = 5, 16 planes, 30 points (6 per entropy band, a prefix of the §5.3 draw), [results/scramble/consistent_pilot.json](results/scramble/consistent_pilot.json):
+
+| condition | median `K` | real > condition |
+|---|---|---|
+| real | **0.2554** | — |
+| `within` (§5.4) | **−0.0004** | 27/30, z = +4.38 |
+| **consistent** | **0.2532** | **15/30, z = +0.00** |
+
+| entropy (nats) | n | real | `within` | consistent |
+|---|---|---|---|---|
+| [0, 0.5) | 6 | 0.2828 | −4.2419 | 0.2704 |
+| [0.5, 1) | 6 | 0.2684 | −0.2516 | 0.2527 |
+| [1, 2) | 6 | 0.2520 | +0.0044 | 0.2655 |
+| [2, 4) | 6 | 0.2571 | +0.0710 | 0.2428 |
+| [4, ∞) | 6 | 0.1701 | +0.0308 | 0.2190 |
+
+> 🔴 **The §5.4 collapse does not survive a consistent control.** The same scramble, realised as a genuine pullback, leaves `K` where the real model has it — in every entropy band, with no paired difference (15/30). The collapse comes from the inconsistency between `p` and the Jacobian, not from destroying the learned assignment.
+
+**§5.1–5.2 already said this.** The Gaussian-`U` control is also a genuine pullback (`p` and `J` from the same `U`), carries no learned structure, and reproduced the real median `K` to within 0.002 across [0.5, 3) nats. §5.2 set it aside as blunt, and §5.4 explained the disagreement as "a Gaussian unembedding has, by symmetry, no relationship between probability mass and direction to destroy". The simpler reading is that both genuine pullbacks agree with the real model, and the one control that is not a pullback is the one that disagrees.
+
+**What changes.**
+
+- *"Which probability sits on which direction is what puts the manifold at the simplex value"* (§5.4), *"the learned assignment stabilises `K`"* (§5.3) and the curvature half of the separation (§5.5, README item 7, the conference paper) are **not supported as stated**. `K ≈ +1/4` looks like a property of softmax-pullback geometry generally, not of learning.
+- **Unaffected:** the spectral results of §5.5. Log-volume and `k_eff` are functions of `G(h0)` alone, and at `h0` the two controls are identical, so the reproduction of the volume and `k_eff` profiles stands. So do the validation ladder, the null-direction test, the Mabrok calibration and RQ3b.
+
+⚠️ One model, 30 points, `k` = 5. Scaling it — four architectures, the 221 points of §5.4, `k` = 4–6, and an untrained-model control — is E1–E2 of [13-revision-plan.md](13-revision-plan.md). At entropy ≥ 4 the real `K` sits below the consistent one at 5 of 6 points; that is too thin to read, and §5.1's [5, ∞) bin pointed the other way.
+
 ---
 
 ## 6. Limits
