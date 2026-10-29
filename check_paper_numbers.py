@@ -125,7 +125,7 @@ for rung in (1, 2, 3, 6):
 has("worst analytic error", f"to {sci(max([lad[r] for r in (1, 2, 3, 6)] + [V['rung7']['sectional_worst']]))} or better")
 has("rung 7", sci(V["rung7"]["sectional_worst"]))
 has("reparameterisation", sci(V["rung7"]["reparam_worst"]))
-has("broken assembly", f"fails, {num(V['rung7']['broken_assembly'], 3)}")
+has("broken assembly", f"fails by {num(V['rung7']['broken_assembly'], 3)}")
 gs = V["geomstats"]
 has("geomstats gamma/beta", sci(max(gs["gamma"]["max_diff"], gs["beta"]["max_diff"])))
 assert gs["normal"]["agree"] == gs["normal"]["n"] and not gs["Poincare"]["agree"] and not gs["categorical"]["agree"]
@@ -134,7 +134,9 @@ nl = V["null"]
 has("null directions", f"≤ {sci(max(r['kl_null'] for r in nl))} nats")
 has("random step", f"{num(min(r['kl_rand'] for r in nl), 2)} to {num(max(r['kl_rand'] for r in nl), 1)} nats")
 assert all(r["ok"] for r in nl) and len(nl) == 6
-has("trace share", f"a median {num(V['trace_fraction']['5']['median'] * 100, 1)} % of the quotiented trace ({V['trace_fraction']['5']['n']} states)")
+tf = load("tracefrac", "tracefrac.json")
+has("trace share", f"a median {num(V['trace_fraction']['5']['median'] * 100, 1)} % of the quotiented trace "
+                   f"({V['trace_fraction']['5']['n']} {'SmolLM2' if 'SmolLM2' in tf['model'] else tf['model']} states)")
 tr = load("stage0", "stage0.json")["truncation_error"]["500"]
 has("truncation", f"truncation to 500 tokens changes the metric by {sci(tr)}")
 
